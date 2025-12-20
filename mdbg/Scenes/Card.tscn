@@ -1,0 +1,22 @@
+[gd_scene load_steps=4 format=3 uid="uid://bga0ugpdqt1lt"]
+
+[ext_resource type="Script" uid="uid://mfc5sb0qp3yn" path="res://scripts/Card.gd" id="1_3p273"]
+[ext_resource type="Texture2D" uid="uid://bgoq4q8agkto5" path="res://cards/IronMan-QuantumBreakthrough.png" id="2_h8wm0"]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_hael8"]
+size = Vector2(320, 451)
+
+[node name="Card" type="Node2D"]
+script = ExtResource("1_3p273")
+
+[node name="CardImage" type="Sprite2D" parent="."]
+texture = ExtResource("2_h8wm0")
+
+[node name="Area2D" type="Area2D" parent="."]
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Area2D"]
+position = Vector2(0, 1.5)
+shape = SubResource("RectangleShape2D_hael8")
+
+[connection signal="mouse_entered" from="Area2D" to="." method="_on_area_2d_mouse_entered"]
+[connection signal="mouse_exited" from="Area2D" to="." method="_on_area_2d_mouse_exited"]

@@ -1,4 +1,4 @@
-[gd_scene load_steps=7 format=3 uid="uid://dokr14biam1hj"]
+[gd_scene load_steps=8 format=3 uid="uid://dokr14biam1hj"]
 
 [ext_resource type="Script" uid="uid://bxvjr2go4dlw6" path="res://scripts/CardManager.gd" id="1_idj7w"]
 [ext_resource type="Script" uid="uid://og0oya8vvyxd" path="res://scripts/PlayerHand.gd" id="2_kln2b"]
@@ -6,6 +6,7 @@
 [ext_resource type="Script" uid="uid://bggmcpx3wkl85" path="res://scripts/DeckDisplay.gd" id="4_rgh2o"]
 [ext_resource type="Script" uid="uid://dtab5k4buc3a2" path="res://scripts/DiscardDisplay.gd" id="5_pbw6q"]
 [ext_resource type="Script" uid="uid://jgmjqsrpmr8l" path="res://scripts/Resources.gd" id="6_v1gob"]
+[ext_resource type="Script" uid="uid://m4h1jp75jtrx" path="res://Scenes/HeroDeck.gd" id="7_jw32o"]
 
 [node name="Main" type="Node2D"]
 
@@ -71,6 +72,9 @@ offset_top = 400.0
 offset_right = 1575.0
 offset_bottom = 650.0
 color = Color(0.5890956, 0.5890956, 0.5890956, 1)
+
+[node name="HeroDeck" type="Node2D" parent="."]
+script = ExtResource("7_jw32o")
 
 [connection signal="addAttack" from="PlayerHand" to="Resources" method="_on_player_hand_add_attack"]
 [connection signal="addRecruit" from="PlayerHand" to="Resources" method="_on_player_hand_add_recruit"]

@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://cnk6w8xjxqqrg"
-path="res://.godot/imported/shield-agent.png-187091947546fdb8cfc7107c43851731.ctex"
+uid="uid://7ysxbgaefhgh"
+path="res://.godot/imported/Spiderman-TheAmazingSpiderman.png-231be575f29453738e3c7cb46a979a5a.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://cards/shield-agent.png"
-dest_files=["res://.godot/imported/shield-agent.png-187091947546fdb8cfc7107c43851731.ctex"]
+source_file="res://cards/Base/Heros/Spiderman/Spiderman-TheAmazingSpiderman.png"
+dest_files=["res://.godot/imported/Spiderman-TheAmazingSpiderman.png-231be575f29453738e3c7cb46a979a5a.ctex"]
 
 [params]
 

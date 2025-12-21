@@ -10,6 +10,9 @@ func _ready() -> void:
 	var size = get_parent().BASE_SIZE
 	self.scale = Vector2(size, size)
 	get_parent().connectCardSignals(self)
+	
+	var s = get_child(1).get_child(0).get_shape()
+	print(s.size)
 	#$CardManager.add_child(self)
 	
 

@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://dbj7qxo8qd3oh"
-path="res://.godot/imported/shield-trooper.png-3f6de48a8819b56c7bbde6838a7d04ec.ctex"
+uid="uid://bd3g6wp66wkul"
+path="res://.godot/imported/Wolverine-FrenziedSlashing.png-69ef893e38fddf0eb3ddd0be4a96ab53.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://cards/shield-trooper.png"
-dest_files=["res://.godot/imported/shield-trooper.png-3f6de48a8819b56c7bbde6838a7d04ec.ctex"]
+source_file="res://cards/Base/Heros/Wolverine/Wolverine-FrenziedSlashing.png"
+dest_files=["res://.godot/imported/Wolverine-FrenziedSlashing.png-69ef893e38fddf0eb3ddd0be4a96ab53.ctex"]
 
 [params]
 

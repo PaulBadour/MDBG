@@ -15,6 +15,10 @@ var centerScreenx
 signal deckCount
 signal discardCount
 
+signal addAttack
+signal addRecruit
+signal endTurn
+
 # Called when the node enters the scene tree for the first time.
 func _ready() -> void:
 	centerScreenx = get_viewport().size.x / 2
@@ -43,6 +47,12 @@ func playCard(card):
 		removeFromHand(card)
 		played.insert(0, card)
 		$"../CardManager".hoverOff(card)
+		
+		if card.attack:
+			emit_signal("addAttack", card.attack)
+		
+		if card.recruit:
+			emit_signal("addRecruit", card.recruit)
 
 func addCardToManager(card):
 	$"../CardManager".add_child(card)
@@ -89,6 +99,7 @@ func updateDiscardCount(num):
 	emit_signal("discardCount", num)
 
 func _on_button_button_down() -> void:
+	emit_signal("endTurn")
 	discardHand()
 	while played.size() > 0:
 		var c = played[0]

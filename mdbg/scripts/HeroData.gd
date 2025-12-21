@@ -12,7 +12,7 @@ static var SHIELD_AGENT = {
 	effect = nullFunc,
 	heroName = "Hero",
 	cardName = "SHIELD Agent",
-	spritePath = "res://cards/shield-agent.png"
+	spritePath = "res://cards/Base/Heros/Hero/shield-agent.png"
 }
 
 static var SHIELD_TROOPER = {
@@ -24,5 +24,5 @@ static var SHIELD_TROOPER = {
 	effect = nullFunc,
 	heroName = "Hero",
 	cardName = "SHIELD Trooper",
-	spritePath = "res://cards/shield-trooper.png"
+	spritePath = "res://cards/Base/Heros/Hero/shield-trooper.png"
 }

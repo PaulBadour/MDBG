@@ -3,7 +3,6 @@ extends Node2D
 var cardDragged
 var screenSize
 var isHovering
-var isZoomed
 var cardZoomed
 var oldZoomPos
 
@@ -17,20 +16,21 @@ func _input(event):
 		get_tree().quit()
 	if event is InputEventKey and event.keycode == KEY_SPACE and !event.is_echo():
 		print(event)
-		if event.is_pressed() and isHovering:
+		if event.is_pressed() and isHovering and !cardDragged:
 			var c = findCard()
 			if c:
-				isZoomed = true
 				cardZoomed = c
 				oldZoomPos = c.position
 				c.position = Vector2(screenSize.x / 2.0, screenSize.y / 2.0)
 				c.scale = Vector2(ZOOM_SCALE, ZOOM_SCALE)
-		elif event.is_released():
-			isZoomed = false
+				c.z_index = 3
+		elif event.is_released() and cardZoomed:
 			cardZoomed.position = oldZoomPos
 			cardZoomed.scale = Vector2(BASE_SIZE, BASE_SIZE)
+			cardZoomed.z_index = 1
 			hoverOff(cardZoomed)
-	if event is InputEventMouseButton and event.button_index == MOUSE_BUTTON_LEFT and !isZoomed:
+			cardZoomed = null
+	if event is InputEventMouseButton and event.button_index == MOUSE_BUTTON_LEFT and !cardZoomed:
 		if event.is_pressed():
 			var c = findCard()
 			if c and $"../PlayerHand".isCardInHand(c):
@@ -60,12 +60,12 @@ func findCard():
 
 func hoverOn(card):
 	
-	if !isHovering and !isZoomed:
+	if !isHovering and !cardZoomed:
 		highlightCard(card, true)
 		isHovering = true
 
 func hoverOff(card):
-	if isZoomed:
+	if cardZoomed:
 		return
 	highlightCard(card, false)
 	#isHovering = false

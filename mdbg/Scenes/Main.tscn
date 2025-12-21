@@ -1,10 +1,11 @@
-[gd_scene load_steps=6 format=3 uid="uid://dokr14biam1hj"]
+[gd_scene load_steps=7 format=3 uid="uid://dokr14biam1hj"]
 
 [ext_resource type="Script" uid="uid://bxvjr2go4dlw6" path="res://scripts/CardManager.gd" id="1_idj7w"]
 [ext_resource type="Script" uid="uid://og0oya8vvyxd" path="res://scripts/PlayerHand.gd" id="2_kln2b"]
 [ext_resource type="Script" uid="uid://b2qy63u1p8e23" path="res://scripts/EndTurnButton.gd" id="3_kln2b"]
 [ext_resource type="Script" uid="uid://bggmcpx3wkl85" path="res://scripts/DeckDisplay.gd" id="4_rgh2o"]
 [ext_resource type="Script" uid="uid://dtab5k4buc3a2" path="res://scripts/DiscardDisplay.gd" id="5_pbw6q"]
+[ext_resource type="Script" uid="uid://jgmjqsrpmr8l" path="res://scripts/Resources.gd" id="6_v1gob"]
 
 [node name="Main" type="Node2D"]
 
@@ -30,9 +31,9 @@ script = ExtResource("4_rgh2o")
 
 [node name="Label" type="Label" parent="DeckDisplay"]
 offset_left = 34.0
-offset_top = 684.0
+offset_top = 700.0
 offset_right = 100.0
-offset_bottom = 710.0
+offset_bottom = 726.0
 text = "Deck: 6"
 
 [node name="DiscardDisplay" type="Node2D" parent="."]
@@ -40,11 +41,40 @@ script = ExtResource("5_pbw6q")
 
 [node name="Label" type="Label" parent="DiscardDisplay"]
 offset_left = 34.0
-offset_top = 731.0
-offset_right = 101.0
-offset_bottom = 754.0
+offset_top = 750.0
+offset_right = 110.0
+offset_bottom = 773.0
 text = "Discard: 0"
 
+[node name="Resources" type="Node2D" parent="."]
+script = ExtResource("6_v1gob")
+
+[node name="Attack" type="Label" parent="Resources"]
+offset_left = 34.0
+offset_top = 800.0
+offset_right = 102.0
+offset_bottom = 823.0
+text = "Attack: 0"
+
+[node name="Recruit" type="Label" parent="Resources"]
+offset_left = 34.0
+offset_top = 850.0
+offset_right = 107.0
+offset_bottom = 873.0
+text = "Recruit: 0"
+
+[node name="HQ" type="Node2D" parent="."]
+
+[node name="ColorRect" type="ColorRect" parent="HQ"]
+offset_left = 275.0
+offset_top = 400.0
+offset_right = 1575.0
+offset_bottom = 650.0
+color = Color(0.5890956, 0.5890956, 0.5890956, 1)
+
+[connection signal="addAttack" from="PlayerHand" to="Resources" method="_on_player_hand_add_attack"]
+[connection signal="addRecruit" from="PlayerHand" to="Resources" method="_on_player_hand_add_recruit"]
 [connection signal="deckCount" from="PlayerHand" to="DeckDisplay" method="_on_player_hand_deck_count"]
 [connection signal="discardCount" from="PlayerHand" to="DiscardDisplay" method="_on_player_hand_discard_count"]
+[connection signal="endTurn" from="PlayerHand" to="Resources" method="_on_player_hand_end_turn"]
 [connection signal="button_down" from="EndTurn/Button" to="PlayerHand" method="_on_button_button_down"]

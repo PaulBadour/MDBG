@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://bgoq4q8agkto5"
-path="res://.godot/imported/IronMan-QuantumBreakthrough.png-4d3bfe4ffb11de0698cfd9b5710cbb21.ctex"
+uid="uid://nf7kf4o4la5i"
+path="res://.godot/imported/Cyclops-UnendingEnergy.png-cd86bb4cb13f73e4fb08f172705502c7.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://cards/IronMan-QuantumBreakthrough.png"
-dest_files=["res://.godot/imported/IronMan-QuantumBreakthrough.png-4d3bfe4ffb11de0698cfd9b5710cbb21.ctex"]
+source_file="res://cards/Base/Heros/Cyclops/Cyclops-UnendingEnergy.png"
+dest_files=["res://.godot/imported/Cyclops-UnendingEnergy.png-cd86bb4cb13f73e4fb08f172705502c7.ctex"]
 
 [params]
 

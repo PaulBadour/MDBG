@@ -7,20 +7,18 @@ var handPos
 
 # Called when the node enters the scene tree for the first time.
 func _ready() -> void:
-	self.scale = Vector2(.5, .5)
-	get_parent().connectCardSignals(self) # Replace with function body.
-
-
-# Called every frame. 'delta' is the elapsed time since the previous frame.
-func _process(delta: float) -> void:
-	pass
+	var size = get_parent().BASE_SIZE
+	self.scale = Vector2(size, size)
+	get_parent().connectCardSignals(self)
+	#$CardManager.add_child(self)
+	
 
 func initSprite(path):
 	var loadedPath = load(path)
 	$CardImage.texture = loadedPath
 
 func _on_area_2d_mouse_entered() -> void:
-	emit_signal("hovOn", self) # Replace with function body.
+	emit_signal("hovOn", self)
 
 
 func _on_area_2d_mouse_exited() -> void:

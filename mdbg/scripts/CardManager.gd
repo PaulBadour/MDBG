@@ -3,23 +3,43 @@ extends Node2D
 var cardDragged
 var screenSize
 var isHovering
-
+var isZoomed
+var cardZoomed
+var oldZoomPos
 
 const BASE_SIZE = .5
 const HIGHLIGHT_SIZE = .75
+const PLAY_ZONE = 400
+const ZOOM_SCALE = 2
 
 func _input(event):
 	if event.is_action_pressed("ui_cancel"):
 		get_tree().quit()
-	if event is InputEventMouseButton and event.button_index == MOUSE_BUTTON_LEFT:
-		if event.is_pressed():
+	if event is InputEventKey and event.keycode == KEY_SPACE and !event.is_echo():
+		print(event)
+		if event.is_pressed() and isHovering:
 			var c = findCard()
 			if c:
+				isZoomed = true
+				cardZoomed = c
+				oldZoomPos = c.position
+				c.position = Vector2(screenSize.x / 2.0, screenSize.y / 2.0)
+				c.scale = Vector2(ZOOM_SCALE, ZOOM_SCALE)
+		elif event.is_released():
+			isZoomed = false
+			cardZoomed.position = oldZoomPos
+			cardZoomed.scale = Vector2(BASE_SIZE, BASE_SIZE)
+			hoverOff(cardZoomed)
+	if event is InputEventMouseButton and event.button_index == MOUSE_BUTTON_LEFT and !isZoomed:
+		if event.is_pressed():
+			var c = findCard()
+			if c and $"../PlayerHand".isCardInHand(c):
+				
 				cardDragged = c
 		elif cardDragged:
-			if cardDragged.position.y < 150:
-				$"../PlayerHand".removeFromHand(cardDragged)
-			else:
+			if cardDragged.position.y < PLAY_ZONE:
+				$"../PlayerHand".playCard(cardDragged)
+			elif $"../PlayerHand".isCardInHand(cardDragged):
 				$"../PlayerHand".animateCard(cardDragged, cardDragged.handPos)
 			cardDragged = null
 
@@ -39,20 +59,24 @@ func findCard():
 	return null
 
 func hoverOn(card):
-	if !isHovering:
+	
+	if !isHovering and !isZoomed:
 		highlightCard(card, true)
 		isHovering = true
 
 func hoverOff(card):
+	if isZoomed:
+		return
 	highlightCard(card, false)
 	#isHovering = false
 	var newCard = findCard()
-	if newCard:
+	if newCard and $"../PlayerHand".isCardInHand(card):
 		highlightCard(newCard, true)
 	else:
 		isHovering = false
+
 func highlightCard(card, hovered):
-	if hovered:
+	if hovered and $"../PlayerHand".isCardInHand(card):
 		card.scale = Vector2(HIGHLIGHT_SIZE, HIGHLIGHT_SIZE)
 		card.z_index = 2
 	else:
@@ -70,6 +94,7 @@ func _ready() -> void:
 
 
 # Called every frame. 'delta' is the elapsed time since the previous frame.
+@warning_ignore("UNUSED_PARAMETER")
 func _process(delta: float) -> void:
 	if cardDragged:
 		var mpos = get_global_mouse_position()

@@ -27,3 +27,6 @@ func initHero(info: Dictionary):
 	spritePath = info.spritePath
 	
 	initSprite(spritePath)
+
+func getFuncName():
+	return str(heroName, "-", cardName)

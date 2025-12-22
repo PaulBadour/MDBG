@@ -12,14 +12,14 @@ func initStarterDeck():
 	var heroScene = preload("res://Scenes/Hero.tscn")
 	for i in range(8):
 		var newCard = heroScene.instantiate()
-		newCard.initHero(HeroData.SHIELD_AGENT)
+		newCard.initHero(GameData.SHIELD_AGENT)
 		get_parent().addCardToManager(newCard)
 		#newCard.initSprite(agent)
 		addCards(newCard)
 		
 	for i in range(4):
 		var newCard = heroScene.instantiate()
-		newCard.initHero(HeroData.SHIELD_TROOPER)
+		newCard.initHero(GameData.FRENZIED_SLASHING)
 		get_parent().addCardToManager(newCard)
 		#newCard.initSprite(trooper)
 		addCards(newCard)

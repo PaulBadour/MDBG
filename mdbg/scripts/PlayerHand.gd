@@ -1,7 +1,6 @@
 extends Node2D
 
 
-const CARD_SCENE_PATH = "res://Scenes/Card.tscn"
 const CARD_WIDTH = 190
 const HAND_Y_POS = 800
 
@@ -9,6 +8,8 @@ var handSize = 6
 var playerHand = []
 var deck
 var played = []
+
+var extraDraws = 0
 
 var centerScreenx
 
@@ -53,6 +54,9 @@ func playCard(card):
 		
 		if card.recruit:
 			emit_signal("addRecruit", card.recruit)
+			
+		#card.effect()
+		$"../EffectManager".effect(card)
 
 func addCardToManager(card):
 	$"../CardManager".add_child(card)
@@ -86,10 +90,15 @@ func discardHand():
 		var c = playerHand[0]
 		playerHand.erase(c)
 		deck.discardCard(c)
-	
+
+func drawCard():
+	addCardToHand(deck.draw())
+	extraDraws += 1
+
 func drawHand():
 	for i in range(handSize):
-		addCardToHand(deck.draw())
+		drawCard()
+	extraDraws = 0
 	handSize = 6
 
 func updateDeckCount(num):
@@ -99,11 +108,19 @@ func updateDiscardCount(num):
 	emit_signal("discardCount", num)
 
 func _on_button_button_down() -> void:
-	emit_signal("endTurn")
-	discardHand()
-	while played.size() > 0:
-		var c = played[0]
-		played.erase(c)
-		deck.discardCard(c)
+	if !$"../CardManager".isHovering:
+		emit_signal("endTurn")
+		discardHand()
+		while played.size() > 0:
+			var c = played[0]
+			played.erase(c)
+			deck.discardCard(c)
 
-	drawHand()
+		drawHand()
+
+func classCount(c):
+	var count = 0
+	for i in range(1, played.size()):
+		if played[i].hClass == c:
+			count += 1
+	return count

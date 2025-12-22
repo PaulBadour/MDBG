@@ -16,17 +16,23 @@ func _ready() -> void:
 
 
 func _on_player_hand_add_attack(num) -> void:
-	attack += num
-	$Attack.text = str("Attack: ", attack)
+	addAttack(num)
 
 
 func _on_player_hand_add_recruit(num) -> void:
-	recruit += num
-	$Recruit.text = str("Recruit: ", recruit)
+	addRecruit(num)
 
 
 func _on_player_hand_end_turn() -> void:
 	attack = 0
 	recruit = 0
 	$Attack.text = str("Attack: ", attack)
+	$Recruit.text = str("Recruit: ", recruit)
+
+func addAttack(num):
+	attack += num
+	$Attack.text = str("Attack: ", attack)
+	
+func addRecruit(num):
+	recruit += num
 	$Recruit.text = str("Recruit: ", recruit)

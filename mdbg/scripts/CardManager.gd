@@ -1,5 +1,7 @@
 extends Node2D
 
+var isFocused = false
+
 var cardDragged
 var screenSize
 var isHovering
@@ -14,27 +16,28 @@ const ZOOM_SCALE = 2
 func _input(event):
 	if event.is_action_pressed("ui_cancel"):
 		get_tree().quit()
+	if isFocused:
+		return
 	if event is InputEventKey and event.keycode == KEY_SPACE and !event.is_echo():
-		print(event)
-		if event.is_pressed() and isHovering and !cardDragged:
+		#print(event)
+		if event.is_pressed() and !cardDragged:
 			var c = findCard()
 			if c:
 				cardZoomed = c
 				oldZoomPos = c.position
 				c.position = Vector2(screenSize.x / 2.0, screenSize.y / 2.0)
 				c.scale = Vector2(ZOOM_SCALE, ZOOM_SCALE)
-				c.z_index = 3
+				c.z_index = 5
 		elif event.is_released() and cardZoomed:
 			cardZoomed.position = oldZoomPos
 			cardZoomed.scale = Vector2(BASE_SIZE, BASE_SIZE)
-			cardZoomed.z_index = 1
+			cardZoomed.z_index = 3
 			hoverOff(cardZoomed)
 			cardZoomed = null
 	if event is InputEventMouseButton and event.button_index == MOUSE_BUTTON_LEFT and !cardZoomed:
 		if event.is_pressed():
 			var c = findCard()
 			if c and $"../PlayerHand".isCardInHand(c):
-				
 				cardDragged = c
 		elif cardDragged:
 			if cardDragged.position.y < PLAY_ZONE:
@@ -60,17 +63,18 @@ func findCard():
 
 func hoverOn(card):
 	
-	if !isHovering and !cardZoomed:
+	if !isHovering and !cardZoomed and !isFocused:
 		highlightCard(card, true)
 		isHovering = true
 
 func hoverOff(card):
+	#print("HoverOff")
 	if cardZoomed:
 		return
 	highlightCard(card, false)
 	#isHovering = false
 	var newCard = findCard()
-	if newCard and $"../PlayerHand".isCardInHand(card):
+	if newCard and $"../PlayerHand".isCardInHand(card) and !isFocused:
 		highlightCard(newCard, true)
 	else:
 		isHovering = false
@@ -80,6 +84,7 @@ func highlightCard(card, hovered):
 		card.scale = Vector2(HIGHLIGHT_SIZE, HIGHLIGHT_SIZE)
 		card.z_index = 2
 	else:
+		#print(str("Resetting card", card))
 		card.scale = Vector2(BASE_SIZE, BASE_SIZE)
 		card.z_index = 1
 
@@ -99,3 +104,14 @@ func _process(delta: float) -> void:
 	if cardDragged:
 		var mpos = get_global_mouse_position()
 		cardDragged.position = Vector2(clamp(mpos.x, 0, screenSize.x), clamp(mpos.y, 0, screenSize.y))
+
+
+func _on_hq_focused_hq() -> void:
+	isFocused = true
+	if isHovering:
+		isHovering = false
+		highlightCard(findCard(), false)
+
+
+func _on_hq_un_focus_hq() -> void:
+	isFocused = false

@@ -12,9 +12,6 @@
 
 [node name="Main" type="Node2D"]
 
-[node name="EffectManager" type="Node2D" parent="."]
-script = ExtResource("9_vy5pj")
-
 [node name="CardManager" type="Node2D" parent="."]
 script = ExtResource("1_idj7w")
 
@@ -99,6 +96,9 @@ text = "Recruit"
 
 [node name="HeroDeck" type="Node2D" parent="."]
 script = ExtResource("7_jw32o")
+
+[node name="EffectManager" type="Node2D" parent="."]
+script = ExtResource("9_vy5pj")
 
 [connection signal="addAttack" from="PlayerHand" to="Resources" method="_on_player_hand_add_attack"]
 [connection signal="addRecruit" from="PlayerHand" to="Resources" method="_on_player_hand_add_recruit"]

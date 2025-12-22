@@ -44,19 +44,19 @@ func isCardPlayed(card):
 	return false
 
 func playCard(card):
-	if isCardInHand(card):
-		removeFromHand(card)
-		played.insert(0, card)
-		$"../CardManager".hoverOff(card)
+	#if isCardInHand(card):
+	removeFromHand(card)
+	played.insert(0, card)
+	$"../CardManager".hoverOff(card)
+	
+	if card.attack:
+		emit_signal("addAttack", card.attack)
+	
+	if card.recruit:
+		emit_signal("addRecruit", card.recruit)
 		
-		if card.attack:
-			emit_signal("addAttack", card.attack)
-		
-		if card.recruit:
-			emit_signal("addRecruit", card.recruit)
-			
-		#card.effect()
-		$"../EffectManager".effect(card)
+	#card.effect()
+	$"../EffectManager".effect(card)
 
 func addCardToManager(card):
 	$"../CardManager".add_child(card)
@@ -122,5 +122,12 @@ func classCount(c):
 	var count = 0
 	for i in range(1, played.size()):
 		if played[i].hClass == c:
+			count += 1
+	return count
+
+func teamCount(c):
+	var count = 0
+	for i in range(1, played.size()):
+		if played[i].team == c:
 			count += 1
 	return count

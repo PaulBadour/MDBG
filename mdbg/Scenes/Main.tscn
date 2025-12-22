@@ -1,4 +1,4 @@
-[gd_scene load_steps=10 format=3 uid="uid://dokr14biam1hj"]
+[gd_scene load_steps=11 format=3 uid="uid://dokr14biam1hj"]
 
 [ext_resource type="Script" uid="uid://bxvjr2go4dlw6" path="res://scripts/CardManager.gd" id="1_idj7w"]
 [ext_resource type="Script" uid="uid://og0oya8vvyxd" path="res://scripts/PlayerHand.gd" id="2_kln2b"]
@@ -7,8 +7,9 @@
 [ext_resource type="Script" uid="uid://dtab5k4buc3a2" path="res://scripts/DiscardDisplay.gd" id="5_pbw6q"]
 [ext_resource type="Script" uid="uid://jgmjqsrpmr8l" path="res://scripts/Resources.gd" id="6_v1gob"]
 [ext_resource type="Script" uid="uid://dkjrk5ruvaet6" path="res://scripts/HQ.gd" id="7_50glp"]
-[ext_resource type="Script" uid="uid://m4h1jp75jtrx" path="res://Scenes/HeroDeck.gd" id="7_jw32o"]
+[ext_resource type="Script" uid="uid://m4h1jp75jtrx" path="res://scripts/HeroDeck.gd" id="7_jw32o"]
 [ext_resource type="Script" uid="uid://btkeam6yo7pba" path="res://scripts/EffectManager.gd" id="9_vy5pj"]
+[ext_resource type="Script" uid="uid://cc3pje6hbw6fr" path="res://scripts/Bystanders.gd" id="10_bmxlf"]
 
 [node name="Main" type="Node2D"]
 
@@ -99,6 +100,9 @@ text = "Recruit"
 
 [node name="HeroDeck" type="Node2D" parent="."]
 script = ExtResource("7_jw32o")
+
+[node name="Bystanders" type="Node2D" parent="."]
+script = ExtResource("10_bmxlf")
 
 [connection signal="addAttack" from="PlayerHand" to="Resources" method="_on_player_hand_add_attack"]
 [connection signal="addRecruit" from="PlayerHand" to="Resources" method="_on_player_hand_add_recruit"]

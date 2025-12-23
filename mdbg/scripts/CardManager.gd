@@ -16,10 +16,21 @@ const ZOOM_SCALE = 2
 func _input(event):
 	if event.is_action_pressed("ui_cancel"):
 		get_tree().quit()
+	if $"../BlackScreen".isClickable:
+		return
 	if isFocused:
 		return
+	if event is InputEventKey and event.keycode == KEY_D and !event.is_echo():
+		if event.is_pressed():
+			$"../BlackScreen".showCards($"../PlayerHand".deck.discard, true)
+		else:
+			$"../BlackScreen".stopShowCards()
+	if event is InputEventKey and event.keycode == KEY_N and !event.is_echo() and event.is_pressed():
+		var c = findCard(false)
+		if c:
+			print(c)
 	if event is InputEventKey and event.keycode == KEY_SPACE and !event.is_echo():
-		#print(event)
+		#$"../BlackScreen".appear()
 		if event.is_pressed() and !cardDragged:
 			var c = findCard()
 			if c:
@@ -46,7 +57,7 @@ func _input(event):
 				$"../PlayerHand".animateCard(cardDragged, cardDragged.handPos)
 			cardDragged = null
 
-func findCard():
+func findCard(first=true):
 	var space_state = get_world_2d().direct_space_state
 	var parameters = PhysicsPointQueryParameters2D.new()
 	parameters.position = get_global_mouse_position()
@@ -54,6 +65,11 @@ func findCard():
 	parameters.collision_mask = 1
 	var result = space_state.intersect_point(parameters)
 	if result.size() > 0:
+		if !first:
+			var ret = []
+			for i in result:
+				ret.append(i.collider.get_parent())
+			return ret
 		var topCard = result[0].collider.get_parent()
 		for i in range(1, result.size()):
 			if result[i].collider.get_parent().z_index > topCard.z_index:

@@ -5,6 +5,11 @@ var hand = $"../PlayerHand"
 @onready
 var res = $"../Resources"
 
+# Cards have 3 types of effects:
+# Post Effect: Most cards are like this
+# Prereqs: Requirement to play a card
+# Event: Does something when something else happens
+
 var links = {
 	"Hero-SHIELD Trooper" : nullFunc,
 	"Hero-SHIELD Agent" : nullFunc,
@@ -14,12 +19,22 @@ var links = {
 	"Iron Man-Arc Reactor" : Arc_Reactor,
 	"Spiderman-Astonishing Strength" : Astonishing_Strength,
 	"Spiderman-Great Responsibility" : Great_Responsibility,
+	"Spiderman-Web Shooters" : Web_Shooters,
 	"Wolverine-Berserker Rage" : Berserker_Rage, # Some issue with drawing too many cards
 	"Wolverine-Frenzied Slashing" : Frenzied_Slashing, # Some issue with drawing too many cards
 	"Wolverine-Keen Senses" : Keen_Senses,
+	"Wolverine-Healing Factor" : Healing_Factor,
 	"Cyclops-XMen United" : XMen_United,
+	"Cyclops-Determination" : nullFunc,
+	"Cyclops-Optic Blast" : nullFunc,
+	"Cyclops-Unending Energy" : nullFunc,
 	"Hawkeye-Quick Draw" : Quick_Draw,
 	"Hawkeye-Team Player" : Team_Player
+}
+
+var prereqs = {
+	"Cyclops-Determination" : Determination_prereq,
+	"Cyclops-Optic Blast" : Optic_Blast_prereq
 }
 
 # Iron Man
@@ -27,6 +42,7 @@ var links = {
 func Repulsor_Rays():
 	if hand.classCount(GameData.Classes.RANGED) >= 1:
 		res.addAttack(1)
+	return true
 
 func Quantum_Breakthrough():
 	hand.drawCard()
@@ -34,16 +50,19 @@ func Quantum_Breakthrough():
 	if hand.classCount(GameData.Classes.TECH):
 		hand.drawCard()
 		hand.drawCard()
+	return true
 
 func Endless_Invention():
 	hand.drawCard()
 	if hand.classCount(GameData.Classes.TECH):
 		hand.drawCard()
+	return true
 
 func Arc_Reactor():
 	var c = hand.classCount(GameData.Classes.TECH)
 	if c:
 		res.addAttack(c)
+	return true
 
 # SpiderMan
 
@@ -53,6 +72,7 @@ func Astonishing_Strength():
 		return
 	if c.cost <= 2:
 		hand.drawCard()
+	return true
 
 func Great_Responsibility():
 	var c = await hand.deck.reveal()
@@ -60,14 +80,22 @@ func Great_Responsibility():
 		return
 	if c.cost <= 2:
 		hand.drawCard()
+	return true
 
-# Requires saving bystanders
 func Web_Shooters():
-	pass
+	hand.saveBystander()
+	var c = await hand.deck.reveal()
+	if not c:
+		return
+	if c.cost <= 2:
+		hand.drawCard()
+	return true
 
 # Requires reveal multiple and choose order
 func The_Amazing_Spiderman():
 	pass
+
+
 # Wolverine
 
 func Berserker_Rage():
@@ -76,36 +104,45 @@ func Berserker_Rage():
 	hand.drawCard()
 	if hand.classCount(GameData.Classes.INSTINCT):
 		res.addAttack(hand.extraDraws)
+	return true
 
 func Frenzied_Slashing():
 	if hand.classCount(GameData.Classes.INSTINCT):
 		hand.drawCard()
 		hand.drawCard()
+	return true
 
-# Needs KOing wounds
 func Healing_Factor():
-	pass
+	#var w = preload("res://scripts/Wounds.gd")
+	
+	var r = await $"../BlackScreen".chooseCardKO(0, 1, ["hand", "discard"], woundFilter)
+	if r:
+		hand.drawCard()
+	return true
 
 func Keen_Senses():
 	if hand.classCount(GameData.Classes.INSTINCT):
 		hand.drawCard()
+	return true
 
 # Cyclops
 
-# Both of these need discard
-func Determination():
-	pass
+func Determination_prereq():
+	var result = await $"../BlackScreen".chooseCardDiscard(1, 1)
+	return result
 
-func Optic_Blast():
-	pass
+func Optic_Blast_prereq():
+	var result = await $"../BlackScreen".chooseCardDiscard(1, 1)
+	return result
 
 # This can actually just be null function, needs some functionality in the discard code
-func Unending_Energy():
-	pass
+# Event - prevent discard
+# Unending Energy
 
 func XMen_United():
 	var c = hand.teamCount(GameData.Teams.XMEN)
 	res.addAttack(c * 2)
+	return true
 
 # Hawkeye
 
@@ -119,10 +156,12 @@ func Impossible_Trickshot():
 
 func Quick_Draw():
 	hand.drawCard()
+	return true
 
 func Team_Player():
 	if hand.teamCount(GameData.Teams.AVENGERS):
 		res.addAttack(1)
+	return true
 
 
 # General funcs
@@ -130,10 +169,21 @@ func Team_Player():
 func effect(card, args=[]):
 	var s = card.getFuncName()
 	if args.size() > 0:
-		links[s].call(args)
+		return await links[s].call(args)
 	else:
-		links[s].call()
+		return await links[s].call()
 
+func prereq(card, args=[]):
+	for i in prereqs:
+		if i == card.getFuncName():
+			if args.size() > 0:
+				return await prereqs[i].call(args)
+			else:
+				return await prereqs[i].call()
+	return true
+
+func woundFilter(c) :
+	return c.spritePath == $"../Wounds".SPRITE_PATH
 
 func nullFunc():
-	return
+	return true

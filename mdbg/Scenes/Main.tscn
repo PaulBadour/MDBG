@@ -1,4 +1,4 @@
-[gd_scene load_steps=11 format=3 uid="uid://dokr14biam1hj"]
+[gd_scene load_steps=14 format=3 uid="uid://dokr14biam1hj"]
 
 [ext_resource type="Script" uid="uid://bxvjr2go4dlw6" path="res://scripts/CardManager.gd" id="1_idj7w"]
 [ext_resource type="Script" uid="uid://og0oya8vvyxd" path="res://scripts/PlayerHand.gd" id="2_kln2b"]
@@ -10,6 +10,9 @@
 [ext_resource type="Script" uid="uid://m4h1jp75jtrx" path="res://scripts/HeroDeck.gd" id="7_jw32o"]
 [ext_resource type="Script" uid="uid://btkeam6yo7pba" path="res://scripts/EffectManager.gd" id="9_vy5pj"]
 [ext_resource type="Script" uid="uid://cc3pje6hbw6fr" path="res://scripts/Bystanders.gd" id="10_bmxlf"]
+[ext_resource type="Script" uid="uid://cr0jam5chkls2" path="res://scripts/BlackScreen.gd" id="11_4kpch"]
+[ext_resource type="Script" uid="uid://b5wpv6b1xk6qe" path="res://scripts/KODeck.gd" id="12_grg3l"]
+[ext_resource type="Script" uid="uid://dc42lnh0jh83d" path="res://scripts/Wounds.gd" id="13_frkhe"]
 
 [node name="Main" type="Node2D"]
 
@@ -103,6 +106,39 @@ script = ExtResource("7_jw32o")
 
 [node name="Bystanders" type="Node2D" parent="."]
 script = ExtResource("10_bmxlf")
+
+[node name="BlackScreen" type="Node2D" parent="."]
+script = ExtResource("11_4kpch")
+
+[node name="Drapes" type="ColorRect" parent="BlackScreen"]
+z_index = 20
+offset_right = 1923.0
+offset_bottom = 1073.0
+color = Color(0, 0, 0, 0)
+
+[node name="DiscardButton" type="Button" parent="BlackScreen"]
+z_index = 25
+offset_left = -446.0
+offset_top = 339.0
+offset_right = -296.0
+offset_bottom = 389.0
+focus_mode = 0
+text = "Discard"
+
+[node name="KOButton" type="Button" parent="BlackScreen"]
+z_index = 25
+offset_left = -446.0
+offset_top = 339.0
+offset_right = -296.0
+offset_bottom = 389.0
+focus_mode = 0
+text = "KO"
+
+[node name="KODeck" type="Node2D" parent="."]
+script = ExtResource("12_grg3l")
+
+[node name="Wounds" type="Node2D" parent="."]
+script = ExtResource("13_frkhe")
 
 [connection signal="addAttack" from="PlayerHand" to="Resources" method="_on_player_hand_add_attack"]
 [connection signal="addRecruit" from="PlayerHand" to="Resources" method="_on_player_hand_add_recruit"]

@@ -1,27 +1,23 @@
 extends "res://scripts/Pile.gd"
 
 var discard = []
-var vicPile = []
 
-const OOS = Vector2(-100, -100)
-
+const OOS = Vector2(-500, 500)
 
 func initStarterDeck():
 	var heroScene = preload("res://Scenes/Hero.tscn")
 	for i in range(8):
 		var newCard = heroScene.instantiate()
-		newCard.initHero(GameData.GREAT_RESPONSIBILITY) # SHIELD_AGENT
+		newCard.initHero(GameData.SHIELD_AGENT) # SHIELD_AGENT
 		get_parent().addCardToManager(newCard)
-		#newCard.initSprite(agent)
 		addCards(newCard)
 		
 	for i in range(4):
 		var newCard = heroScene.instantiate()
-		newCard.initHero(GameData.SHIELD_TROOPER)
+		newCard.initHero(GameData.SHIELD_TROOPER) # SHIELD_TROOPER
 		get_parent().addCardToManager(newCard)
-		#newCard.initSprite(trooper)
 		addCards(newCard)
-		
+	
 	for i in cards:
 		i.position = OOS
 
@@ -44,12 +40,12 @@ func resetDiscardDraw():
 
 	addCards(discard)
 	discard.clear()
-	get_parent().updateDiscardCount(discard.size())
+	updateDiscardCount()
 
 func discardCard(card):
 	discard.insert(0, card)
 	card.position = OOS
-	get_parent().updateDiscardCount(discard.size())
+	updateDiscardCount()
 
 # This is gonna need to allow for discard shuffle mid get
 func getTop(num=1):
@@ -64,3 +60,9 @@ func getTop(num=1):
 		return c
 	else:
 		return null
+
+func updateDiscardCount():
+	get_parent().updateDiscardCount(discard.size())
+	
+func updateDrawCount():
+	get_parent().updateDrawCount(cards.size())

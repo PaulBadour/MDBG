@@ -8,7 +8,7 @@ var hClass
 var effect
 var heroName
 var cardName
-var spritePath
+
 
 
 # Called when the node enters the scene tree for the first time.
@@ -21,7 +21,6 @@ func initHero(info: Dictionary):
 	cost = info.cost
 	team = info.team
 	hClass = info.hClass
-	effect = info.effect
 	heroName = info.heroName
 	cardName = info.cardName
 	spritePath = info.spritePath

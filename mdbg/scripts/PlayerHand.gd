@@ -4,10 +4,17 @@ extends Node2D
 const CARD_WIDTH = 190
 const HAND_Y_POS = 800
 
+const HERO_SCRIPT = preload("res://scripts/Hero.gd")
+
 var handSize = 6
 var playerHand = []
 var deck
 var played = []
+var vicPile = []
+
+var killOrRecruit = false
+
+var cardBeingPlayed
 
 var extraDraws = 0
 
@@ -31,6 +38,15 @@ func _ready() -> void:
 
 	drawHand()
 
+func _input(event):
+	if event is InputEventKey and event.keycode == KEY_W and event.is_pressed():
+		discardCard($"../Wounds".draw())
+	if event is InputEventKey and event.keycode == KEY_H and event.is_pressed():
+		print("--------------")
+		for i in playerHand:
+			print(str("Card in Hand: ", i, ": path - ", i.spritePath))
+		print("--------------")
+
 func isCardInHand(card):
 	for i in playerHand:
 		if i == card:
@@ -45,8 +61,14 @@ func isCardPlayed(card):
 
 func playCard(card):
 	#if isCardInHand(card):
-	removeFromHand(card)
+	cardBeingPlayed = card
+	var pr = await $"../EffectManager".prereq(card)
+	if !pr:
+		updateHandPositions()
+		return
+	
 	played.insert(0, card)
+	card.position = Vector2(2000, 2000)
 	$"../CardManager".hoverOff(card)
 	
 	if card.attack:
@@ -56,7 +78,9 @@ func playCard(card):
 		emit_signal("addRecruit", card.recruit)
 		
 	#card.effect()
-	$"../EffectManager".effect(card)
+	await $"../EffectManager".effect(card)
+	removeFromHand(card)
+	cardBeingPlayed = null
 
 func addCardToManager(card):
 	$"../CardManager".add_child(card)
@@ -66,6 +90,7 @@ func addCardToHand(card):
 	updateHandPositions()
 
 func updateHandPositions():
+	#print("Updating hand pos")
 	for i in range(playerHand.size()):
 		var newPostition = Vector2(calcCardPosition(i), HAND_Y_POS)
 		var card = playerHand[i]
@@ -78,8 +103,10 @@ func calcCardPosition(num):
 	return xoffset
 
 func animateCard(card, pos):
-	var tween = get_tree().create_tween()
-	tween.tween_property(card, "position", pos, .2)
+	card.position = pos
+	return
+	#var tween = get_tree().create_tween()
+	#tween.tween_property(card, "position", pos, .2)
 
 func removeFromHand(card):
 	playerHand.erase(card)
@@ -87,9 +114,18 @@ func removeFromHand(card):
 
 func discardHand():
 	while playerHand.size() > 0:
-		var c = playerHand[0]
-		playerHand.erase(c)
-		deck.discardCard(c)
+		discardCard(playerHand[0], true)
+
+func discardCard(c, endOfTurn = false):
+	if !endOfTurn:
+		if is_instance_of(c, HERO_SCRIPT) and c.getFuncName() == "Cyclops-Unending Energy":
+			return
+	playerHand.erase(c)
+	deck.discardCard(c)
+
+func deleteCard(c):
+	playerHand.erase(c)
+	updateHandPositions()
 
 func drawCard():
 	addCardToHand(deck.draw())
@@ -107,17 +143,28 @@ func updateDeckCount(num):
 func updateDiscardCount(num):
 	emit_signal("discardCount", num)
 
+# End of turn
 func _on_button_button_down() -> void:
 	if !$"../CardManager".isHovering:
+		if !killOrRecruit:
+			#print("no kill/recruit")
+			if countWoundsInHand() > 0:
+				#print("wounds found")
+				await $"../BlackScreen".chooseCardKO(0, 0, ["hand"], $"../EffectManager".woundFilter)
+				print(str("Hand size after KO: ", playerHand.size()))
 		emit_signal("endTurn")
 		discardHand()
+		killOrRecruit = false
 		while played.size() > 0:
 			var c = played[0]
 			played.erase(c)
 			deck.discardCard(c)
 
 		drawHand()
-
+		print("End of Turn: ")
+		print("Hand: ", playerHand)
+		print("Discard: ", deck.discard)
+		print("-----------------")
 func classCount(c):
 	var count = 0
 	for i in range(1, played.size()):
@@ -129,5 +176,24 @@ func teamCount(c):
 	var count = 0
 	for i in range(1, played.size()):
 		if played[i].team == c:
+			count += 1
+	return count
+
+func saveBystander():
+	if $"../Bystanders".countLeft > 0:
+		var v = $"../Bystanders".draw()
+		vicPile.insert(0, v)
+	#print(str("VP: ", getVP()))
+
+func getVP():
+	var c = 0
+	for i in vicPile:
+		c += i.vp
+	return c
+
+func countWoundsInHand():
+	var count = 0
+	for i in playerHand:
+		if i.spritePath == $"../Wounds".SPRITE_PATH:
 			count += 1
 	return count

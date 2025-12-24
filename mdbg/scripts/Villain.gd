@@ -2,6 +2,7 @@ extends "res://scripts/Card.gd"
 
 var cardName
 var attack
+var team
 
 # Called when the node enters the scene tree for the first time.
 func _ready() -> void:
@@ -9,6 +10,7 @@ func _ready() -> void:
 
 func initVil(info: Dictionary):
 	identifier = "Villain"
+	team = info.team
 	attack = info.attack
 	cardName = info.name
 	vp = info.vp
@@ -17,4 +19,4 @@ func initVil(info: Dictionary):
 	initSprite(spritePath)
 
 func getFuncName():
-	pass
+	return str(team, "-", cardName)

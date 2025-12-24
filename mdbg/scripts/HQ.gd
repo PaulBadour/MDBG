@@ -38,6 +38,7 @@ func _on_recruit_button_down() -> void:
 		$"../Resources".addRecruit(-cost)
 		$"../PlayerHand".deck.discardCard(hq[focused])
 		hq[focused] = null
+		$"../PlayerHand".killOrRecruit = true
 		fillHQ()
 	_on_cancel_button_down()
 

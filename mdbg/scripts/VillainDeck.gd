@@ -1,7 +1,7 @@
 extends "res://scripts/Pile.gd"
 
 var henchman = [GameData.HENCHMAN_SENTINEL]
-var henchCount = 3
+var henchCount = 8
 
 const OOS = Vector2(-200, -500)
 

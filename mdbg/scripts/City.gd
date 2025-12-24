@@ -25,6 +25,7 @@ const OOS = Vector2(1217, -1224)
 
 # Called when the node enters the scene tree for the first time.
 func _ready() -> void:
+	#escaped = null
 	for i in range(5):
 		cityZones[i] = [(START_X - (i*DECR)) - (CARD_SIZE_X/2.0), (START_X - (i*DECR)) + (CARD_SIZE_X/2.0)]
 
@@ -60,11 +61,21 @@ func _on_fight_button_down() -> void:
 	var attack = city[focused].attack
 	var currAttack = $"../Resources".attack
 	if currAttack >= attack:
+		
+		if city[focused].getFuncName() in $"../EffectManager".villain_prereqs.keys():
+			if !$"../EffectManager".villain_prereqs[city[focused].getFuncName()].call():
+				return
+		
 		$"../Resources".addAttack(-attack)
 		$"../PlayerHand".vicPile.append(city[focused])
 		city[focused].position = OOS
+		$"../PlayerHand".killOrRecruit = true
 		
-		# RUN ANY FIGHT EFFECTS
+		print(city[focused].getFuncName(), " in ", $"../EffectManager".villain_fight.keys())
+		
+		if city[focused].getFuncName() in $"../EffectManager".villain_fight.keys():
+			#print("Calling func")
+			$"../EffectManager".villain_fight[city[focused].getFuncName()].call()
 		
 		city[focused] = null
 	_on_cancel_button_down()
@@ -77,12 +88,31 @@ func _on_cancel_button_down() -> void:
 	focused = null
 
 func addToCity(c):
-	var i = 0
-	city[i] = c
-	c.position = Vector2(START_X - (i * DECR), y)
-	c.z_index = 3
+	for i in range(5):
+		if city[i] == null:
+			city[i] = c
+			c.position = Vector2(START_X - (i * DECR), y)
+			c.z_index = 3
+			if i == 0 and c.getFuncName() in $"../EffectManager".villain_ambush.keys():
+				$"../EffectManager".villain_ambush[c.getFuncName()].call()
+			return
+		var newC = city[i]
+		city[i] = c
+		c.position = Vector2(START_X - (i * DECR), y)
+		if i == 0:
+			c.z_index = 3
+		c = newC
+	$"../EscapePile".addCards(c)
+	c.position = OOS
+	if c.getFuncName() in $"../EffectManager".villain_escape.keys():
+		$"../EffectManager".villain_escape[c.getFuncName()].call()
+
+	# KO HQ
 
 func startTurn():
 	var vc = $"../VillainDeck".draw()
+	if !vc:
+		# GAME OVER
+		return
 	if vc.identifier == "Villain":
 		addToCity(vc)

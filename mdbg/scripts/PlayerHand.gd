@@ -151,7 +151,7 @@ func _on_button_button_down() -> void:
 			if countWoundsInHand() > 0:
 				#print("wounds found")
 				await $"../BlackScreen".chooseCardKO(0, 0, ["hand"], $"../EffectManager".woundFilter)
-				print(str("Hand size after KO: ", playerHand.size()))
+				#print(str("Hand size after KO: ", playerHand.size()))
 		emit_signal("endTurn")
 		discardHand()
 		killOrRecruit = false

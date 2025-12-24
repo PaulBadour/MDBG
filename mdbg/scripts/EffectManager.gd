@@ -199,5 +199,28 @@ func prereq(card, args=[]):
 func woundFilter(c) :
 	return c.identifier == "Wound"
 
+func heroFilter(c):
+	return c.identifier == "Hero"
+
 func nullFunc():
 	return true
+
+var villain_prereqs = {
+	
+}
+
+var villain_ambush = {
+	
+}
+
+var villain_fight = {
+	"Henchmen-Sentinel" : Sentinel_Fight
+}
+
+var villain_escape = {
+	
+}
+
+func Sentinel_Fight():
+	#print("Choosing ko")
+	$"../BlackScreen".chooseCardKO(1, 1, ["hand", "played"], heroFilter)

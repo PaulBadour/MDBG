@@ -114,16 +114,19 @@ func chooseCardKO(minKO, maxKO, locations, filter=null):
 	var hand = $"../PlayerHand".playerHand
 	
 	var stack = []
-	
+	print(locations)
 	for i in locations:
 		if i == "hand":
-			#print("hand")
+			print("hand")
 			stack.append_array(hand)
 		if i == "discard":
 			#print("discard")
 			stack.append_array($"../PlayerHand".deck.discard)
+		if i == "played":
+			print("played")
+			stack.append_array($"../PlayerHand".played)
 	
-	#print(stack)
+	print(stack)
 	if filter:
 		#print("filtering")
 		var newStack = []
@@ -131,7 +134,7 @@ func chooseCardKO(minKO, maxKO, locations, filter=null):
 			if filter.call(i):
 				newStack.append(i)
 		stack = newStack
-	#print(stack)
+	print(stack)
 	maxClick = maxKO
 	if stack.size() == 0:
 		return false
@@ -151,14 +154,17 @@ func chooseCardKO(minKO, maxKO, locations, filter=null):
 		
 		$"../KODeck".addCards(i)
 		if i in hand:
-			print("Removing hand wound")
+			#print("Removing hand wound")
 			await $"../PlayerHand".deleteCard(i)
-			i.debugPos(Vector2(-500, -500))
+			i.position = Vector2(-500, -500)
 		if i in $"../PlayerHand".deck.discard:
-			print("Removing deck wound")
+			#print("Removing deck wound")
 			await $"../PlayerHand".deck.discard.erase(i)
 			i.position = Vector2(-500, -500)
 			$"../PlayerHand".updateDiscardCount($"../PlayerHand".deck.discard.size())
+		if i in $"../PlayerHand".played:
+			$"../PlayerHand".played.erase(i)
+			i.position = Vector2(-500, -500)
 		
 
 	$"../PlayerHand".updateHandPositions()

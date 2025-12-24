@@ -283,15 +283,12 @@ static var BASE_HEROS = {
 
 
 
-enum VillainGroup {
-	HENCHMEN
-}
 
 
 static var HENCHMAN_SENTINEL = {
 	name = "Sentinel",
 	attack = 3,
-	team = VillainGroup.HENCHMEN,
+	team = "Henchmen",
 	vp = 1,
 	spritePath = "res://cards/Base/Villains/Henchman-Sentinel.png"
 }

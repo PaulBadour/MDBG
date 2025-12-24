@@ -95,14 +95,16 @@ func hoverOff(card):
 	else:
 		isHovering = false
 
+@warning_ignore("unused_parameter")
 func highlightCard(card, hovered):
-	if hovered and $"../PlayerHand".isCardInHand(card):
-		card.scale = Vector2(HIGHLIGHT_SIZE, HIGHLIGHT_SIZE)
-		card.z_index = 2
-	else:
-		#print(str("Resetting card", card))
-		card.scale = Vector2(BASE_SIZE, BASE_SIZE)
-		card.z_index = 1
+	pass
+	#if hovered and $"../PlayerHand".isCardInHand(card):
+		#card.scale = Vector2(HIGHLIGHT_SIZE, HIGHLIGHT_SIZE)
+		#card.z_index = 2
+	#else:
+		##print(str("Resetting card", card))
+		#card.scale = Vector2(BASE_SIZE, BASE_SIZE)
+		#card.z_index = 1
 
 func connectCardSignals(card):
 	card.connect("hovOn", hoverOn)

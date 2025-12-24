@@ -10,6 +10,8 @@ var res = $"../Resources"
 # Prereqs: Requirement to play a card
 # Event: Does something when something else happens
 
+# 
+
 var links = {
 	"Hero-SHIELD Trooper" : nullFunc,
 	"Hero-SHIELD Agent" : nullFunc,
@@ -20,6 +22,7 @@ var links = {
 	"Spiderman-Astonishing Strength" : Astonishing_Strength,
 	"Spiderman-Great Responsibility" : Great_Responsibility,
 	"Spiderman-Web Shooters" : Web_Shooters,
+	"Spiderman-The Amazing Spiderman" : The_Amazing_Spiderman, # This kinda works, some bug with too many cards and card overlap
 	"Wolverine-Berserker Rage" : Berserker_Rage, # Some issue with drawing too many cards
 	"Wolverine-Frenzied Slashing" : Frenzied_Slashing, # Some issue with drawing too many cards
 	"Wolverine-Keen Senses" : Keen_Senses,
@@ -93,8 +96,21 @@ func Web_Shooters():
 
 # Requires reveal multiple and choose order
 func The_Amazing_Spiderman():
-	pass
-
+	var c = await hand.deck.reveal(3)
+	var nc = 0
+	for i in c:
+		if i.cost <= 2:
+			hand.deck.cards.erase(i)
+			hand.addCardToHand(i)
+			hand.deck.updateDrawCount()
+			print("Drawing card")
+		else:
+			print("Not drawing")
+			nc += 1
+	if nc > 1:
+		print("Ordering ", nc)
+		await $"../BlackScreen".orderTopDeck(nc)
+	return true
 
 # Wolverine
 
@@ -113,8 +129,6 @@ func Frenzied_Slashing():
 	return true
 
 func Healing_Factor():
-	#var w = preload("res://scripts/Wounds.gd")
-	
 	var r = await $"../BlackScreen".chooseCardKO(0, 1, ["hand", "discard"], woundFilter)
 	if r:
 		hand.drawCard()
@@ -183,7 +197,7 @@ func prereq(card, args=[]):
 	return true
 
 func woundFilter(c) :
-	return c.spritePath == $"../Wounds".SPRITE_PATH
+	return c.identifier == "Wound"
 
 func nullFunc():
 	return true

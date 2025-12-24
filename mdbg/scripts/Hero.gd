@@ -16,6 +16,7 @@ func _ready() -> void:
 	super()
 
 func initHero(info: Dictionary):
+	identifier = "Hero"
 	attack = info.attack
 	recruit = info.recruit
 	cost = info.cost

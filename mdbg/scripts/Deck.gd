@@ -6,13 +6,13 @@ const OOS = Vector2(-500, 500)
 
 func initStarterDeck():
 	var heroScene = preload("res://Scenes/Hero.tscn")
-	for i in range(8):
+	for i in range(8): # 8
 		var newCard = heroScene.instantiate()
 		newCard.initHero(GameData.SHIELD_AGENT) # SHIELD_AGENT
 		get_parent().addCardToManager(newCard)
 		addCards(newCard)
 		
-	for i in range(4):
+	for i in range(4): # 4
 		var newCard = heroScene.instantiate()
 		newCard.initHero(GameData.SHIELD_TROOPER) # SHIELD_TROOPER
 		get_parent().addCardToManager(newCard)
@@ -24,7 +24,13 @@ func initStarterDeck():
 	shuffle()
 
 # Grossly oversimplified and overwriting the super class
-func draw():
+func draw(c=null):
+	if c:
+		if c in cards:
+			cards.erase(c)
+			get_parent().updateDeckCount(cards.size() - 1)
+			return c
+		return null
 	if cards.size() == 0:
 		resetDiscardDraw()
 		if cards.size() == 0:
@@ -56,13 +62,15 @@ func getTop(num=1):
 	if num == 1:
 		return cards[0]
 	if num <= cards.size():
-		var c = cards.slice(0, num-1)
+		var c = cards.slice(0, num)
 		return c
 	else:
 		return null
+
+
 
 func updateDiscardCount():
 	get_parent().updateDiscardCount(discard.size())
 	
 func updateDrawCount():
-	get_parent().updateDrawCount(cards.size())
+	get_parent().updateDeckCount(cards.size())

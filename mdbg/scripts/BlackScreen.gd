@@ -101,9 +101,6 @@ func chooseCardDiscard(minDisc, maxDisc, exclude=true):
 	#print(clicked)
 	
 	for i in clicked:
-		#hand.erase(i)
-		#print(i.position)
-		#print(i.position)
 		$"../PlayerHand".discardCard(i)
 		i.position = Vector2(-500, -500)
 
@@ -170,4 +167,26 @@ func chooseCardKO(minKO, maxKO, locations, filter=null):
 	if clicked.size() == 0:
 		return false
 	
+	return true
+
+func orderTopDeck(num):
+	var hand = $"../PlayerHand"
+	print("num is ", num)
+	showCards(hand.deck.getTop(num), true)
+	maxClick = num
+	
+	get_node("OrderButton").position = BUTTON_LOCATION
+	
+	var valid = false
+	while !valid:
+		await get_node("OrderButton").pressed
+		if clicked.size() == num:
+			valid = true
+
+	get_node("OrderButton").position = Vector2(1000, -200)
+
+	for i in range(clicked.size()):
+		hand.deck.cards[i] = clicked[i]
+		clicked[i].position = Vector2(3000, 0)
+	stopShowCards()
 	return true

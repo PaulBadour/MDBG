@@ -12,6 +12,7 @@ func draw():
 	if countLeft == 0:
 		return null
 	var c = cardScene.instantiate()
+	c.identifier = "Wound"
 	#c.position = Vector2(c.BASE_SIZE, c.BASE_SIZE) 
 	c.position = Vector2(0,-300)
 	$"../PlayerHand".addCardToManager(c)

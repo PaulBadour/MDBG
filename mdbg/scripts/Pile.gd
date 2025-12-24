@@ -20,14 +20,23 @@ func count():
 	return cards.size()
 
 func getTop(num=1):
+	print("In getTop")
 	if cards.size() == 0:
+		print("returning null")
 		return null
 	if num == 1:
+		print("returning 1")
 		return cards[0]
-	var c = cards.slice(0, num-1)
+	print(cards)
+	var c = cards.slice(0, num)
 	return c
 
-func reveal():
+func reveal(n=1):
+	if n > 1:
+		print("revealing ", n)
+		var t = getTop(n)
+		print(n, t)
+		return t
 	var c = getTop()
 	if !c:
 		pass
@@ -40,6 +49,7 @@ func reveal():
 	c.position = Vector2(-500, 0)
 	c.z_index = oldz
 	#c.scale = oldscale
+	
 	return c
 
 func shuffle():

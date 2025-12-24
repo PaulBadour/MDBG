@@ -164,6 +164,7 @@ func _on_button_button_down() -> void:
 		print("End of Turn: ")
 		print("Hand: ", playerHand)
 		print("Discard: ", deck.discard)
+		print("VP: ", vicPile)
 		print("-----------------")
 func classCount(c):
 	var count = 0

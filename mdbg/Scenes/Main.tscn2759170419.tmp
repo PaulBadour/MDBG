@@ -1,4 +1,4 @@
-[gd_scene load_steps=16 format=3 uid="uid://dokr14biam1hj"]
+[gd_scene load_steps=14 format=3 uid="uid://dokr14biam1hj"]
 
 [ext_resource type="Script" uid="uid://bxvjr2go4dlw6" path="res://scripts/CardManager.gd" id="1_idj7w"]
 [ext_resource type="Script" uid="uid://og0oya8vvyxd" path="res://scripts/PlayerHand.gd" id="2_kln2b"]
@@ -8,13 +8,11 @@
 [ext_resource type="Script" uid="uid://jgmjqsrpmr8l" path="res://scripts/Resources.gd" id="6_v1gob"]
 [ext_resource type="Script" uid="uid://dkjrk5ruvaet6" path="res://scripts/HQ.gd" id="7_50glp"]
 [ext_resource type="Script" uid="uid://m4h1jp75jtrx" path="res://scripts/HeroDeck.gd" id="7_jw32o"]
-[ext_resource type="Script" uid="uid://0dlehe1upwxg" path="res://scripts/City.gd" id="9_1p5hy"]
 [ext_resource type="Script" uid="uid://btkeam6yo7pba" path="res://scripts/EffectManager.gd" id="9_vy5pj"]
 [ext_resource type="Script" uid="uid://cc3pje6hbw6fr" path="res://scripts/Bystanders.gd" id="10_bmxlf"]
 [ext_resource type="Script" uid="uid://cr0jam5chkls2" path="res://scripts/BlackScreen.gd" id="11_4kpch"]
 [ext_resource type="Script" uid="uid://b5wpv6b1xk6qe" path="res://scripts/KODeck.gd" id="12_grg3l"]
 [ext_resource type="Script" uid="uid://dc42lnh0jh83d" path="res://scripts/Wounds.gd" id="13_frkhe"]
-[ext_resource type="Script" uid="uid://bj33fsh78563c" path="res://scripts/VillainDeck.gd" id="15_h1m7h"]
 
 [node name="Main" type="Node2D"]
 
@@ -103,34 +101,6 @@ offset_bottom = 187.0
 focus_mode = 0
 text = "Recruit"
 
-[node name="City" type="Node2D" parent="."]
-script = ExtResource("9_1p5hy")
-
-[node name="ColorRect" type="ColorRect" parent="City"]
-offset_left = 275.0
-offset_top = 100.0
-offset_right = 1575.0
-offset_bottom = 350.0
-color = Color(0.5890956, 0.5890956, 0.5890956, 1)
-
-[node name="Cancel" type="Button" parent="City"]
-z_index = 6
-offset_left = -450.0
-offset_top = 205.0
-offset_right = -300.0
-offset_bottom = 255.0
-focus_mode = 0
-text = "Cancel"
-
-[node name="Fight" type="Button" parent="City"]
-z_index = 6
-offset_left = -450.0
-offset_top = 205.0
-offset_right = -300.0
-offset_bottom = 255.0
-focus_mode = 0
-text = "Fight"
-
 [node name="HeroDeck" type="Node2D" parent="."]
 script = ExtResource("7_jw32o")
 
@@ -179,9 +149,6 @@ script = ExtResource("12_grg3l")
 [node name="Wounds" type="Node2D" parent="."]
 script = ExtResource("13_frkhe")
 
-[node name="VillainDeck" type="Node2D" parent="."]
-script = ExtResource("15_h1m7h")
-
 [connection signal="addAttack" from="PlayerHand" to="Resources" method="_on_player_hand_add_attack"]
 [connection signal="addRecruit" from="PlayerHand" to="Resources" method="_on_player_hand_add_recruit"]
 [connection signal="deckCount" from="PlayerHand" to="DeckDisplay" method="_on_player_hand_deck_count"]
@@ -192,6 +159,4 @@ script = ExtResource("15_h1m7h")
 [connection signal="unFocusHQ" from="HQ" to="CardManager" method="_on_hq_un_focus_hq"]
 [connection signal="button_down" from="HQ/Cancel" to="HQ" method="_on_cancel_button_down"]
 [connection signal="button_down" from="HQ/Recruit" to="HQ" method="_on_recruit_button_down"]
-[connection signal="button_down" from="City/Cancel" to="City" method="_on_cancel_button_down"]
-[connection signal="button_down" from="City/Fight" to="City" method="_on_fight_button_down"]
 [connection signal="SetupHQ" from="HeroDeck" to="HQ" method="_on_hero_deck_setup_hq"]

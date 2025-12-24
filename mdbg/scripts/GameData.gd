@@ -280,3 +280,22 @@ static var BASE_HEROS = {
 	Heros.CYCLOPS : [OPTIC_BLAST, DETERMINATION, UNENDING_ENERGY, XMEN_UNITED],
 	Heros.HAWKEYE : [TEAM_PLAYER, QUICK_DRAW, COVERING_FIRE, IMPOSSIBLE_TRICKSHOT]
 }
+
+
+
+enum VillainGroup {
+	HENCHMEN
+}
+
+
+static var HENCHMAN_SENTINEL = {
+	name = "Sentinel",
+	attack = 3,
+	team = VillainGroup.HENCHMEN,
+	vp = 1,
+	spritePath = "res://cards/Base/Villains/Henchman-Sentinel.png"
+}
+
+static var BASE_HENCHMEN = [
+	HENCHMAN_SENTINEL
+]

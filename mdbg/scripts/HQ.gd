@@ -52,6 +52,8 @@ func focus(zone):
 func _input(event: InputEvent) -> void:
 	if $"../BlackScreen".isClickable:
 		return
+	if $"../City".focused:
+		return
 	if event is InputEventMouseButton and event.button_index == MOUSE_BUTTON_LEFT and event.is_pressed() and !focused:
 		var pos = get_viewport().get_mouse_position()
 		if pos.y < CHECK_Y_MIN or pos.y > CHECK_Y_MAX:

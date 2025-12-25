@@ -3,6 +3,11 @@ extends "res://scripts/Card.gd"
 var cardName
 var attack
 var team
+var bystanders = 0
+var bList = []
+
+signal bystanderLabel
+signal removeBystanderLabel
 
 # Called when the node enters the scene tree for the first time.
 func _ready() -> void:
@@ -17,6 +22,17 @@ func initVil(info: Dictionary):
 	spritePath = info.spritePath
 	
 	initSprite(spritePath)
+	
+	get_parent().connectBystanderSignal(self)
+
+func displayBystanders(on):
+	if on and bystanders > 0:
+		emit_signal("bystanderLabel", str("Bystanders: ", bystanders))
+		#b.text = str("Bystanders: ", bystanders)
+		#b.position = Vector2(1500, 500)
+	elif !on:
+		emit_signal("removeBystanderLabel")
+		#b.position = Vector2(-1500, -500)
 
 func getFuncName():
 	return str(team, "-", cardName)

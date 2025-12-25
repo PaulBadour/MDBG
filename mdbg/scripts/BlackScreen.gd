@@ -9,6 +9,8 @@ const Y_INCR = 300
 
 const BUTTON_LOCATION = Vector2(1700, 400)
 
+var customButtons = []
+
 var isCovered = false
 var shownCards = []
 var lastLocations = []
@@ -32,12 +34,10 @@ func _ready():
 	disappear()
 
 func appear():
-	#get_child(0).color = Color(0.0, 0.0, 0.0, TRANSPARENCY)
 	position = Vector2(0, 0)
 	isCovered = true
 
 func disappear():
-	#get_child(0).color = Color(0.0, 0.0, 0.0, 0.0)
 	position = Vector2(2000, 2000)
 	isCovered = false
 	
@@ -131,7 +131,7 @@ func chooseCardKO(minKO, maxKO, locations, filter=null):
 			print("played")
 			stack.append_array($"../PlayerHand".played)
 	
-	print(stack)
+	#print(stack)
 	if filter:
 		#print("filtering")
 		var newStack = []
@@ -208,6 +208,9 @@ func KOFromDeck(minKO, maxKO, number):
 	var deck = $"../PlayerHand".deck
 	
 	var stack = deck.getTop(number)
+	
+	if stack == null:
+		return false
 
 	showCards(stack, true)
 	get_node("KOButton").position = BUTTON_LOCATION
@@ -237,6 +240,9 @@ func discardFromDeck(minDisc, maxDisc, number):
 	var deck = $"../PlayerHand".deck
 	
 	var stack = deck.getTop(number)
+	
+	if stack == null:
+		return false
 
 	showCards(stack, true)
 	get_node("DiscardButton").position = BUTTON_LOCATION
@@ -268,14 +274,14 @@ func customChoices(text : Array, funcs : Array):
 		push_error("fucked up custom choices")
 		return
 	appear()
-	var buttons = []
+	#customButtons = []
 	var c = 0
 	var offset = 150
 	for i in text:
 		var b = $DiscardButton.duplicate()
 		add_child(b)
 		b.text = i
-		buttons.append(b)
+		customButtons.append(b)
 		b.position = Vector2(BUTTON_LOCATION.x - 700, BUTTON_LOCATION.y + (c * offset))
 		b.button_down.connect(funcs[c])
 		c += 1
@@ -284,5 +290,32 @@ func customChoices(text : Array, funcs : Array):
 	await $"../EffectManager".finishCustom
 	
 	disappear()
-	for i in buttons:
+
+func deleteCustomButtons():
+	for i in customButtons:
 		i.queue_free()
+	customButtons.clear()
+
+func KOfromHQ(filter):
+	maxClick = 1
+	var stack = $"../HQ".hq
+	if filter:
+		var newStack = []
+		for i in stack:
+			if filter.call(i):
+				newStack.append(i)
+		stack = newStack
+	showCards(stack, true)
+	get_node("KOButton").position = BUTTON_LOCATION
+	var valid = false
+	while !valid:
+		await get_node("KOButton").pressed
+		if clicked.size() == 1:
+			valid = true
+
+	get_node("KOButton").position = Vector2(1000, -200)
+	
+	$"../HQ".KOhero(clicked[0])
+	
+	stopShowCards()
+	return true

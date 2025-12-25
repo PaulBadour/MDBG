@@ -78,6 +78,9 @@ func _on_fight_button_down() -> void:
 			$"../Resources".addAttack(-attack)
 			var t = $"../Mastermind".drawTactic()
 			$"../PlayerHand".vicPile.append(t)
+			for i in $"../Mastermind".bystanders:
+				$"../PlayerHand".vicPile.append(i)
+			$"../Mastermind".bystanders.clear()
 			$"../PlayerHand".killOrRecruit = true
 			
 			var fName = str($"../Mastermind".mName, "-", t.tName)
@@ -94,6 +97,8 @@ func _on_fight_button_down() -> void:
 			
 			$"../Resources".addAttack(-attack)
 			$"../PlayerHand".vicPile.append(city[focused])
+			for i in city[focused].bList:
+				$"../PlayerHand".vicPile.append(i)
 			city[focused].position = OOS
 			$"../PlayerHand".killOrRecruit = true
 			
@@ -135,17 +140,34 @@ func addToCity(c):
 	if c.getFuncName() in $"../EffectManager".villain_escape.keys():
 		$"../EffectManager".villain_escape[c.getFuncName()].call()
 
-	# KO HQ
+	await $"../BlackScreen".KOfromHQ($"../EffectManager".sixCostFilter)
+	if c.bystanders > 0:
+		await $"../BlackScreen".chooseCardDiscard(1, 1, false)
+
+func addBystander():
+	for i in city:
+		if i:
+			i.bystanders += 1
+			i.bList.append($"../Bystanders".draw())
+			return
+	$"../Mastermind".bystanders.append($"../Bystanders".draw())
 
 func startTurn():
 	var vc = $"../VillainDeck".draw()
 	if !vc:
-		# GAME OVER
+		print("Game over")
 		return
-	if vc.identifier == "Villain":
+	elif vc.identifier == "Villain":
+		print("Vil")
 		addToCity(vc)
-	if vc.identifier == "Twist":
+	elif vc.identifier == "Twist":
 		print("Twist!")
 		$"../Scheme".twist()
-	if vc.identifier == "Master Strike":
+	elif vc.identifier == "Master Strike":
+		print("Strike")
 		$"../Mastermind".strike()
+	elif vc.identifier == "Bystander":
+		print("Bystander")
+		addBystander()
+	else:
+		print(vc.identifier)

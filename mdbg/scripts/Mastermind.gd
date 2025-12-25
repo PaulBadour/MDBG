@@ -4,11 +4,15 @@ var mCard
 
 const cardPos = Vector2(400, 225)
 
+signal bystanderLabel
+signal removeBystanderLabel
+
 var leads
 var masterStrike
 var tactics = []
 var attack
 var mName
+var bystanders = []
 
 var info = GameData.RED_SKULL
 const OOS = Vector2(904, -1224)
@@ -18,7 +22,7 @@ func _ready() -> void:
 	
 	attack = info.attack
 	mName = info.mName
-	
+	$"../CardManager".connectBystanderSignal(self)
 	var cardScene = preload("res://Scenes/Card.tscn")
 	mCard = cardScene.instantiate()
 	mCard.identifier = "Mastermind"
@@ -46,3 +50,12 @@ func strike():
 
 func getFuncName():
 	return str("Mastermind-", mName)
+
+func displayBystanders(on):
+	if on and bystanders.size() > 0:
+		emit_signal("bystanderLabel", str("Bystanders: ", bystanders.size()))
+		#b.text = str("Bystanders: ", bystanders)
+		#b.position = Vector2(1500, 500)
+	elif !on:
+		emit_signal("removeBystanderLabel")
+		#b.position = Vector2(-1500, -500)

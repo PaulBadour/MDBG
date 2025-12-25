@@ -130,8 +130,10 @@ func deleteCard(c):
 	updateHandPositions()
 
 func drawCard():
-	addCardToHand(deck.draw())
-	extraDraws += 1
+	var d = deck.draw()
+	if d:
+		addCardToHand(d)
+		extraDraws += 1
 
 func drawHand():
 	for i in range(handSize):

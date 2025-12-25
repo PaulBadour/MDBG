@@ -55,7 +55,7 @@ func _input(event: InputEvent) -> void:
 		return
 	if $"../City".focused:
 		return
-	if event is InputEventMouseButton and event.button_index == MOUSE_BUTTON_LEFT and event.is_pressed() and !focused:
+	if event is InputEventMouseButton and event.button_index == MOUSE_BUTTON_LEFT and event.is_pressed() and !focused and !$"../BlackScreen".isCovered:
 		var pos = get_viewport().get_mouse_position()
 		if pos.y < CHECK_Y_MIN or pos.y > CHECK_Y_MAX:
 			return
@@ -79,6 +79,13 @@ func fillHQ():
 			card.position = Vector2(START_X - (i * DECR), y)
 			card.z_index = 3
 			hq[i] = card
+
+func KOhero(c):
+	var ind = hq.find(c)
+	$"../KODeck".addCards(hq[ind])
+	hq[ind].position = Vector2(200, -420)
+	hq[ind] = null
+	fillHQ()
 
 func _on_hero_deck_setup_hq() -> void:
 	fillHQ()

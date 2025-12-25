@@ -11,6 +11,7 @@ func draw():
 	if countLeft == 0:
 		return null
 	var c = cardScene.instantiate()
+	c.identifier = "Bystander"
 	c.position = Vector2(0,-200)
 	$"../PlayerHand".addCardToManager(c)
 	c.vp = 1

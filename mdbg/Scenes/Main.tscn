@@ -1,4 +1,4 @@
-[gd_scene load_steps=20 format=3 uid="uid://dokr14biam1hj"]
+[gd_scene load_steps=21 format=3 uid="uid://dokr14biam1hj"]
 
 [ext_resource type="Script" uid="uid://bvjanc1l5qt86" path="res://scripts/Main.gd" id="1_346fj"]
 [ext_resource type="Script" uid="uid://bxvjr2go4dlw6" path="res://scripts/CardManager.gd" id="1_idj7w"]
@@ -19,6 +19,7 @@
 [ext_resource type="Script" uid="uid://dn8bwc23u4h4a" path="res://scripts/EscapePile.gd" id="16_erwvk"]
 [ext_resource type="Script" uid="uid://b0u7bdwgaemy6" path="res://scripts/Mastermind.gd" id="17_2w5on"]
 [ext_resource type="Script" uid="uid://dvbvsv34bvpfx" path="res://scripts/Scheme.gd" id="19_0sclb"]
+[ext_resource type="Script" uid="uid://coqq2aj6xwp0u" path="res://scripts/ExtraLabels.gd" id="20_sxkr1"]
 
 [node name="Main" type="Node2D"]
 script = ExtResource("1_346fj")
@@ -139,9 +140,6 @@ text = "Fight"
 [node name="HeroDeck" type="Node2D" parent="."]
 script = ExtResource("7_jw32o")
 
-[node name="Bystanders" type="Node2D" parent="."]
-script = ExtResource("10_bmxlf")
-
 [node name="BlackScreen" type="Node2D" parent="."]
 script = ExtResource("11_4kpch")
 
@@ -187,6 +185,9 @@ script = ExtResource("13_frkhe")
 [node name="VillainDeck" type="Node2D" parent="."]
 script = ExtResource("15_h1m7h")
 
+[node name="Bystanders" type="Node2D" parent="."]
+script = ExtResource("10_bmxlf")
+
 [node name="EscapePile" type="Node2D" parent="."]
 script = ExtResource("16_erwvk")
 
@@ -195,6 +196,16 @@ script = ExtResource("17_2w5on")
 
 [node name="Scheme" type="Node2D" parent="."]
 script = ExtResource("19_0sclb")
+
+[node name="ExtraLabels" type="Node2D" parent="."]
+script = ExtResource("20_sxkr1")
+
+[node name="CardInfo" type="Label" parent="ExtraLabels"]
+z_index = 10
+offset_left = -534.0
+offset_top = 583.0
+offset_right = -394.0
+offset_bottom = 751.0
 
 [connection signal="addAttack" from="PlayerHand" to="Resources" method="_on_player_hand_add_attack"]
 [connection signal="addRecruit" from="PlayerHand" to="Resources" method="_on_player_hand_add_recruit"]

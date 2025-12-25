@@ -39,12 +39,21 @@ func _input(event):
 				c.position = Vector2(screenSize.x / 2.0, screenSize.y / 2.0)
 				c.scale = Vector2(ZOOM_SCALE, ZOOM_SCALE)
 				c.z_index = 5
+				if c.identifier == "Villain":
+					c.displayBystanders(true)
+				elif c.identifier == "Mastermind":
+					$"../Mastermind".displayBystanders(true)
 		elif event.is_released() and cardZoomed:
 			cardZoomed.position = oldZoomPos
 			cardZoomed.scale = Vector2(BASE_SIZE, BASE_SIZE)
 			cardZoomed.z_index = 3
 			hoverOff(cardZoomed)
+			if cardZoomed.identifier == "Villain":
+				cardZoomed.displayBystanders(false)
+			elif cardZoomed.identifier == "Villain":
+				$"../Mastermind".displayBystanders(false)
 			cardZoomed = null
+			
 	if event is InputEventMouseButton and event.button_index == MOUSE_BUTTON_LEFT and !cardZoomed:
 		if event.is_pressed():
 			var c = findCard()
@@ -110,6 +119,9 @@ func connectCardSignals(card):
 	card.connect("hovOn", hoverOn)
 	card.connect("hovOff", hoverOff)
 
+func connectBystanderSignal(card):
+	card.connect("bystanderLabel", $"../ExtraLabels".showLabel)
+	card.connect("removeBystanderLabel", $"../ExtraLabels".removeLabel)
 
 # Called when the node enters the scene tree for the first time.
 func _ready() -> void:

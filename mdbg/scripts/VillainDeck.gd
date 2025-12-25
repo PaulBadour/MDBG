@@ -1,8 +1,9 @@
 extends "res://scripts/Pile.gd"
 
 var henchman = [GameData.HENCHMAN_SENTINEL]
-var henchCount = 8
-var masterStrikeCount = 5
+var henchCount = 10
+var masterStrikeCount = 1
+var bystanderCount = 10
 
 const OOS = Vector2(-200, -500)
 
@@ -12,8 +13,8 @@ func _ready() -> void:
 	for j in henchman:
 		for i in range(henchCount):
 			var v = vilScene.instantiate()
-			v.initVil(j)
 			$"../PlayerHand".addCardToManager(v)
+			v.initVil(j)
 			addCards(v)
 			v.position = OOS
 	
@@ -25,6 +26,13 @@ func _ready() -> void:
 		addCards(ms)
 		ms.position = OOS
 	
+	print("good unitl bystanders")
+	await $"../Bystanders".ready
+	
+	for i in range(bystanderCount):
+		addCards($"../Bystanders".draw())
+	
+	print("good unitl scheme")
 	await $"../Scheme".ready
 	
 	
@@ -37,3 +45,4 @@ func _ready() -> void:
 		addCards(t)
 		
 	shuffle()
+	print("Vil deck made With ", cards.size())

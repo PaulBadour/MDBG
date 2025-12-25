@@ -168,7 +168,9 @@ func Covering_Fire():
 			emit_signal("finishCustom")
 			
 		var f2 = func():
-			$"../BlackScreen".chooseCardDiscard(1, 1)
+			$"../BlackScreen".disappear()
+			$"../BlackScreen".deleteCustomButtons()
+			await $"../BlackScreen".chooseCardDiscard(1, 1)
 			emit_signal("finishCustom")
 			
 		$"../BlackScreen".customChoices(["Draw", "Discard"], [f1, f2])
@@ -212,6 +214,9 @@ func woundFilter(c) :
 
 func heroFilter(c):
 	return c.identifier == "Hero"
+	
+func sixCostFilter(c):
+	return c.cost <= 6
 
 func nullFunc():
 	return true

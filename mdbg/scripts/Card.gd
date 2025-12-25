@@ -6,6 +6,7 @@ signal hovOff
 var handPos
 var vp
 var identifier
+var tName
 
 var spritePath
 

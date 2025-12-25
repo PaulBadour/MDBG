@@ -78,7 +78,7 @@ func findCard(first=true):
 	return null
 
 func hoverOn(card):
-	
+	return
 	if !isHovering and !cardZoomed and !isFocused:
 		highlightCard(card, true)
 		isHovering = true

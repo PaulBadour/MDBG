@@ -20,6 +20,8 @@ var extraDraws = 0
 
 var centerScreenx
 
+var eventCards = {}
+
 signal deckCount
 signal discardCount
 
@@ -40,7 +42,9 @@ func _ready() -> void:
 
 func _input(event):
 	if event is InputEventKey and event.keycode == KEY_W and event.is_pressed():
-		discardCard($"../Wounds".draw())
+		print("Vic size: ", vicPile.size())
+		for i in vicPile:
+			print(i, " named ", i.tName)
 	if event is InputEventKey and event.keycode == KEY_H and event.is_pressed():
 		print("--------------")
 		for i in playerHand:
@@ -161,11 +165,14 @@ func _on_button_button_down() -> void:
 			deck.discardCard(c)
 
 		drawHand()
+		eventCards.clear()
 		print("End of Turn: ")
 		print("Hand: ", playerHand)
 		print("Discard: ", deck.discard)
 		print("VP: ", vicPile)
 		print("-----------------")
+	else:
+		print("we got hovering")
 func classCount(c):
 	var count = 0
 	for i in range(1, played.size()):

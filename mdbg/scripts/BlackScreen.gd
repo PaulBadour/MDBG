@@ -79,6 +79,11 @@ func stopShowCards():
 	clicked.clear()
 	disappear()
 
+
+
+
+
+
 # Bug if played card is played where a choice may be
 
 func chooseCardDiscard(minDisc, maxDisc, exclude=true):
@@ -109,7 +114,7 @@ func chooseCardDiscard(minDisc, maxDisc, exclude=true):
 	stopShowCards()
 	return true
 
-# possible locations: "hand", "discard"
+# possible locations: "hand", "discard", "Played"
 func chooseCardKO(minKO, maxKO, locations, filter=null):
 	var hand = $"../PlayerHand".playerHand
 	
@@ -177,7 +182,7 @@ func chooseCardKO(minKO, maxKO, locations, filter=null):
 
 func orderTopDeck(num):
 	var hand = $"../PlayerHand"
-	print("num is ", num)
+	#print("num is ", num)
 	showCards(hand.deck.getTop(num), true)
 	maxClick = num
 	
@@ -195,4 +200,65 @@ func orderTopDeck(num):
 		hand.deck.cards[i] = clicked[i]
 		clicked[i].position = Vector2(3000, 0)
 	stopShowCards()
+	return true
+
+
+func KOFromDeck(minKO, maxKO, number):
+	maxClick = maxKO
+	var deck = $"../PlayerHand".deck
+	
+	var stack = deck.getTop(number)
+
+	showCards(stack, true)
+	get_node("KOButton").position = BUTTON_LOCATION
+	var valid = false
+	while !valid:
+		await get_node("KOButton").pressed
+		if clicked.size() >= minKO:
+			valid = true
+
+	get_node("KOButton").position = Vector2(1000, -200)
+	
+	for i in clicked:
+		
+		$"../KODeck".addCards(i)
+		deck.cards.erase(i)
+	deck.updateDrawCount()
+
+	stopShowCards()
+
+	if clicked.size() == 0:
+		return false
+	
+	return true
+
+func discardFromDeck(minDisc, maxDisc, number):
+	maxClick = maxDisc
+	var deck = $"../PlayerHand".deck
+	
+	var stack = deck.getTop(number)
+
+	showCards(stack, true)
+	get_node("DiscardButton").position = BUTTON_LOCATION
+	var valid = false
+	while !valid:
+		await get_node("DiscardButton").pressed
+		if clicked.size() >= minDisc:
+			valid = true
+
+	get_node("DiscardButton").position = Vector2(1000, -200)
+	
+	for i in clicked:
+		
+		deck.discard.append(i)
+		deck.cards.erase(i)
+		i.position = Vector2(-1130, 1224)
+	deck.updateDrawCount()
+	deck.updateDiscardCount()
+
+	stopShowCards()
+
+	if clicked.size() == 0:
+		return false
+	
 	return true

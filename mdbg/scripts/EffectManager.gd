@@ -32,7 +32,8 @@ var links = {
 	"Cyclops-Optic Blast" : nullFunc,
 	"Cyclops-Unending Energy" : nullFunc,
 	"Hawkeye-Quick Draw" : Quick_Draw,
-	"Hawkeye-Team Player" : Team_Player
+	"Hawkeye-Team Player" : Team_Player,
+	"Hawkeye-Impossible Trick Shot" : Impossible_Trickshot
 }
 
 var prereqs = {
@@ -94,7 +95,6 @@ func Web_Shooters():
 		hand.drawCard()
 	return true
 
-# Requires reveal multiple and choose order
 func The_Amazing_Spiderman():
 	var c = await hand.deck.reveal(3)
 	var nc = 0
@@ -103,12 +103,9 @@ func The_Amazing_Spiderman():
 			hand.deck.cards.erase(i)
 			hand.addCardToHand(i)
 			hand.deck.updateDrawCount()
-			print("Drawing card")
 		else:
-			print("Not drawing")
 			nc += 1
 	if nc > 1:
-		print("Ordering ", nc)
 		await $"../BlackScreen".orderTopDeck(nc)
 	return true
 
@@ -164,9 +161,11 @@ func XMen_United():
 func Covering_Fire():
 	pass
 
-# Needs city implementation
 func Impossible_Trickshot():
-	pass
+	if "Impossible Trickshot" in $"../PlayerHand".eventCards:
+		$"../PlayerHand".eventCards["Impossible Trickshot"] += 1
+	else:
+		$"../PlayerHand".eventCards["Impossible Trickshot"] = 1
 
 func Quick_Draw():
 	hand.drawCard()
@@ -204,6 +203,12 @@ func heroFilter(c):
 
 func nullFunc():
 	return true
+	
+	
+	
+	
+	
+	
 
 var villain_prereqs = {
 	
@@ -222,5 +227,62 @@ var villain_escape = {
 }
 
 func Sentinel_Fight():
-	#print("Choosing ko")
 	$"../BlackScreen".chooseCardKO(1, 1, ["hand", "played"], heroFilter)
+
+var mastermind_strikes = {
+	"Mastermind-Red Skull" : Red_Skull_Strike
+}
+
+func Red_Skull_Strike():
+	$"../BlackScreen".chooseCardKO(1, 1, ["hand"], heroFilter)
+
+var mastermind_prereqs = {
+	
+}
+
+var tactic_fight = {
+	"Red Skull-Endless Resources" : Endless_Resources,
+	"Red Skull-Hydra Conspiracy" : Hydra_Conspiracy,
+	"Red Skull-Negablast Grenades" : Negablast_Grenades,
+	"Red Skull-Ruthless Dictator" : Ruthless_Dictator
+}
+
+func Endless_Resources():
+	res.addRecruit(4)
+
+# Needs a little more juice
+func Hydra_Conspiracy():
+	hand.drawCard()
+	hand.drawCard()
+	for i in $"../PlayerHand".vicPile:
+		if i.identifier == "Villain" and i.team == "HYDRA":
+			hand.drawCard()
+
+func Negablast_Grenades():
+	res.addAttack(3)
+
+func Ruthless_Dictator():
+	await $"../BlackScreen".KOFromDeck(1, 1, 3)
+	await $"../BlackScreen".discardFromDeck(1, 1, 2)
+
+
+var SchemeTwistLinks = {
+	"Unleash the Power of the Cosmic Cube" : PowerCosmicCube_twist
+}
+
+
+# Schemes have pther setup funcs and twist funcs
+
+func PowerCosmicCube_twist(t : int):
+	print("Twist cound ", t)
+	if t == 5 or t == 6:
+		$"../PlayerHand".deck.discard.append($"../Wounds".draw())
+		$"../PlayerHand".deck.updateDiscardCount()
+	elif t == 7:
+		$"../PlayerHand".deck.discard.append($"../Wounds".draw())
+		$"../PlayerHand".deck.discard.append($"../Wounds".draw())
+		$"../PlayerHand".deck.discard.append($"../Wounds".draw())
+		$"../PlayerHand".deck.updateDiscardCount()
+	elif t == 8:
+		# End of game
+		pass

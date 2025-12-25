@@ -282,6 +282,20 @@ static var BASE_HEROS = {
 }
 
 
+static var RED_SKULL = {
+	mName = "Red Skull",
+	leads = "HYDRA",
+	attack = 7,
+	vp = 5,
+	spritePath = "res://cards/Base/Masterminds/Mastermind-RedSkull.png",
+	tactics = {
+		"Endless Resources" : "res://cards/Base/Masterminds/RedSkull-EndlessResources.png",
+		"Hydra Conspiracy" : "res://cards/Base/Masterminds/RedSkull-HydraConspiracy.png",
+		"Negablast Grenades" : "res://cards/Base/Masterminds/RedSkull-NegablastGrenades.png",
+		"Ruthless Dictator" : "res://cards/Base/Masterminds/RedSkull-RuthlessDictator.png"
+	}
+}
+
 
 
 
@@ -296,3 +310,9 @@ static var HENCHMAN_SENTINEL = {
 static var BASE_HENCHMEN = [
 	HENCHMAN_SENTINEL
 ]
+
+static var PowerCosmicCube = {
+	sName = "Unleash the Power of the Cosmic Cube",
+	twistCount = 8,
+	spritePath = "res://cards/Base/Schemes/PowerCosmicCube.png"
+}

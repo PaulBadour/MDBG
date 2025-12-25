@@ -19,6 +19,8 @@ const CHECK_Y_MAX = y + (CARD_SIZE_Y / 2.0)
 var city = [null, null, null, null, null]
 var cityZones = [null, null, null, null, null]
 
+const MM_ZONE = [290, 510]
+
 var focused = null
 
 const OOS = Vector2(1217, -1224)
@@ -33,7 +35,11 @@ func focus(zone):
 	if focused == null:
 		emit_signal("focusedCity")
 		focused = zone
-		var xButton = START_X - (zone * DECR) + BUTTON_X_OFFSET
+		var xButton
+		if focused == -1:
+			xButton = 400 + BUTTON_X_OFFSET
+		else:
+			xButton = START_X - (zone * DECR) + BUTTON_X_OFFSET
 		$Fight.position = Vector2(xButton, y - BUTTON_Y_OFFSET)
 		$Cancel.position = Vector2(xButton, y + BUTTON_Y_OFFSET)
 
@@ -50,34 +56,56 @@ func _input(event: InputEvent) -> void:
 			return
 		var zone = -1
 		for i in range(5):
-			if pos.x > cityZones[i][0] and pos.x < cityZones[i][1]:
+			if pos.x > cityZones[i][0] and pos.x < cityZones[i][1] and city[i]:
 				zone = i
 				break
 		if zone >= 0:
 			focus(zone) 
-
+			
+		elif pos.x > MM_ZONE[0] and pos.x < MM_ZONE[1]:
+			focus(-1)
 
 func _on_fight_button_down() -> void:
-	var attack = city[focused].attack
 	var currAttack = $"../Resources".attack
-	if currAttack >= attack:
-		
-		if city[focused].getFuncName() in $"../EffectManager".villain_prereqs.keys():
-			if !$"../EffectManager".villain_prereqs[city[focused].getFuncName()].call():
-				return
-		
-		$"../Resources".addAttack(-attack)
-		$"../PlayerHand".vicPile.append(city[focused])
-		city[focused].position = OOS
-		$"../PlayerHand".killOrRecruit = true
-		
-		print(city[focused].getFuncName(), " in ", $"../EffectManager".villain_fight.keys())
-		
-		if city[focused].getFuncName() in $"../EffectManager".villain_fight.keys():
-			#print("Calling func")
-			$"../EffectManager".villain_fight[city[focused].getFuncName()].call()
-		
-		city[focused] = null
+	var attack
+	if focused == -1:
+		attack = $"../Mastermind".attack
+		if currAttack >= attack:
+			if $"../Mastermind".getFuncName() in $"../EffectManager".mastermind_prereqs.keys():
+				if !$"../EffectManager".mastermind_prereqs[$"../Mastermind".getFuncName()].call():
+					return
+			
+			$"../Resources".addAttack(-attack)
+			var t = $"../Mastermind".drawTactic()
+			$"../PlayerHand".vicPile.append(t)
+			$"../PlayerHand".killOrRecruit = true
+			
+			var fName = str($"../Mastermind".mName, "-", t.tName)
+			if fName in $"../EffectManager".tactic_fight.keys():
+				$"../EffectManager".tactic_fight[fName].call()
+			
+	else:
+		attack = city[focused].attack
+		if currAttack >= attack:
+			
+			if city[focused].getFuncName() in $"../EffectManager".villain_prereqs.keys():
+				if !$"../EffectManager".villain_prereqs[city[focused].getFuncName()].call():
+					return
+			
+			$"../Resources".addAttack(-attack)
+			$"../PlayerHand".vicPile.append(city[focused])
+			city[focused].position = OOS
+			$"../PlayerHand".killOrRecruit = true
+			
+			if city[focused].getFuncName() in $"../EffectManager".villain_fight.keys():
+				$"../EffectManager".villain_fight[city[focused].getFuncName()].call()
+			
+			city[focused] = null
+	if "Impossible Trickshot" in $"../PlayerHand".eventCards:
+		for i in range($"../PlayerHand".eventCards["Impossible Trickshot"]):
+			$"../PlayerHand".saveBystander()
+			$"../PlayerHand".saveBystander()
+			$"../PlayerHand".saveBystander()
 	_on_cancel_button_down()
 
 
@@ -116,3 +144,8 @@ func startTurn():
 		return
 	if vc.identifier == "Villain":
 		addToCity(vc)
+	if vc.identifier == "Twist":
+		print("Twist!")
+		$"../Scheme".twist()
+	if vc.identifier == "Master Strike":
+		$"../Mastermind".strike()

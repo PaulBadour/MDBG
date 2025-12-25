@@ -284,7 +284,7 @@ static var BASE_HEROS = {
 
 static var RED_SKULL = {
 	mName = "Red Skull",
-	leads = "HYDRA",
+	leads = HYDRA_VILLAINS,
 	attack = 7,
 	vp = 5,
 	spritePath = "res://cards/Base/Masterminds/Mastermind-RedSkull.png",
@@ -296,8 +296,44 @@ static var RED_SKULL = {
 	}
 }
 
+static var ENDLESS_ARMIES_HYDRA = {
+	name = "Endless Armies of Hydra",
+	attack = 4,
+	team = "HYDRA",
+	vp = 3,
+	spritePath = "res://cards/Base/Villains/HYDRA-Endless Arms of Hydra.png"
+}
 
+static var HYDRA_KIDNAPPERS = {
+	name = "Hydra Kidnappers",
+	attack = 3,
+	team = "HYDRA",
+	vp = 1,
+	spritePath = "res://cards/Base/Villains/HYDRA-Hydra Kidnappers.png"
+}
 
+static var SUPREME_HYDRA = {
+	name = "Endless Armies of Hydra",
+	attack = 6,
+	team = "HYDRA",
+	vp = 3,
+	spritePath = "res://cards/Base/Villains/HYDRA-Supreme Hydra.png"
+}
+
+static var VIPER = {
+	name = "Viper",
+	attack = 5,
+	team = "HYDRA",
+	vp = 3,
+	spritePath = "res://cards/Base/Villains/HYDRA-Viper.png"
+}
+
+static var HYDRA_VILLAINS = {
+	ENDLESS_ARMIES_HYDRA : 3,
+	HYDRA_KIDNAPPERS : 3,
+	SUPREME_HYDRA : 1,
+	VIPER : 1
+}
 
 static var HENCHMAN_SENTINEL = {
 	name = "Sentinel",

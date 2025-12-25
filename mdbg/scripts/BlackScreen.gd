@@ -262,3 +262,27 @@ func discardFromDeck(minDisc, maxDisc, number):
 		return false
 	
 	return true
+
+func customChoices(text : Array, funcs : Array):
+	if text.size() != funcs.size():
+		push_error("fucked up custom choices")
+		return
+	appear()
+	var buttons = []
+	var c = 0
+	var offset = 150
+	for i in text:
+		var b = $DiscardButton.duplicate()
+		add_child(b)
+		b.text = i
+		buttons.append(b)
+		b.position = Vector2(BUTTON_LOCATION.x - 700, BUTTON_LOCATION.y + (c * offset))
+		b.button_down.connect(funcs[c])
+		c += 1
+	
+	#get_node("DiscardButton").position = BUTTON_LOCATION
+	await $"../EffectManager".finishCustom
+	
+	disappear()
+	for i in buttons:
+		i.queue_free()

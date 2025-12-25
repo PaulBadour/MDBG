@@ -1,5 +1,7 @@
 extends Node2D
 
+signal finishCustom
+
 @onready
 var hand = $"../PlayerHand"
 @onready
@@ -33,7 +35,8 @@ var links = {
 	"Cyclops-Unending Energy" : nullFunc,
 	"Hawkeye-Quick Draw" : Quick_Draw,
 	"Hawkeye-Team Player" : Team_Player,
-	"Hawkeye-Impossible Trick Shot" : Impossible_Trickshot
+	"Hawkeye-Impossible Trick Shot" : Impossible_Trickshot,
+	"Hawkeye-Covering Fire" : Covering_Fire
 }
 
 var prereqs = {
@@ -159,7 +162,16 @@ func XMen_United():
 
 # Needs to have choice menu
 func Covering_Fire():
-	pass
+	if hand.classCount(GameData.Classes.TECH) >= 1:
+		var f1 = func():
+			$"../PlayerHand".drawCard()
+			emit_signal("finishCustom")
+			
+		var f2 = func():
+			$"../BlackScreen".chooseCardDiscard(1, 1)
+			emit_signal("finishCustom")
+			
+		$"../BlackScreen".customChoices(["Draw", "Discard"], [f1, f2])
 
 func Impossible_Trickshot():
 	if "Impossible Trickshot" in $"../PlayerHand".eventCards:

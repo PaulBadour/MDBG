@@ -42,9 +42,7 @@ func _ready() -> void:
 
 func _input(event):
 	if event is InputEventKey and event.keycode == KEY_W and event.is_pressed():
-		print("Vic size: ", vicPile.size())
-		for i in vicPile:
-			print(i, " named ", i.tName)
+		$"../BlackScreen".customChoices(["Choice 1", "Choice 2"], [null, null])
 	if event is InputEventKey and event.keycode == KEY_H and event.is_pressed():
 		print("--------------")
 		for i in playerHand:

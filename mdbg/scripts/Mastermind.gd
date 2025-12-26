@@ -14,7 +14,8 @@ var attack
 var mName
 var bystanders = []
 
-var info = GameData.RED_SKULL
+@onready
+var info = $"..".mastermind
 const OOS = Vector2(904, -1224)
 
 # Called when the node enters the scene tree for the first time.

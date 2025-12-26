@@ -1,7 +1,9 @@
 extends "res://scripts/Pile.gd"
 
-var henchman = [GameData.HENCHMAN_SENTINEL]
-var villains = [GameData.HYDRA_VILLAINS]
+@onready
+var villains = $"..".villains
+#var henchman = [GameData.HENCHMAN_SENTINEL]
+#var villains = [GameData.HYDRA_VILLAINS]
 var henchCount = 3
 var masterStrikeCount = 1
 var bystanderCount = 1
@@ -11,20 +13,23 @@ const OOS = Vector2(-200, -500)
 func _ready() -> void:
 	var vilScene = preload("res://Scenes/Villain.tscn")
 	var cardScene = preload("res://Scenes/Card.tscn")
-	for j in henchman:
-		for i in range(henchCount):
-			var v = vilScene.instantiate()
-			$"../PlayerHand".addCardToManager(v)
-			v.initVil(j)
-			addCards(v)
-			v.position = OOS
 	
-	for i in villains:
-		for j in i.keys():
-			for k in range(i[j]):
+	
+	for t in villains:
+		if "team" not in t.keys():
+			for j in t.keys():
+				print(j, t[j])
+				for k in range(t[j]):
+					var v = vilScene.instantiate()
+					$"../PlayerHand".addCardToManager(v)
+					v.initVil(j)
+					addCards(v)
+					v.position = OOS
+		else:
+			for i in range(henchCount):
 				var v = vilScene.instantiate()
 				$"../PlayerHand".addCardToManager(v)
-				v.initVil(j)
+				v.initVil(t)
 				addCards(v)
 				v.position = OOS
 	

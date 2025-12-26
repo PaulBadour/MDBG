@@ -1,7 +1,7 @@
 extends Node2D
 
 '''
-A = Autoplay
+A = Autoplay*
 D = Discard
 V = Vicpile
 P = Played
@@ -42,6 +42,9 @@ func _input(event):
 			$"../BlackScreen".showCards($"../PlayerHand".played, false)
 		else:
 			$"../BlackScreen".stopShowCards()
+	if event is InputEventKey and event.keycode == KEY_A and !event.is_echo():
+		if event.is_pressed():
+			$"../PlayerHand".autoplay()
 	# DEBUG
 	if event is InputEventKey and event.keycode == KEY_N and !event.is_echo() and event.is_pressed():
 		var c = findCard(false)

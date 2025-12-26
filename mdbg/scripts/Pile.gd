@@ -33,9 +33,9 @@ func getTop(num=1):
 
 func reveal(n=1):
 	if n > 1:
-		print("revealing ", n)
+		#print("revealing ", n)
 		var t = getTop(n)
-		print(n, t)
+		#print(n, t)
 		return t
 	var c = getTop()
 	if !c:

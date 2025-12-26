@@ -1,9 +1,23 @@
 extends Node2D
 
+var scheme
+var mastermind
+var villains
+var heros
 
 # Called when the node enters the scene tree for the first time.
-func _ready() -> void:
+func _init():
 	randomize()
+	scheme = GameData.PowerCosmicCube
+	mastermind = GameData.RED_SKULL
+	villains = [GameData.HYDRA_VILLAINS, GameData.HENCHMAN_SENTINEL]
+	heros = [GameData.Heros.IRON_MAN, GameData.Heros.CYCLOPS, GameData.Heros.HAWKEYE]
+
+func _ready() -> void:
+	await showInfoPanel()
+
+func showInfoPanel():
+	print("Info")
 
 func win():
 	print("You win!")

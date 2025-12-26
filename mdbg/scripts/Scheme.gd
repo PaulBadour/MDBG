@@ -8,7 +8,8 @@ var sName
 var twistCount
 var playedTwists = 0
 
-var info = GameData.PowerCosmicCube
+@onready
+var info = $"..".scheme
 const OOS = Vector2(1047, -1224)
 
 # Called when the node enters the scene tree for the first time.

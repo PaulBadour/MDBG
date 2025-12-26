@@ -154,12 +154,25 @@ func addBystander():
 			return
 	$"../Mastermind".bystanders.append($"../Bystanders".draw())
 
+func reveal(c):
+	var oldz = c.z_index
+	var oldScale = c.scale
+	c.position = Vector2(1000, 500)
+	c.z_index = 10
+	c.scale = Vector2(2, 2)
+	await get_tree().create_timer(1.5).timeout
+	c.position = Vector2(-500, 0)
+	c.z_index = oldz
+	c.scale = oldScale
+
 func drawVilCard():
 	var vc = $"../VillainDeck".draw()
+	
 	if !vc:
 		print("Game over")
 		return
-	elif vc.identifier == "Villain":
+	await reveal(vc)
+	if vc.identifier == "Villain":
 		print("Vil")
 		addToCity(vc)
 	elif vc.identifier == "Twist":
@@ -169,6 +182,7 @@ func drawVilCard():
 		print("Strike")
 		$"../Mastermind".strike()
 	elif vc.identifier == "Bystander":
+		
 		print("Bystander")
 		addBystander()
 	else:

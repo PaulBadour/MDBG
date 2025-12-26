@@ -212,3 +212,7 @@ func addWound(num):
 	for i in num:
 		deck.discard.append($"../Wounds".draw())
 	deck.updateDiscardCount()
+
+func autoplay():
+	while playerHand.size() > 0:
+		await playCard(playerHand[0])

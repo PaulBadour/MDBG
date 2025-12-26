@@ -14,10 +14,8 @@ func _init():
 	heros = [GameData.Heros.IRON_MAN, GameData.Heros.CYCLOPS, GameData.Heros.HAWKEYE]
 
 func _ready() -> void:
-	await showInfoPanel()
-
-func showInfoPanel():
-	print("Info")
+	await $BlackScreen.infoPanel()
+	$City.drawVilCard()
 
 func win():
 	print("You win!")

@@ -18,7 +18,7 @@ func _ready() -> void:
 	for t in villains:
 		if "team" not in t.keys():
 			for j in t.keys():
-				print(j, t[j])
+				#print(j, t[j])
 				for k in range(t[j]):
 					var v = vilScene.instantiate()
 					$"../PlayerHand".addCardToManager(v)
@@ -41,13 +41,13 @@ func _ready() -> void:
 		addCards(ms)
 		ms.position = OOS
 	
-	print("good unitl bystanders")
+	#print("good unitl bystanders")
 	await $"../Bystanders".ready
 	
 	for i in range(bystanderCount):
 		addCards($"../Bystanders".draw())
 	
-	print("good unitl scheme")
+	#print("good unitl scheme")
 	await $"../Scheme".ready
 	
 	
@@ -60,7 +60,7 @@ func _ready() -> void:
 		addCards(t)
 		
 	shuffle()
-	print("Vil deck made With ", cards.size())
+	#print("Vil deck made With ", cards.size())
 	
 
 func draw():

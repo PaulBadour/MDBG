@@ -176,6 +176,13 @@ offset_bottom = 389.0
 focus_mode = 0
 text = "Order"
 
+[node name="Info" type="Label" parent="BlackScreen"]
+z_index = 100
+offset_left = -56.0
+offset_top = 13.0
+offset_right = -16.0
+offset_bottom = 36.0
+
 [node name="KODeck" type="Node2D" parent="."]
 script = ExtResource("12_grg3l")
 

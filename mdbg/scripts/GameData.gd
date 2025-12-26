@@ -346,6 +346,45 @@ static var HYDRA_VILLAINS = {
 	VIPER : 1
 }
 
+static var DOCTOR_OCTOPUS = {
+	name = "Doctor Octopus",
+	attack = 4,
+	team = "Spider Foes",
+	vp = 2,
+	spritePath = "res://cards/Base/Villains/SpiderFoes-DoctorOctopus.png"
+}
+
+static var GREEN_GOBLIN = {
+	name = "Green Goblin",
+	attack = 6,
+	team = "Spider Foes",
+	vp = 4,
+	spritePath = "res://cards/Base/Villains/SpiderFoes-GreenGoblin.png"
+}
+
+static var THE_LIZARD = {
+	name = "The Lizard",
+	attack = 3,
+	team = "Spider Foes",
+	vp = 2,
+	spritePath = "res://cards/Base/Villains/SpiderFoes-TheLizard.png"
+}
+
+static var VENOM = {
+	name = "Venom",
+	attack = 5,
+	team = "Spider Foes",
+	vp = 3,
+	spritePath = "res://cards/Base/Villains/SpiderFoes-Venom.png"
+}
+
+static var SPIDERFOES_VILLAINS = {
+	GREEN_GOBLIN : 2,
+	DOCTOR_OCTOPUS : 2,
+	THE_LIZARD : 2,
+	VENOM : 2
+}
+
 static var HENCHMAN_SENTINEL = {
 	name = "Sentinel",
 	attack = 3,

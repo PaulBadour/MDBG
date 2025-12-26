@@ -48,7 +48,7 @@ func _input(event: InputEvent) -> void:
 		return
 	if $"../HQ".focused:
 		return
-	if event is InputEventKey and event.keycode == KEY_V and event.is_pressed():
+	if event is InputEventKey and event.keycode == KEY_S and event.is_pressed():
 		drawVilCard()
 	if event is InputEventMouseButton and event.button_index == MOUSE_BUTTON_LEFT and event.is_pressed() and !focused:
 		var pos = get_viewport().get_mouse_position()

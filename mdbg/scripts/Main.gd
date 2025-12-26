@@ -7,6 +7,7 @@ func _ready() -> void:
 
 func win():
 	print("You win!")
+	print("VP : ", get_node("PlayerHand").getVP())
 	get_tree().quit()
 
 func lose():

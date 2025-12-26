@@ -56,6 +56,7 @@ func _ready() -> void:
 		
 	shuffle()
 	print("Vil deck made With ", cards.size())
+	
 
 func draw():
 	var c = super()

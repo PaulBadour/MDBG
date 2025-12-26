@@ -29,9 +29,20 @@ func _input(event):
 		return
 	if event is InputEventKey and event.keycode == KEY_D and !event.is_echo():
 		if event.is_pressed():
-			$"../BlackScreen".showCards($"../PlayerHand".deck.discard, true)
+			$"../BlackScreen".showCards($"../PlayerHand".deck.discard, false)
 		else:
 			$"../BlackScreen".stopShowCards()
+	if event is InputEventKey and event.keycode == KEY_V and !event.is_echo():
+		if event.is_pressed():
+			$"../BlackScreen".showCards($"../PlayerHand".vicPile, false)
+		else:
+			$"../BlackScreen".stopShowCards()
+	if event is InputEventKey and event.keycode == KEY_P and !event.is_echo():
+		if event.is_pressed():
+			$"../BlackScreen".showCards($"../PlayerHand".played, false)
+		else:
+			$"../BlackScreen".stopShowCards()
+	# DEBUG
 	if event is InputEventKey and event.keycode == KEY_N and !event.is_echo() and event.is_pressed():
 		var c = findCard(false)
 		if c:

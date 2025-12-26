@@ -1,9 +1,10 @@
 extends "res://scripts/Pile.gd"
 
 var henchman = [GameData.HENCHMAN_SENTINEL]
-var henchCount = 10
+var villains = [GameData.HYDRA_VILLAINS]
+var henchCount = 3
 var masterStrikeCount = 1
-var bystanderCount = 10
+var bystanderCount = 1
 
 const OOS = Vector2(-200, -500)
 
@@ -17,6 +18,15 @@ func _ready() -> void:
 			v.initVil(j)
 			addCards(v)
 			v.position = OOS
+	
+	for i in villains:
+		for j in i.keys():
+			for k in range(i[j]):
+				var v = vilScene.instantiate()
+				$"../PlayerHand".addCardToManager(v)
+				v.initVil(j)
+				addCards(v)
+				v.position = OOS
 	
 	for i in range(masterStrikeCount):
 		var ms = cardScene.instantiate()
@@ -46,3 +56,9 @@ func _ready() -> void:
 		
 	shuffle()
 	print("Vil deck made With ", cards.size())
+
+func draw():
+	var c = super()
+	if !c:
+		$"..".tie()
+	return c

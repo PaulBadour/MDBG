@@ -17,6 +17,7 @@ var res = $"../Resources"
 var links = {
 	"Hero-SHIELD Trooper" : nullFunc,
 	"Hero-SHIELD Agent" : nullFunc,
+	"Hero-SHIELD Officer" : nullFunc,
 	"Iron Man-Repulsor Rays" : Repulsor_Rays,
 	"Iron Man-Quantum Breakthrough" : Quantum_Breakthrough,
 	"Iron Man-Endless Invention" : Endless_Invention,
@@ -182,7 +183,7 @@ func Impossible_Trickshot():
 		$"../PlayerHand".eventCards["Impossible Trickshot"] = 1
 
 func Quick_Draw():
-	hand.drawCard()
+	await hand.drawCard()
 	return true
 
 func Team_Player():
@@ -236,15 +237,43 @@ var villain_ambush = {
 }
 
 var villain_fight = {
-	"Henchmen-Sentinel" : Sentinel_Fight
+	"Henchmen-Sentinel" : Sentinel_Fight,
+	"HYDRA-Endless Armies of Hydra" : Endless_Armies_Hydra_fight,
+	"HYDRA-Viper" : Viper_fight_esc,
+	"HYDRA-Hydra Kidnappers" : Kidnapper_fight
 }
 
 var villain_escape = {
-	
+	"HYDRA-Viper" : Viper_fight_esc
 }
 
 func Sentinel_Fight():
 	$"../BlackScreen".chooseCardKO(1, 1, ["hand", "played"], heroFilter)
+
+func Endless_Armies_Hydra_fight():
+	await $"../City".drawVilCard()
+	await $"../City".drawVilCard()
+
+func Viper_fight_esc():
+	print("Running fight")
+	for i in $"../PlayerHand".vicPile:
+		if i.identifier == "Villain" and i.team == "HYDRA":
+			print("Found HYDRA")
+			return true
+	await $"../PlayerHand".addWound(1)
+	return true
+
+func Kidnapper_fight():
+	var f1 = func():
+		print("f1")
+		$"../HQ".addOfficer()
+		emit_signal("finishCustom")
+		
+	var f2 = func():
+		emit_signal("finishCustom")
+		
+	$"../BlackScreen".customChoices(["Add Officer", "Nothing"], [f1, f2])
+
 
 var mastermind_strikes = {
 	"Mastermind-Red Skull" : Red_Skull_Strike
@@ -267,7 +296,6 @@ var tactic_fight = {
 func Endless_Resources():
 	res.addRecruit(4)
 
-# Needs a little more juice
 func Hydra_Conspiracy():
 	hand.drawCard()
 	hand.drawCard()
@@ -281,6 +309,8 @@ func Negablast_Grenades():
 func Ruthless_Dictator():
 	await $"../BlackScreen".KOFromDeck(1, 1, 3)
 	await $"../BlackScreen".discardFromDeck(1, 1, 2)
+
+
 
 
 var SchemeTwistLinks = {
@@ -301,5 +331,4 @@ func PowerCosmicCube_twist(t : int):
 		$"../PlayerHand".deck.discard.append($"../Wounds".draw())
 		$"../PlayerHand".deck.updateDiscardCount()
 	elif t == 8:
-		# End of game
-		pass
+		$"..".lose()

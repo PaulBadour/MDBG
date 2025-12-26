@@ -28,3 +28,4 @@ func _ready() -> void:
 func twist():
 	playedTwists += 1
 	$"../EffectManager".SchemeTwistLinks[sName].call(playedTwists)
+	await $"../BlackScreen".KOfromHQ($"../EffectManager".sixCostFilter)

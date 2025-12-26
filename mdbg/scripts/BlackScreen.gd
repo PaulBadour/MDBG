@@ -153,7 +153,7 @@ func chooseCardKO(minKO, maxKO, locations, filter=null):
 			valid = true
 
 	get_node("KOButton").position = Vector2(1000, -200)
-	print(clicked)
+	#print(clicked)
 	
 	for i in clicked:
 		
@@ -161,6 +161,7 @@ func chooseCardKO(minKO, maxKO, locations, filter=null):
 		if i in hand:
 			#print("Removing hand wound")
 			await $"../PlayerHand".deleteCard(i)
+			await $"../PlayerHand".updateHandPositions()
 			i.position = Vector2(-500, -500)
 		if i in $"../PlayerHand".deck.discard:
 			#print("Removing deck wound")
@@ -289,6 +290,7 @@ func customChoices(text : Array, funcs : Array):
 	#get_node("DiscardButton").position = BUTTON_LOCATION
 	await $"../EffectManager".finishCustom
 	
+	deleteCustomButtons()
 	disappear()
 
 func deleteCustomButtons():

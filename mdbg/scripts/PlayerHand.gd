@@ -79,9 +79,8 @@ func playCard(card):
 	if card.recruit:
 		emit_signal("addRecruit", card.recruit)
 		
-	#card.effect()
-	await $"../EffectManager".effect(card)
 	removeFromHand(card)
+	await $"../EffectManager".effect(card)
 	cardBeingPlayed = null
 
 func addCardToManager(card):
@@ -171,8 +170,10 @@ func _on_button_button_down() -> void:
 		print("Discard: ", deck.discard)
 		print("VP: ", vicPile)
 		print("-----------------")
+		$"../City".drawVilCard()
 	else:
 		print("we got hovering")
+
 func classCount(c):
 	var count = 0
 	for i in range(1, played.size()):
@@ -202,6 +203,12 @@ func getVP():
 func countWoundsInHand():
 	var count = 0
 	for i in playerHand:
-		if i.spritePath == $"../Wounds".SPRITE_PATH:
+		if i.identifier == "Wound":
 			count += 1
 	return count
+	
+func addWound(num):
+	print("Adding wound")
+	for i in num:
+		deck.discard.append($"../Wounds".draw())
+	deck.updateDiscardCount()

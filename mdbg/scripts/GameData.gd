@@ -48,6 +48,17 @@ static var SHIELD_TROOPER = {
 	spritePath = "res://cards/Base/Heros/Hero/shield-trooper.png"
 }
 
+static var SHIELD_OFFICER = {
+	attack = null,
+	recruit = 2,
+	cost = 3,
+	team = Teams.SHIELD,
+	hClass = Classes.BASIC,
+	heroName = "Hero",
+	cardName = "SHIELD Officer",
+	spritePath = "res://cards/Base/Heros/Hero/shield-officer.png"
+}
+
 #func imrr():
 	#if $PlayerHand.classCount():
 		#pass

@@ -1,5 +1,12 @@
 extends Node2D
 
+'''
+A = Autoplay
+D = Discard
+V = Vicpile
+P = Played
+'''
+
 var isFocused = false
 
 var cardDragged
@@ -50,7 +57,7 @@ func _input(event):
 			hoverOff(cardZoomed)
 			if cardZoomed.identifier == "Villain":
 				cardZoomed.displayBystanders(false)
-			elif cardZoomed.identifier == "Villain":
+			elif cardZoomed.identifier == "Mastermind":
 				$"../Mastermind".displayBystanders(false)
 			cardZoomed = null
 			

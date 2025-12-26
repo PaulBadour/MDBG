@@ -4,17 +4,20 @@ var discard = []
 
 const OOS = Vector2(-500, 500)
 
+# Good test cards:
+# High Damage: IMPOSSIBLE_TRICKSHOT
+
 func initStarterDeck():
 	var heroScene = preload("res://Scenes/Hero.tscn")
 	for i in range(8): # 8
 		var newCard = heroScene.instantiate()
-		newCard.initHero(GameData.COVERING_FIRE) # SHIELD_AGENT
+		newCard.initHero(GameData.QUICK_DRAW) # SHIELD_AGENT
 		get_parent().addCardToManager(newCard)
 		addCards(newCard)
 		
 	for i in range(4): # 4
 		var newCard = heroScene.instantiate()
-		newCard.initHero(GameData.IMPOSSIBLE_TRICKSHOT) # SHIELD_TROOPER
+		newCard.initHero(GameData.SHIELD_TROOPER) # SHIELD_TROOPER
 		get_parent().addCardToManager(newCard)
 		addCards(newCard)
 	

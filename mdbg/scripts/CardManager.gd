@@ -64,6 +64,8 @@ func _input(event):
 					c.displayBystanders(true)
 				elif c.identifier == "Mastermind":
 					$"../Mastermind".displayBystanders(true)
+				elif cardZoomed.identifier == "Scheme":
+					$"../Scheme".displayTwists(true)
 		elif event.is_released() and cardZoomed:
 			cardZoomed.position = oldZoomPos
 			cardZoomed.scale = Vector2(BASE_SIZE, BASE_SIZE)
@@ -73,6 +75,8 @@ func _input(event):
 				cardZoomed.displayBystanders(false)
 			elif cardZoomed.identifier == "Mastermind":
 				$"../Mastermind".displayBystanders(false)
+			elif cardZoomed.identifier == "Scheme":
+				$"../Scheme".displayTwists(false)
 			cardZoomed = null
 			
 	if event is InputEventMouseButton and event.button_index == MOUSE_BUTTON_LEFT and !cardZoomed:

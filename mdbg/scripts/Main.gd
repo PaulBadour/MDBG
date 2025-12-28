@@ -4,13 +4,14 @@ var scheme
 var mastermind
 var villains
 var heros
+const PLAYER_COUNT = 1
 
 # Called when the node enters the scene tree for the first time.
 func _init():
 	randomize()
 	scheme = GameData.PowerCosmicCube
 	mastermind = GameData.RED_SKULL
-	villains = [GameData.HYDRA_VILLAINS, GameData.HENCHMAN_SENTINEL]
+	villains = [GameData.SPIDERFOES_VILLAINS, GameData.HENCHMAN_SENTINEL]
 	heros = [GameData.Heros.IRON_MAN, GameData.Heros.CYCLOPS, GameData.Heros.HAWKEYE]
 
 func _ready() -> void:

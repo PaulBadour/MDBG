@@ -19,6 +19,8 @@ const CHECK_Y_MAX = y + (CARD_SIZE_Y / 2.0)
 var city = [null, null, null, null, null]
 var cityZones = [null, null, null, null, null]
 
+var addedVil
+
 const MM_ZONE = [290, 510]
 
 var focused = null
@@ -99,7 +101,7 @@ func _on_fight_button_down() -> void:
 					return
 			
 			if city[focused].getFuncName() in $"../EffectManager".villain_fight.keys():
-				$"../EffectManager".villain_fight[city[focused].getFuncName()].call()
+				await $"../EffectManager".villain_fight[city[focused].getFuncName()].call()
 			$"../Resources".addAttack(-attack)
 			$"../PlayerHand".vicPile.append(city[focused])
 			for i in city[focused].bList:
@@ -123,13 +125,14 @@ func _on_cancel_button_down() -> void:
 	focused = null
 
 func addToCity(c):
+	addedVil = c
 	for i in range(5):
+		if i == 0 and c.getFuncName() in $"../EffectManager".villain_ambush.keys():
+			await $"../EffectManager".villain_ambush[c.getFuncName()].call()
 		if city[i] == null:
 			city[i] = c
 			c.position = Vector2(START_X - (i * DECR), y)
 			c.z_index = 3
-			if i == 0 and c.getFuncName() in $"../EffectManager".villain_ambush.keys():
-				$"../EffectManager".villain_ambush[c.getFuncName()].call()
 			return
 		var newC = city[i]
 		city[i] = c
@@ -140,7 +143,7 @@ func addToCity(c):
 	$"../EscapePile".addCards(c)
 	c.position = OOS
 	if c.getFuncName() in $"../EffectManager".villain_escape.keys():
-		$"../EffectManager".villain_escape[c.getFuncName()].call()
+		await $"../EffectManager".villain_escape[c.getFuncName()].call()
 
 	await $"../BlackScreen".KOfromHQ($"../EffectManager".sixCostFilter)
 	if c.bystanders > 0:
@@ -174,13 +177,13 @@ func drawVilCard():
 	await reveal(vc)
 	if vc.identifier == "Villain":
 		print("Vil")
-		addToCity(vc)
+		await addToCity(vc)
 	elif vc.identifier == "Twist":
 		print("Twist!")
-		$"../Scheme".twist()
+		await $"../Scheme".twist()
 	elif vc.identifier == "Master Strike":
 		print("Strike")
-		$"../Mastermind".strike()
+		await $"../Mastermind".strike()
 	elif vc.identifier == "Bystander":
 		
 		print("Bystander")

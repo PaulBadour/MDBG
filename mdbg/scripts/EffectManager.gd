@@ -222,35 +222,35 @@ func sixCostFilter(c):
 func nullFunc():
 	return true
 	
-	
-	
-	
-	
-	
+
 
 var villain_prereqs = {
-	
+	"Spider Foes-Venom" : Venom_prereq
 }
 
 var villain_ambush = {
-	
+	"Spider Foes-Green Goblin" : GreenGoblin_ambush
 }
 
 var villain_fight = {
 	"Henchmen-Sentinel" : Sentinel_Fight,
 	"HYDRA-Endless Armies of Hydra" : Endless_Armies_Hydra_fight,
 	"HYDRA-Viper" : Viper_fight_esc,
-	"HYDRA-Hydra Kidnappers" : Kidnapper_fight
+	"HYDRA-Hydra Kidnappers" : Kidnapper_fight,
+	"Spider Foes-Doctor Octopus" : DocOc_fight,
+	"Spider Foes-The Lizard" : Lizard_fight
 }
 
 var villain_escape = {
-	"HYDRA-Viper" : Viper_fight_esc
+	"HYDRA-Viper" : Viper_fight_esc,
+	"Spider Foes-Venom" : Venom_esc
 }
 
 func Sentinel_Fight():
 	$"../BlackScreen".chooseCardKO(1, 1, ["hand", "played"], heroFilter)
 
 func Endless_Armies_Hydra_fight():
+	print("Endless Armies Fight")
 	await $"../City".drawVilCard()
 	await $"../City".drawVilCard()
 
@@ -274,6 +274,29 @@ func Kidnapper_fight():
 		
 	$"../BlackScreen".customChoices(["Add Officer", "Nothing"], [f1, f2])
 
+func DocOc_fight():
+	$"../PlayerHand".handSize += 2
+
+func GreenGoblin_ambush():
+	var v = $"../City".addedVil
+	var b = $"../Bystanders".draw()
+	if b:
+		print("Adding bystander")
+		v.bystanders += 1
+		v.bList.append(b)
+	else:
+		print("Could not draw bystander")
+
+func Lizard_fight():
+	var ind = $"../City".focused
+	if ind == 0:
+		$"../PlayerHand".addWound(1)
+
+func Venom_prereq():
+	return $"../PlayerHand".classCount(GameData.Classes.COVERT, false, true) > 0
+
+func Venom_esc():
+	$"../PlayerHand".addWound(1)
 
 var mastermind_strikes = {
 	"Mastermind-Red Skull" : Red_Skull_Strike
@@ -321,7 +344,7 @@ var SchemeTwistLinks = {
 # Schemes have pther setup funcs and twist funcs
 
 func PowerCosmicCube_twist(t : int):
-	print("Twist cound ", t)
+	#print("Twist cound ", t)
 	if t == 5 or t == 6:
 		$"../PlayerHand".deck.discard.append($"../Wounds".draw())
 		$"../PlayerHand".deck.updateDiscardCount()

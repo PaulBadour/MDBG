@@ -84,7 +84,7 @@ func playCard(card):
 	cardBeingPlayed = null
 
 func addCardToManager(card):
-	$"../CardManager".add_child(card)
+	$"../CardManager".add_child(card, true)
 
 func addCardToHand(card):
 	playerHand.insert(0, card)
@@ -174,11 +174,18 @@ func _on_button_button_down() -> void:
 	else:
 		print("we got hovering")
 
-func classCount(c):
+func classCount(c, skipPlayed = true, countHand = false):
 	var count = 0
-	for i in range(1, played.size()):
+	var start = 0
+	if skipPlayed:
+		start = 1
+	for i in range(start, played.size()):
 		if played[i].hClass == c:
 			count += 1
+	if countHand:
+		for i in playerHand:
+			if i.hClass == c:
+				count += 1
 	return count
 
 func teamCount(c):
@@ -214,5 +221,9 @@ func addWound(num):
 	deck.updateDiscardCount()
 
 func autoplay():
-	while playerHand.size() > 0:
-		await playCard(playerHand[0])
+	var limit = 0
+	while playerHand.size() > limit:
+		if playerHand[limit].identifier != "Hero":
+			limit += 1
+		else:
+			await playCard(playerHand[limit])

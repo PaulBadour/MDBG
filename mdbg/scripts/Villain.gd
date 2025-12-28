@@ -28,11 +28,9 @@ func initVil(info: Dictionary):
 func displayBystanders(on):
 	if on and bystanders > 0:
 		emit_signal("bystanderLabel", str("Bystanders: ", bystanders))
-		#b.text = str("Bystanders: ", bystanders)
-		#b.position = Vector2(1500, 500)
+
 	elif !on:
 		emit_signal("removeBystanderLabel")
-		#b.position = Vector2(-1500, -500)
 
 func getFuncName():
 	return str(team, "-", cardName)

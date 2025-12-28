@@ -324,7 +324,7 @@ static var HYDRA_KIDNAPPERS = {
 }
 
 static var SUPREME_HYDRA = {
-	name = "Endless Armies of Hydra",
+	name = "Supreme Hydra",
 	attack = 6,
 	team = "HYDRA",
 	vp = 3,
@@ -395,6 +395,10 @@ static var HENCHMAN_SENTINEL = {
 
 static var BASE_HENCHMEN = [
 	HENCHMAN_SENTINEL
+]
+
+static var SCHEMES = [
+	PowerCosmicCube
 ]
 
 static var PowerCosmicCube = {

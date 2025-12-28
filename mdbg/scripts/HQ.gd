@@ -48,7 +48,7 @@ func _on_cancel_button_down() -> void:
 # Recruit button
 func _on_recruit_button_down() -> void:
 	var currRecruit = $"../Resources".recruit
-	if focused > 0:
+	if focused >= 0:
 		var cost = hq[focused].cost
 		if currRecruit >= cost:
 			$"../Resources".addRecruit(-cost)
@@ -64,6 +64,7 @@ func _on_recruit_button_down() -> void:
 	_on_cancel_button_down()
 
 func addOfficer():
+	print("Adding officer")
 	if officerCount == 1:
 		$"../PlayerHand".deck.discardCard(displayOfficer)
 	else:

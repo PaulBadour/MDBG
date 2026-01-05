@@ -148,31 +148,24 @@ func updateDiscardCount(num):
 
 # End of turn
 func _on_button_button_down() -> void:
-	if !$"../CardManager".isHovering:
-		if !killOrRecruit:
-			#print("no kill/recruit")
-			if countWoundsInHand() > 0:
-				#print("wounds found")
-				await $"../BlackScreen".chooseCardKO(0, 0, ["hand"], $"../EffectManager".woundFilter)
-				#print(str("Hand size after KO: ", playerHand.size()))
-		emit_signal("endTurn")
-		discardHand()
-		killOrRecruit = false
-		while played.size() > 0:
-			var c = played[0]
-			played.erase(c)
-			deck.discardCard(c)
+	#if !$"../CardManager".isHovering:
+	if !killOrRecruit:
+		#print("no kill/recruit")
+		if countWoundsInHand() > 0:
+			#print("wounds found")
+			await $"../BlackScreen".chooseCardKO(0, 0, ["hand"], $"../EffectManager".woundFilter)
+			#print(str("Hand size after KO: ", playerHand.size()))
+	emit_signal("endTurn")
+	discardHand()
+	killOrRecruit = false
+	while played.size() > 0:
+		var c = played[0]
+		played.erase(c)
+		deck.discardCard(c)
 
-		drawHand()
-		eventCards.clear()
-		print("End of Turn: ")
-		print("Hand: ", playerHand)
-		print("Discard: ", deck.discard)
-		print("VP: ", vicPile)
-		print("-----------------")
-		$"../City".drawVilCard()
-	else:
-		print("we got hovering")
+	drawHand()
+	eventCards.clear()
+	$"../..".socket.send_text("End Turn")
 
 func classCount(c, skipPlayed = true, countHand = false):
 	var count = 0

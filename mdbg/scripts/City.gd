@@ -50,9 +50,9 @@ func _input(event: InputEvent) -> void:
 		return
 	if $"../HQ".focused:
 		return
-	if event is InputEventKey and event.keycode == KEY_S and event.is_pressed():
-		drawVilCard()
-	if event is InputEventMouseButton and event.button_index == MOUSE_BUTTON_LEFT and event.is_pressed() and !focused:
+	#if event is InputEventKey and event.keycode == KEY_S and event.is_pressed():
+		#drawVilCard()
+	if event is InputEventMouseButton and event.button_index == MOUSE_BUTTON_LEFT and event.is_pressed() and !focused and $"..".yourTurn:
 		var pos = get_viewport().get_mouse_position()
 		if pos.y < CHECK_Y_MIN or pos.y > CHECK_Y_MAX:
 			return

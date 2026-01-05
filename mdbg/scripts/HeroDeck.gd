@@ -43,6 +43,16 @@ func makeDeck():
 		addCards(c4)
 		c4.position = OOS
 		
+	if !$"../..".host:
+		print("Not host")
+		shuffle($"../..".heroShuffleCode)
+	elif $"../..".playerCount > 1:
+		print("Making code")
+		var hsc = shuffle()
+		print("Sending: ", hsc)
+		$"../..".socket.send_text(str("HeroDeck:", JSON.stringify(hsc)))
+	else:
+		print("Singleplayer")
 		shuffle()
 	
 	emit_signal("SetupHQ")

@@ -52,5 +52,30 @@ func reveal(n=1):
 	
 	return c
 
-func shuffle():
-	cards.shuffle()
+func shuffle(sc=null):
+	if sc:
+		#print("Shuffle Code: ", sc)
+		var i = 0
+		while i < cards.size():
+			if sc[i] == i:
+				i += 1
+			else:
+				var swap1 = i
+				var swap2 = sc[i]
+
+				var temp = sc[swap1]
+				sc[swap1] = sc[swap2]
+				sc[swap2] = temp
+		
+				temp = cards[swap1]
+				cards[swap1] = cards[swap2]
+				cards[swap2] = temp
+	else:
+		var shuffleCode = []
+		for i in range(0, cards.size()):
+			shuffleCode.append(i)
+		
+		shuffleCode.shuffle()
+		
+		shuffle(shuffleCode.duplicate(true))
+		return shuffleCode

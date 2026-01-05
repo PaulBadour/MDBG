@@ -347,7 +347,7 @@ func infoPanel():
 	
 	await appear()
 	l.position = Vector2(1000, 500)
-	l.text = str(schemeText, mastermindText, heroText, villainText)
+	l.text = str(schemeText, mastermindText, heroText, villainText, "Player Count: ", $"..".PLAYER_COUNT)
 	
 	await get_tree().create_timer(6.0).timeout
 	l.position = Vector2(1225, 2025)

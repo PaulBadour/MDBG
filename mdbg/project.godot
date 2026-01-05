@@ -11,7 +11,7 @@ config_version=5
 [application]
 
 config/name="MDBG"
-run/main_scene="uid://dokr14biam1hj"
+run/main_scene="uid://b7nxo7hw6don2"
 config/features=PackedStringArray("4.5", "Mobile")
 config/icon="res://icon.svg"
 

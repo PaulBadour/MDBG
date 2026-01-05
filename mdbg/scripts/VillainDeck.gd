@@ -59,9 +59,18 @@ func _ready() -> void:
 		$"../PlayerHand".addCardToManager(t)
 		addCards(t)
 		
-	shuffle()
-	#print("Vil deck made With ", cards.size())
-	
+	if !$"../..".host:
+		#print("Not host")
+		shuffle($"../..".villainShuffleCode)
+	elif $"../..".playerCount > 1:
+		#print("Making code")
+		var hsc = shuffle()
+		#print("Sending: ", hsc)
+		$"../..".socket.send_text(str("VillainDeck:", JSON.stringify(hsc)))
+	else:
+		#print("Singleplayer")
+		shuffle()
+
 
 func draw():
 	var c = super()

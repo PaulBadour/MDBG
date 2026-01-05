@@ -1,0 +1,41 @@
+[gd_scene load_steps=2 format=3 uid="uid://b7nxo7hw6don2"]
+
+[ext_resource type="Script" uid="uid://bgvqc5us7cjyy" path="res://scripts/Menu.gd" id="1_3kf3n"]
+
+[node name="Menu" type="Node2D"]
+script = ExtResource("1_3kf3n")
+
+[node name="JoinButton" type="Button" parent="."]
+offset_left = 235.0
+offset_top = 615.0
+offset_right = 414.0
+offset_bottom = 695.0
+text = "Join"
+
+[node name="HostButton" type="Button" parent="."]
+offset_left = 237.0
+offset_top = 484.0
+offset_right = 416.0
+offset_bottom = 564.0
+text = "Host
+"
+
+[node name="SingleButton" type="Button" parent="."]
+offset_left = 237.0
+offset_top = 300.0
+offset_right = 416.0
+offset_bottom = 379.99933
+text = "Single Player"
+
+[node name="StartButton" type="Button" parent="."]
+visible = false
+offset_left = 580.0
+offset_top = 502.0
+offset_right = 759.0
+offset_bottom = 582.0
+text = "Start"
+
+[connection signal="button_down" from="JoinButton" to="." method="_on_button_button_down"]
+[connection signal="button_down" from="HostButton" to="." method="_on_host_button_button_down"]
+[connection signal="button_down" from="SingleButton" to="." method="_on_single_button_button_down"]
+[connection signal="button_down" from="StartButton" to="." method="_on_start_button_button_down"]

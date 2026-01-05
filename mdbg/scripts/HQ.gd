@@ -92,7 +92,7 @@ func _input(event: InputEvent) -> void:
 		return
 	if $"../City".focused:
 		return
-	if event is InputEventMouseButton and event.button_index == MOUSE_BUTTON_LEFT and event.is_pressed() and !focused and !$"../BlackScreen".isCovered:
+	if event is InputEventMouseButton and event.button_index == MOUSE_BUTTON_LEFT and event.is_pressed() and !focused and !$"../BlackScreen".isCovered and $"..".yourTurn:
 		var pos = get_viewport().get_mouse_position()
 		if pos.y < CHECK_Y_MIN or pos.y > CHECK_Y_MAX:
 			return

@@ -1,39 +1,40 @@
 [gd_scene load_steps=21 format=3 uid="uid://dokr14biam1hj"]
 
-[ext_resource type="Script" uid="uid://bvjanc1l5qt86" path="res://scripts/Main.gd" id="1_346fj"]
-[ext_resource type="Script" uid="uid://bxvjr2go4dlw6" path="res://scripts/CardManager.gd" id="1_idj7w"]
-[ext_resource type="Script" uid="uid://og0oya8vvyxd" path="res://scripts/PlayerHand.gd" id="2_kln2b"]
-[ext_resource type="Script" uid="uid://b2qy63u1p8e23" path="res://scripts/EndTurnButton.gd" id="3_kln2b"]
-[ext_resource type="Script" uid="uid://bggmcpx3wkl85" path="res://scripts/DeckDisplay.gd" id="4_rgh2o"]
-[ext_resource type="Script" uid="uid://dtab5k4buc3a2" path="res://scripts/DiscardDisplay.gd" id="5_pbw6q"]
-[ext_resource type="Script" uid="uid://jgmjqsrpmr8l" path="res://scripts/Resources.gd" id="6_v1gob"]
-[ext_resource type="Script" uid="uid://dkjrk5ruvaet6" path="res://scripts/HQ.gd" id="7_50glp"]
-[ext_resource type="Script" uid="uid://m4h1jp75jtrx" path="res://scripts/HeroDeck.gd" id="7_jw32o"]
-[ext_resource type="Script" uid="uid://0dlehe1upwxg" path="res://scripts/City.gd" id="9_1p5hy"]
-[ext_resource type="Script" uid="uid://btkeam6yo7pba" path="res://scripts/EffectManager.gd" id="9_vy5pj"]
-[ext_resource type="Script" uid="uid://cc3pje6hbw6fr" path="res://scripts/Bystanders.gd" id="10_bmxlf"]
-[ext_resource type="Script" uid="uid://cr0jam5chkls2" path="res://scripts/BlackScreen.gd" id="11_4kpch"]
-[ext_resource type="Script" uid="uid://b5wpv6b1xk6qe" path="res://scripts/KODeck.gd" id="12_grg3l"]
-[ext_resource type="Script" uid="uid://dc42lnh0jh83d" path="res://scripts/Wounds.gd" id="13_frkhe"]
-[ext_resource type="Script" uid="uid://bj33fsh78563c" path="res://scripts/VillainDeck.gd" id="15_h1m7h"]
-[ext_resource type="Script" uid="uid://dn8bwc23u4h4a" path="res://scripts/EscapePile.gd" id="16_erwvk"]
-[ext_resource type="Script" uid="uid://b0u7bdwgaemy6" path="res://scripts/Mastermind.gd" id="17_2w5on"]
-[ext_resource type="Script" uid="uid://dvbvsv34bvpfx" path="res://scripts/Scheme.gd" id="19_0sclb"]
-[ext_resource type="Script" uid="uid://coqq2aj6xwp0u" path="res://scripts/ExtraLabels.gd" id="20_sxkr1"]
+[ext_resource type="Script" uid="uid://bvjanc1l5qt86" path="res://scripts/Main.gd" id="1_tfod6"]
+[ext_resource type="Script" uid="uid://btkeam6yo7pba" path="res://scripts/EffectManager.gd" id="2_rajel"]
+[ext_resource type="Script" uid="uid://bxvjr2go4dlw6" path="res://scripts/CardManager.gd" id="3_vvhu1"]
+[ext_resource type="Script" uid="uid://og0oya8vvyxd" path="res://scripts/PlayerHand.gd" id="4_lbihj"]
+[ext_resource type="Script" uid="uid://b2qy63u1p8e23" path="res://scripts/EndTurnButton.gd" id="5_raj38"]
+[ext_resource type="Script" uid="uid://bggmcpx3wkl85" path="res://scripts/DeckDisplay.gd" id="6_8e0uq"]
+[ext_resource type="Script" uid="uid://dtab5k4buc3a2" path="res://scripts/DiscardDisplay.gd" id="7_i0vto"]
+[ext_resource type="Script" uid="uid://jgmjqsrpmr8l" path="res://scripts/Resources.gd" id="8_3jf1l"]
+[ext_resource type="Script" uid="uid://dkjrk5ruvaet6" path="res://scripts/HQ.gd" id="9_356ba"]
+[ext_resource type="Script" uid="uid://0dlehe1upwxg" path="res://scripts/City.gd" id="10_i4lct"]
+[ext_resource type="Script" uid="uid://m4h1jp75jtrx" path="res://scripts/HeroDeck.gd" id="11_iyesh"]
+[ext_resource type="Script" uid="uid://cr0jam5chkls2" path="res://scripts/BlackScreen.gd" id="12_i1pr2"]
+[ext_resource type="Script" uid="uid://b5wpv6b1xk6qe" path="res://scripts/KODeck.gd" id="13_4f4ik"]
+[ext_resource type="Script" uid="uid://dc42lnh0jh83d" path="res://scripts/Wounds.gd" id="14_khs3t"]
+[ext_resource type="Script" uid="uid://bj33fsh78563c" path="res://scripts/VillainDeck.gd" id="15_0iyqm"]
+[ext_resource type="Script" uid="uid://cc3pje6hbw6fr" path="res://scripts/Bystanders.gd" id="16_jn8rg"]
+[ext_resource type="Script" uid="uid://dn8bwc23u4h4a" path="res://scripts/EscapePile.gd" id="17_umnjm"]
+[ext_resource type="Script" uid="uid://b0u7bdwgaemy6" path="res://scripts/Mastermind.gd" id="18_4eqlp"]
+[ext_resource type="Script" uid="uid://dvbvsv34bvpfx" path="res://scripts/Scheme.gd" id="19_18uti"]
+[ext_resource type="Script" uid="uid://coqq2aj6xwp0u" path="res://scripts/ExtraLabels.gd" id="20_khy6b"]
 
-[node name="Main" type="Node2D"]
-script = ExtResource("1_346fj")
+[node name="Game" type="Node2D"]
+script = ExtResource("1_tfod6")
 
 [node name="EffectManager" type="Node2D" parent="."]
-script = ExtResource("9_vy5pj")
+script = ExtResource("2_rajel")
 
 [node name="CardManager" type="Node2D" parent="."]
-script = ExtResource("1_idj7w")
+script = ExtResource("3_vvhu1")
 
 [node name="PlayerHand" type="Node2D" parent="."]
-script = ExtResource("2_kln2b")
+script = ExtResource("4_lbihj")
 
 [node name="EndTurn" type="Node2D" parent="."]
+visible = false
 
 [node name="Button" type="Button" parent="EndTurn"]
 offset_left = 1664.0
@@ -42,10 +43,10 @@ offset_right = 1900.0
 offset_bottom = 862.0
 focus_mode = 0
 text = "End Turn"
-script = ExtResource("3_kln2b")
+script = ExtResource("5_raj38")
 
 [node name="DeckDisplay" type="Node2D" parent="."]
-script = ExtResource("4_rgh2o")
+script = ExtResource("6_8e0uq")
 
 [node name="Label" type="Label" parent="DeckDisplay"]
 offset_left = 34.0
@@ -55,7 +56,7 @@ offset_bottom = 726.0
 text = "Deck: 6"
 
 [node name="DiscardDisplay" type="Node2D" parent="."]
-script = ExtResource("5_pbw6q")
+script = ExtResource("7_i0vto")
 
 [node name="Label" type="Label" parent="DiscardDisplay"]
 offset_left = 34.0
@@ -65,7 +66,7 @@ offset_bottom = 773.0
 text = "Discard: 0"
 
 [node name="Resources" type="Node2D" parent="."]
-script = ExtResource("6_v1gob")
+script = ExtResource("8_3jf1l")
 
 [node name="Attack" type="Label" parent="Resources"]
 offset_left = 34.0
@@ -81,8 +82,14 @@ offset_right = 107.0
 offset_bottom = 873.0
 text = "Recruit: 0"
 
+[node name="UsernameLabel" type="Label" parent="Resources"]
+offset_left = 25.0
+offset_top = 20.0
+offset_right = 102.0
+offset_bottom = 61.0
+
 [node name="HQ" type="Node2D" parent="."]
-script = ExtResource("7_50glp")
+script = ExtResource("9_356ba")
 
 [node name="ColorRect" type="ColorRect" parent="HQ"]
 offset_left = 275.0
@@ -110,7 +117,7 @@ focus_mode = 0
 text = "Recruit"
 
 [node name="City" type="Node2D" parent="."]
-script = ExtResource("9_1p5hy")
+script = ExtResource("10_i4lct")
 
 [node name="ColorRect" type="ColorRect" parent="City"]
 offset_left = 275.0
@@ -138,10 +145,10 @@ focus_mode = 0
 text = "Fight"
 
 [node name="HeroDeck" type="Node2D" parent="."]
-script = ExtResource("7_jw32o")
+script = ExtResource("11_iyesh")
 
 [node name="BlackScreen" type="Node2D" parent="."]
-script = ExtResource("11_4kpch")
+script = ExtResource("12_i1pr2")
 
 [node name="Drapes" type="ColorRect" parent="BlackScreen"]
 z_index = 20
@@ -184,28 +191,28 @@ offset_right = -16.0
 offset_bottom = 36.0
 
 [node name="KODeck" type="Node2D" parent="."]
-script = ExtResource("12_grg3l")
+script = ExtResource("13_4f4ik")
 
 [node name="Wounds" type="Node2D" parent="."]
-script = ExtResource("13_frkhe")
+script = ExtResource("14_khs3t")
 
 [node name="VillainDeck" type="Node2D" parent="."]
-script = ExtResource("15_h1m7h")
+script = ExtResource("15_0iyqm")
 
 [node name="Bystanders" type="Node2D" parent="."]
-script = ExtResource("10_bmxlf")
+script = ExtResource("16_jn8rg")
 
 [node name="EscapePile" type="Node2D" parent="."]
-script = ExtResource("16_erwvk")
+script = ExtResource("17_umnjm")
 
 [node name="Mastermind" type="Node2D" parent="."]
-script = ExtResource("17_2w5on")
+script = ExtResource("18_4eqlp")
 
 [node name="Scheme" type="Node2D" parent="."]
-script = ExtResource("19_0sclb")
+script = ExtResource("19_18uti")
 
 [node name="ExtraLabels" type="Node2D" parent="."]
-script = ExtResource("20_sxkr1")
+script = ExtResource("20_khy6b")
 
 [node name="CardInfo" type="Label" parent="ExtraLabels"]
 z_index = 10

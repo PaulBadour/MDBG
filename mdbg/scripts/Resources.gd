@@ -11,6 +11,8 @@ var recruit
 func _ready() -> void:
 	$Attack.add_theme_font_size_override("font_size", TEXT_FONT)
 	$Recruit.add_theme_font_size_override("font_size", TEXT_FONT)
+	$UsernameLabel.add_theme_font_size_override("font_size", TEXT_FONT)
+	$UsernameLabel.text = $"../..".username
 	attack = 0
 	recruit = 0
 

@@ -78,11 +78,11 @@ func _input(event):
 			elif cardZoomed.identifier == "Scheme":
 				$"../Scheme".displayTwists(false)
 			cardZoomed = null
-			
+
 	if event is InputEventMouseButton and event.button_index == MOUSE_BUTTON_LEFT and !cardZoomed:
 		if event.is_pressed():
 			var c = findCard()
-			if c and $"../PlayerHand".isCardInHand(c):
+			if c and $"../PlayerHand".isCardInHand(c) and $"..".yourTurn:
 				cardDragged = c
 		elif cardDragged:
 			if cardDragged.position.y < PLAY_ZONE:

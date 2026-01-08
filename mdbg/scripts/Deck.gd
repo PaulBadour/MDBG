@@ -14,13 +14,13 @@ func initStarterDeck():
 		newCard.initHero(GameData.SHIELD_AGENT) # SHIELD_AGENT
 		get_parent().addCardToManager(newCard)
 		addCards(newCard)
-		
+
 	for i in range(4): # 4
 		var newCard = heroScene.instantiate()
 		newCard.initHero(GameData.SHIELD_TROOPER) # SHIELD_TROOPER
 		get_parent().addCardToManager(newCard)
 		addCards(newCard)
-	
+
 	for i in cards:
 		i.position = OOS
 

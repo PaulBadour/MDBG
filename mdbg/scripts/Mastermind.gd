@@ -43,7 +43,16 @@ func _ready() -> void:
 
 func drawTactic():
 	var num = randi_range(0, tactics.size() - 1)
+	if $"..".PLAYER_COUNT > 1:
+		$"../..".socket.send_text(str("Tactic:", num))
 	return tactics.pop_at(num)
+
+func removeTactic(ind):
+	tactics.pop_at(ind)
+	print("Remaining tactics:")
+	for i in tactics:
+		print(i.tName)
+	print("-------------")
 
 func strike():
 	print("Drew strike")

@@ -1,7 +1,7 @@
 import asyncio
 import websockets
 
-players = []
+# players = []
 
 class Lobby():
 
@@ -36,23 +36,39 @@ class Lobby():
         for i in range(1, len(self.members)):
             await self.members[i][0].send(code)
 
+    async def msgAllOthers(self, msg, ws):
+        for i in self.members:
+            if i[0] != ws:
+                await i[0].send(msg)
+
+async def parseMsg(websocket, message):
+    if message == "ping":
+        # players.append(websocket)
+        await websocket.send(f"Pong")
+    elif message == "Create Lobby":
+        Lobby(websocket)
+        await websocket.send(f"Lobby Created")
+    elif message == "Join Lobby":
+        await Lobby.lobbies[0].joinLobby(websocket)
+    elif message == "Start Game":
+        await Lobby.lobbies[0].startGame()
+    elif message == "End Turn":
+        await Lobby.lobbies[0].sendTurn(True)
+    elif message.startswith("HeroDeck") or message.startswith("VillainDeck"):
+        await Lobby.lobbies[0].sendDeckCode(message)
+    elif message.startswith("Recruited:"):
+        await Lobby.lobbies[0].msgAllOthers(message, websocket)
+    elif message.startswith("Fought:"):
+        await Lobby.lobbies[0].msgAllOthers(message, websocket)
+    elif message.startswith("Tactic:"):
+        await Lobby.lobbies[0].msgAllOthers(message, websocket)
+    elif message.startswith("CardEffect:"):
+        await Lobby.lobbies[0].msgAllOthers(message, websocket)
+
 async def handleMessage(websocket):
     async for message in websocket:
         print(f"Received from client: '{message}'")
-        if message == "ping":
-            players.append(websocket)
-            await websocket.send(f"Pong")
-        elif message == "Create Lobby":
-            Lobby(websocket)
-            await websocket.send(f"Lobby Created")
-        elif message == "Join Lobby":
-            await Lobby.lobbies[0].joinLobby(websocket)
-        elif message == "Start Game":
-            await Lobby.lobbies[0].startGame()
-        elif message == "End Turn":
-            await Lobby.lobbies[0].sendTurn(True)
-        elif message.startswith("HeroDeck") or message.startswith("VillainDeck"):
-            await Lobby.lobbies[0].sendDeckCode(message)
+        await parseMsg(websocket, message)
         
 
 async def main():

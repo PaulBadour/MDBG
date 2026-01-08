@@ -88,6 +88,25 @@ func _process(delta: float) -> void:
 						gNode.newTurn()
 					else:
 						emit_signal("firstTurnRecieved")
+				elif packet_text.begins_with("Recruited:"):
+					var f = int(packet_text.substr(10, packet_text.length()))
+					print(f, " was recruited")
+					if f == -1:
+						gNode.get_node("HQ").addOfficer(true)
+					else:
+						gNode.get_node("HQ").removeHero(f)
+				elif packet_text.begins_with("Fought:"):
+					var f = int(packet_text.substr(7, packet_text.length()))
+					gNode.get_node("City").removeVil(f)
+				elif packet_text.begins_with("Tactic:"):
+					print("Tactic received : ", packet_text)
+					var f = int(packet_text.substr(7, packet_text.length()))
+					gNode.get_node("Mastermind").removeTactic(f)
+				elif packet_text.begins_with("CardEffect:"):
+					var eff = packet_text.substr(11, packet_text.length())
+					var cName = eff.substr(0, eff.find(":"))
+					var choice = eff.substr(eff.find(":") + 1, -1)
+					await gNode.get_node("EffectManager").aop_effects[cName].call(choice)
 				elif host:
 					print("Host: ", packet_text)
 				else:
@@ -129,7 +148,7 @@ func _on_start_button_button_down() -> void:
 
 # Single player button
 func _on_single_button_button_down() -> void:
-	username = ""
+	username = "."
 	host = true
 	playerCount = 1
 	turn = username
@@ -147,6 +166,7 @@ func startGame():
 		if not villainShuffleCode:
 			await villainShuffleCodeRecieved
 	if not turn:
+		print("No turn")
 		await firstTurnRecieved
 	var game = preload("res://Scenes/Game.tscn")
 	gNode = game.instantiate()

@@ -41,8 +41,8 @@ func _ready() -> void:
 	drawHand()
 
 func _input(event):
-	if event is InputEventKey and event.keycode == KEY_W and event.is_pressed():
-		$"../BlackScreen".customChoices(["Choice 1", "Choice 2"], [null, null])
+	#if event is InputEventKey and event.keycode == KEY_W and event.is_pressed():
+		#$"../BlackScreen".customChoices(["Choice 1", "Choice 2"], [null, null])
 	if event is InputEventKey and event.keycode == KEY_H and event.is_pressed():
 		print("--------------")
 		for i in playerHand:
@@ -148,7 +148,7 @@ func updateDiscardCount(num):
 
 # End of turn
 func _on_button_button_down() -> void:
-	#if !$"../CardManager".isHovering:
+	print("EOT button hit")
 	if !killOrRecruit:
 		#print("no kill/recruit")
 		if countWoundsInHand() > 0:
@@ -165,7 +165,10 @@ func _on_button_button_down() -> void:
 
 	drawHand()
 	eventCards.clear()
-	$"../..".socket.send_text("End Turn")
+	if $"..".PLAYER_COUNT > 1:
+		$"../..".socket.send_text("End Turn")
+	else:
+		$"..".newTurn()
 
 func classCount(c, skipPlayed = true, countHand = false):
 	var count = 0

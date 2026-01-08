@@ -50,8 +50,6 @@ func _input(event: InputEvent) -> void:
 		return
 	if $"../HQ".focused:
 		return
-	#if event is InputEventKey and event.keycode == KEY_S and event.is_pressed():
-		#drawVilCard()
 	if event is InputEventMouseButton and event.button_index == MOUSE_BUTTON_LEFT and event.is_pressed() and !focused and $"..".yourTurn:
 		var pos = get_viewport().get_mouse_position()
 		if pos.y < CHECK_Y_MIN or pos.y > CHECK_Y_MAX:
@@ -73,10 +71,10 @@ func _on_fight_button_down() -> void:
 	if focused == -1:
 		attack = $"../Mastermind".attack
 		if currAttack >= attack:
+			
 			if $"../Mastermind".getFuncName() in $"../EffectManager".mastermind_prereqs.keys():
 				if !$"../EffectManager".mastermind_prereqs[$"../Mastermind".getFuncName()].call():
 					return
-			
 			$"../Resources".addAttack(-attack)
 			var t = $"../Mastermind".drawTactic()
 			$"../PlayerHand".vicPile.append(t)
@@ -84,7 +82,7 @@ func _on_fight_button_down() -> void:
 				$"../PlayerHand".vicPile.append(i)
 			$"../Mastermind".bystanders.clear()
 			$"../PlayerHand".killOrRecruit = true
-			
+
 			var fName = str($"../Mastermind".mName, "-", t.tName)
 			if fName in $"../EffectManager".tactic_fight.keys():
 				$"../EffectManager".tactic_fight[fName].call()
@@ -99,17 +97,19 @@ func _on_fight_button_down() -> void:
 			if city[focused].getFuncName() in $"../EffectManager".villain_prereqs.keys():
 				if !$"../EffectManager".villain_prereqs[city[focused].getFuncName()].call():
 					return
-			
-			if city[focused].getFuncName() in $"../EffectManager".villain_fight.keys():
-				await $"../EffectManager".villain_fight[city[focused].getFuncName()].call()
-			$"../Resources".addAttack(-attack)
-			$"../PlayerHand".vicPile.append(city[focused])
-			for i in city[focused].bList:
-				$"../PlayerHand".vicPile.append(i)
-			city[focused].position = OOS
-			$"../PlayerHand".killOrRecruit = true
-			
+			if $"..".PLAYER_COUNT > 1:
+				$"../..".socket.send_text(str("Fought:", focused))
+			var card = city[focused]
 			city[focused] = null
+			card.position = OOS
+			if card.getFuncName() in $"../EffectManager".villain_fight.keys():
+				await $"../EffectManager".villain_fight[card.getFuncName()].call()
+			$"../Resources".addAttack(-attack)
+			$"../PlayerHand".vicPile.append(card)
+			for i in card.bList:
+				$"../PlayerHand".vicPile.append(i)
+			$"../PlayerHand".killOrRecruit = true
+
 	if "Impossible Trickshot" in $"../PlayerHand".eventCards:
 		for i in range($"../PlayerHand".eventCards["Impossible Trickshot"]):
 			$"../PlayerHand".saveBystander()
@@ -145,7 +145,9 @@ func addToCity(c):
 	if c.getFuncName() in $"../EffectManager".villain_escape.keys():
 		await $"../EffectManager".villain_escape[c.getFuncName()].call()
 
-	await $"../BlackScreen".KOfromHQ($"../EffectManager".sixCostFilter)
+	if $"..".yourTurn:
+		await $"../BlackScreen".KOfromHQ($"../EffectManager".sixCostFilter)
+
 	if c.bystanders > 0:
 		await $"../BlackScreen".chooseCardDiscard(1, 1, false)
 
@@ -156,6 +158,17 @@ func addBystander():
 			i.bList.append($"../Bystanders".draw())
 			return
 	$"../Mastermind".bystanders.append($"../Bystanders".draw())
+
+func removeVil(ind):
+	var card = city[ind]
+	card.position = Vector2(-255, 1726)
+	city[ind] = null
+	if card.getFuncName() in $"../EffectManager".villain_aopfight.keys():
+		focused = ind
+		await $"../EffectManager".villain_aopfight[card.getFuncName()].call()
+		focused = null
+	
+	
 
 func reveal(c):
 	var oldz = c.z_index
@@ -170,7 +183,6 @@ func reveal(c):
 
 func drawVilCard():
 	var vc = $"../VillainDeck".draw()
-	
 	if !vc:
 		print("Game over")
 		return

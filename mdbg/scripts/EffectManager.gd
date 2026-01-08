@@ -45,6 +45,10 @@ var prereqs = {
 	"Cyclops-Optic Blast" : Optic_Blast_prereq
 }
 
+var aop_effects = {
+	"Hawkeye-Covering Fire" : Covering_Fire_aop
+}
+
 # Iron Man
 
 func Repulsor_Rays():
@@ -161,20 +165,27 @@ func XMen_United():
 
 # Hawkeye
 
-# Needs to have choice menu
 func Covering_Fire():
 	if hand.classCount(GameData.Classes.TECH) >= 1:
 		var f1 = func():
 			$"../PlayerHand".drawCard()
+			$"../..".socket.send_text("CardEffect:Hawkeye-Covering Fire:1")
 			emit_signal("finishCustom")
 			
 		var f2 = func():
+			$"../..".socket.send_text("CardEffect:Hawkeye-Covering Fire:2")
 			$"../BlackScreen".disappear()
 			$"../BlackScreen".deleteCustomButtons()
 			await $"../BlackScreen".chooseCardDiscard(1, 1)
 			emit_signal("finishCustom")
 			
 		$"../BlackScreen".customChoices(["Draw", "Discard"], [f1, f2])
+
+func Covering_Fire_aop(choice):
+	if choice == "1":
+		$"../PlayerHand".drawCard()
+	else:
+		await $"../BlackScreen".chooseCardDiscard(1, 1)
 
 func Impossible_Trickshot():
 	if "Impossible Trickshot" in $"../PlayerHand".eventCards:
@@ -246,19 +257,22 @@ var villain_escape = {
 	"Spider Foes-Venom" : Venom_esc
 }
 
+var villain_aopfight = {
+	"HYDRA-Endless Armies of Hydra" : Endless_Armies_Hydra_fight,
+	"HYDRA-Viper" : Viper_fight_esc,
+	"Spider Foes-The Lizard" : Lizard_fight
+}
+
 func Sentinel_Fight():
 	$"../BlackScreen".chooseCardKO(1, 1, ["hand", "played"], heroFilter)
 
 func Endless_Armies_Hydra_fight():
-	print("Endless Armies Fight")
 	await $"../City".drawVilCard()
 	await $"../City".drawVilCard()
 
 func Viper_fight_esc():
-	print("Running fight")
 	for i in $"../PlayerHand".vicPile:
 		if i.identifier == "Villain" and i.team == "HYDRA":
-			print("Found HYDRA")
 			return true
 	await $"../PlayerHand".addWound(1)
 	return true
@@ -288,9 +302,11 @@ func GreenGoblin_ambush():
 		print("Could not draw bystander")
 
 func Lizard_fight():
+	print("Liz fight, ", $"..".yourTurn)
 	var ind = $"../City".focused
 	if ind == 0:
-		$"../PlayerHand".addWound(1)
+		if $"..".PLAYER_COUNT == 1 or !$"..".yourTurn:
+			$"../PlayerHand".addWound(1)
 
 func Venom_prereq():
 	return $"../PlayerHand".classCount(GameData.Classes.COVERT, false, true) > 0

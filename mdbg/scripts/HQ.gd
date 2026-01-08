@@ -51,29 +51,40 @@ func _on_recruit_button_down() -> void:
 	if focused >= 0:
 		var cost = hq[focused].cost
 		if currRecruit >= cost:
+			if $"..".PLAYER_COUNT > 1:
+				$"../..".socket.send_text(str("Recruited:", focused))
 			$"../Resources".addRecruit(-cost)
 			$"../PlayerHand".deck.discardCard(hq[focused])
 			hq[focused] = null
 			fillHQ()
 	else:
 		if currRecruit >= 3:
+			if $"..".PLAYER_COUNT > 1:
+				$"../..".socket.send_text(str("Recruited:-1"))
 			$"../Resources".addRecruit(-3)
 			addOfficer()
 			
 	$"../PlayerHand".killOrRecruit = true
 	_on_cancel_button_down()
 
-func addOfficer():
-	print("Adding officer")
+func addOfficer(fake=false):
 	if officerCount == 1:
-		$"../PlayerHand".deck.discardCard(displayOfficer)
-	else:
+		if fake:
+			displayOfficer.position = Vector2(1626, -310)
+		else:
+			$"../PlayerHand".deck.discardCard(displayOfficer)
+	elif not fake:
 		var newOfficer = preload("res://Scenes/Hero.tscn").instantiate()
 		newOfficer.initHero(GameData.SHIELD_OFFICER)
 		$"../PlayerHand".addCardToManager(newOfficer)
 		newOfficer.position = Vector2(-906, 906)
 		$"../PlayerHand".deck.discardCard(newOfficer)
 	officerCount -= 1
+
+func removeHero(ind):
+	hq[ind].position = Vector2(-324, 1626)
+	hq[ind] = null
+	fillHQ()
 
 func focus(zone):
 	if focused == null:

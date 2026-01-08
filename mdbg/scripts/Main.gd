@@ -14,7 +14,7 @@ func _init():
 	randomize()
 	scheme = GameData.PowerCosmicCube
 	mastermind = GameData.RED_SKULL
-	villains = [GameData.SPIDERFOES_VILLAINS, GameData.HENCHMAN_SENTINEL]
+	villains = [GameData.HYDRA_VILLAINS, GameData.HENCHMAN_SENTINEL]
 	heros = [GameData.Heros.IRON_MAN, GameData.Heros.CYCLOPS, GameData.Heros.HAWKEYE]
 
 func start():

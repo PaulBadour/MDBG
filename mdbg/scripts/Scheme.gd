@@ -9,7 +9,7 @@ var twistCount
 var playedTwists = 0
 
 @onready
-var info = $"..".scheme
+var info = $"../..".scheme
 const OOS = Vector2(1047, -1224)
 
 # Called when the node enters the scene tree for the first time.

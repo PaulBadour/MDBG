@@ -180,7 +180,7 @@ func classCount(c, skipPlayed = true, countHand = false):
 			count += 1
 	if countHand:
 		for i in playerHand:
-			if i.hClass == c:
+			if i.identifier == "Hero" and i.hClass == c:
 				count += 1
 	return count
 

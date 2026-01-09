@@ -1,7 +1,7 @@
 import asyncio
 import websockets
 
-# players = []
+players = {}
 
 class Lobby():
 
@@ -9,14 +9,23 @@ class Lobby():
 
     def __init__(self, host):
         self.host = host
-        self.members = [(host, "host")]
+        self.members = [(host, players[host])]
         Lobby.lobbies.append(self)
         self.codeRequired = False
         self.turn = 0
     
+    def getLobbyText(self):
+        text = ""
+        for i in self.members:
+            text += i[1] + "\n"
+        return text
+    
     async def joinLobby(self, player):
-        self.members.append((player, "joiner"))
-        await self.host.send(f"Player joined the lobby")
+        self.members.append((player, players[player]))
+        await self.sendLobby()
+    
+    async def sendLobby(self):
+        await self.msgAllOthers(f"Lobby:{self.getLobbyText()}", None)
 
     async def sendTurn(self, nextTurn = True):
         if nextTurn:
@@ -36,7 +45,7 @@ class Lobby():
         for i in range(1, len(self.members)):
             await self.members[i][0].send(code)
 
-    async def msgAllOthers(self, msg, ws):
+    async def msgAllOthers(self, msg, ws=None):
         for i in self.members:
             if i[0] != ws:
                 await i[0].send(msg)
@@ -64,6 +73,11 @@ async def parseMsg(websocket, message):
         await Lobby.lobbies[0].msgAllOthers(message, websocket)
     elif message.startswith("CardEffect:"):
         await Lobby.lobbies[0].msgAllOthers(message, websocket)
+    elif message.startswith("SetupCode:"):
+        await Lobby.lobbies[0].msgAllOthers(message, websocket)
+    elif message.startswith("Uname:"):
+        uname = message[message.index(":") + 1:]
+        players[websocket] = uname
 
 async def handleMessage(websocket):
     async for message in websocket:

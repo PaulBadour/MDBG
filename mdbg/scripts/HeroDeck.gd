@@ -1,7 +1,7 @@
 extends "res://scripts/Pile.gd"
 
 @onready
-var HEROS = $"..".heros
+var HEROS = $"../..".heros
 const OOS = Vector2(-200, -200)
 signal SetupHQ
 

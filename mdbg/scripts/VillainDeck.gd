@@ -1,12 +1,12 @@
 extends "res://scripts/Pile.gd"
 
 @onready
-var villains = $"..".villains
+var villains = $"../..".villains
 #var henchman = [GameData.HENCHMAN_SENTINEL]
 #var villains = [GameData.HYDRA_VILLAINS]
-var henchCount = 3
-var masterStrikeCount = 1
-var bystanderCount = 1
+var henchCount
+var masterStrikeCount
+var bystanderCount
 
 const OOS = Vector2(-200, -500)
 
@@ -14,6 +14,24 @@ func _ready() -> void:
 	var vilScene = preload("res://Scenes/Villain.tscn")
 	var cardScene = preload("res://Scenes/Card.tscn")
 	
+	match $"../..".playerCount:
+		1:
+			bystanderCount = 1
+		2:
+			bystanderCount = 2
+		3:
+			bystanderCount = 8
+		4:
+			bystanderCount = 8
+		5:
+			bystanderCount = 12
+			
+	if $"../..".playerCount == 1:
+		masterStrikeCount = 1
+		henchCount = 3
+	else:
+		masterStrikeCount = 5
+		henchCount = 10
 	
 	for t in villains:
 		if "team" not in t.keys():

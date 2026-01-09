@@ -42,7 +42,7 @@ func _input(event):
 			$"../BlackScreen".showCards($"../PlayerHand".played, false)
 		else:
 			$"../BlackScreen".stopShowCards()
-	if event is InputEventKey and event.keycode == KEY_A and !event.is_echo():
+	if event is InputEventKey and event.keycode == KEY_A and !event.is_echo() and $"..".yourTurn:
 		if event.is_pressed():
 			$"../PlayerHand".autoplay()
 	# DEBUG

@@ -125,31 +125,38 @@ func _on_cancel_button_down() -> void:
 	focused = null
 
 func addToCity(c):
+	var esc = true
 	addedVil = c
 	for i in range(5):
-		if i == 0 and c.getFuncName() in $"../EffectManager".villain_ambush.keys():
-			await $"../EffectManager".villain_ambush[c.getFuncName()].call()
+		#if i == 0 and c.getFuncName() in $"../EffectManager".villain_ambush.keys():
+			#await $"../EffectManager".villain_ambush[c.getFuncName()].call()
 		if city[i] == null:
 			city[i] = c
 			c.position = Vector2(START_X - (i * DECR), y)
 			c.z_index = 3
-			return
+			esc = false
+			break
 		var newC = city[i]
 		city[i] = c
 		c.position = Vector2(START_X - (i * DECR), y)
 		if i == 0:
 			c.z_index = 3
 		c = newC
-	$"../EscapePile".addCards(c)
-	c.position = OOS
-	if c.getFuncName() in $"../EffectManager".villain_escape.keys():
-		await $"../EffectManager".villain_escape[c.getFuncName()].call()
+	
+	if esc:
+		$"../EscapePile".addCards(c)
+		c.position = OOS
+		if c.getFuncName() in $"../EffectManager".villain_escape.keys():
+			await $"../EffectManager".villain_escape[c.getFuncName()].call()
+		if $"..".yourTurn:
+			await $"../BlackScreen".KOfromHQ($"../EffectManager".sixCostFilter)
 
-	if $"..".yourTurn:
-		await $"../BlackScreen".KOfromHQ($"../EffectManager".sixCostFilter)
+		if c.bystanders > 0:
+			await $"../BlackScreen".chooseCardDiscard(1, 1, false)
+	
+	if addedVil.getFuncName() in $"../EffectManager".villain_ambush.keys():
+		await $"../EffectManager".villain_ambush[addedVil.getFuncName()].call()
 
-	if c.bystanders > 0:
-		await $"../BlackScreen".chooseCardDiscard(1, 1, false)
 
 func addBystander():
 	for i in city:

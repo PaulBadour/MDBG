@@ -15,7 +15,7 @@ var mName
 var bystanders = []
 
 @onready
-var info = $"..".mastermind
+var info = $"../..".mastermind
 const OOS = Vector2(904, -1224)
 
 # Called when the node enters the scene tree for the first time.

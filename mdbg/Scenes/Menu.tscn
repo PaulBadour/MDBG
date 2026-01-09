@@ -6,18 +6,37 @@
 script = ExtResource("1_3kf3n")
 
 [node name="JoinButton" type="Button" parent="."]
-offset_left = 235.0
-offset_top = 615.0
-offset_right = 414.0
-offset_bottom = 695.0
+visible = false
+offset_left = 467.0
+offset_top = 625.0
+offset_right = 646.0
+offset_bottom = 705.0
 text = "Join"
 
+[node name="LeaveButton" type="Button" parent="."]
+visible = false
+offset_left = 697.0
+offset_top = 625.0
+offset_right = 876.0
+offset_bottom = 705.0
+text = "Leave"
+
 [node name="HostButton" type="Button" parent="."]
-offset_left = 237.0
-offset_top = 484.0
-offset_right = 416.0
-offset_bottom = 564.0
+visible = false
+offset_left = 469.0
+offset_top = 494.0
+offset_right = 648.0
+offset_bottom = 574.0
 text = "Host
+"
+
+[node name="BackButton" type="Button" parent="."]
+visible = false
+offset_left = 465.0
+offset_top = 737.0
+offset_right = 644.0
+offset_bottom = 817.0
+text = "Back
 "
 
 [node name="SingleButton" type="Button" parent="."]
@@ -27,15 +46,30 @@ offset_right = 416.0
 offset_bottom = 379.99933
 text = "Single Player"
 
+[node name="MultiplayerButton" type="Button" parent="."]
+offset_left = 243.0
+offset_top = 489.0
+offset_right = 422.0
+offset_bottom = 568.9993
+text = "Multiplayer"
+
 [node name="StartButton" type="Button" parent="."]
 visible = false
-offset_left = 580.0
-offset_top = 502.0
-offset_right = 759.0
-offset_bottom = 582.0
+offset_left = 695.0
+offset_top = 498.0
+offset_right = 874.0
+offset_bottom = 578.0
 text = "Start"
+
+[node name="Username" type="LineEdit" parent="."]
+offset_left = 261.0
+offset_top = 608.0
+offset_right = 402.0
+offset_bottom = 645.0
+placeholder_text = "Username"
 
 [connection signal="button_down" from="JoinButton" to="." method="_on_button_button_down"]
 [connection signal="button_down" from="HostButton" to="." method="_on_host_button_button_down"]
 [connection signal="button_down" from="SingleButton" to="." method="_on_single_button_button_down"]
+[connection signal="button_down" from="MultiplayerButton" to="." method="_on_multiplayer_button_button_down"]
 [connection signal="button_down" from="StartButton" to="." method="_on_start_button_button_down"]

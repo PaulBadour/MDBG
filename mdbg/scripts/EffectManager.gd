@@ -235,36 +235,61 @@ func nullFunc():
 	
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 var villain_prereqs = {
 	"Spider Foes-Venom" : Venom_prereq
 }
 
 var villain_ambush = {
-	"Spider Foes-Green Goblin" : GreenGoblin_ambush
+	"Spider Foes-Green Goblin" : GreenGoblin_ambush,
+	"Radiation-The Leader" : TheLeader_ambush
 }
 
 var villain_fight = {
 	"Henchmen-Sentinel" : Sentinel_Fight,
+	"Henchmen-Hand Ninja" : HandNinja_Fight,
 	"HYDRA-Endless Armies of Hydra" : Endless_Armies_Hydra_fight,
 	"HYDRA-Viper" : Viper_fight_esc,
 	"HYDRA-Hydra Kidnappers" : Kidnapper_fight,
 	"Spider Foes-Doctor Octopus" : DocOc_fight,
-	"Spider Foes-The Lizard" : Lizard_fight
+	"Spider Foes-The Lizard" : Lizard_fight,
+	"Radiation-Abomination" : Abomination_fight,
+	"Radiation-Maestro" : Maestro_fight,
+	"Radiation-Zzzax" : Zzzax_fight_esc
 }
 
 var villain_escape = {
 	"HYDRA-Viper" : Viper_fight_esc,
-	"Spider Foes-Venom" : Venom_esc
+	"Spider Foes-Venom" : Venom_esc,
+	"Radiation-Zzzax" : Zzzax_fight_esc
 }
 
 var villain_aopfight = {
 	"HYDRA-Endless Armies of Hydra" : Endless_Armies_Hydra_fight,
 	"HYDRA-Viper" : Viper_fight_esc,
-	"Spider Foes-The Lizard" : Lizard_fight
+	"Spider Foes-The Lizard" : Lizard_fight,
+	"Radiation-Zzzax" : Zzzax_fight_esc
 }
 
 func Sentinel_Fight():
 	$"../BlackScreen".chooseCardKO(1, 1, ["hand", "played"], heroFilter)
+
+func HandNinja_Fight():
+	res.addRecruit(1)
 
 func Endless_Armies_Hydra_fight():
 	await $"../City".drawVilCard()
@@ -302,7 +327,7 @@ func GreenGoblin_ambush():
 		print("Could not draw bystander")
 
 func Lizard_fight():
-	print("Liz fight, ", $"..".yourTurn)
+	#print("Liz fight, ", $"..".yourTurn)
 	var ind = $"../City".focused
 	if ind == 0:
 		if $"..".PLAYER_COUNT == 1 or !$"..".yourTurn:
@@ -313,6 +338,31 @@ func Venom_prereq():
 
 func Venom_esc():
 	$"../PlayerHand".addWound(1)
+
+func Abomination_fight():
+	var ind = $"../City".focused
+	if ind == 4 or ind == 3:
+		hand.saveBystander()
+		hand.saveBystander()
+		hand.saveBystander()
+
+func TheLeader_ambush():
+	await $"../City".drawVilCard()
+
+func Maestro_fight():
+	var count = $"../PlayerHand".classCount(GameData.Classes.STRENGTH, false, true)
+	if count > 0:
+		await $"../BlackScreen".chooseCardKO(count, count, ["hand", "played"], heroFilter)
+
+func Zzzax_fight_esc():
+	var count = $"../PlayerHand".classCount(GameData.Classes.STRENGTH, false, true)
+	if count == 0:
+		await $"../PlayerHand".addWound(1)
+
+
+
+
+
 
 var mastermind_strikes = {
 	"Mastermind-Red Skull" : Red_Skull_Strike
@@ -352,22 +402,33 @@ func Ruthless_Dictator():
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 var SchemeTwistLinks = {
 	"Unleash the Power of the Cosmic Cube" : PowerCosmicCube_twist
 }
 
 
-# Schemes have pther setup funcs and twist funcs
+# Schemes have other setup funcs and twist funcs
 
 func PowerCosmicCube_twist(t : int):
-	#print("Twist cound ", t)
 	if t == 5 or t == 6:
-		$"../PlayerHand".deck.discard.append($"../Wounds".draw())
-		$"../PlayerHand".deck.updateDiscardCount()
+		await $"../PlayerHand".addWound(1)
+		#$"../PlayerHand".deck.updateDiscardCount()
 	elif t == 7:
-		$"../PlayerHand".deck.discard.append($"../Wounds".draw())
-		$"../PlayerHand".deck.discard.append($"../Wounds".draw())
-		$"../PlayerHand".deck.discard.append($"../Wounds".draw())
-		$"../PlayerHand".deck.updateDiscardCount()
+		await $"../PlayerHand".addWound(3)
+		#$"../PlayerHand".deck.updateDiscardCount()
 	elif t == 8:
 		$"..".lose()

@@ -106,7 +106,7 @@ func chooseCardDiscard(minDisc, maxDisc, exclude=true):
 	#print(clicked)
 	
 	for i in clicked:
-		$"../PlayerHand".discardCard(i)
+		await $"../PlayerHand".discardCard(i)
 		i.position = Vector2(-500, -500)
 
 	$"../PlayerHand".updateHandPositions()
@@ -324,31 +324,31 @@ func KOfromHQ(filter):
 
 func infoPanel():
 	var l = get_node("Info")
-	var schemeText = str("Scheme: ", $"..".scheme.sName, "\n")
-	var mastermindText = str("Mastermind: ", $"..".mastermind.mName, "\n")
+	var schemeText = str("Scheme: ", $"../..".scheme.sName, "\n")
+	var mastermindText = str("Mastermind: ", $"../..".mastermind.mName, "\n")
 	
 	var heroText = "Heros: "
-	for i in $"..".heros:
-		if $"..".heros[0] == i:
+	for i in $"../..".heros:
+		if $"../..".heros[0] == i:
 			heroText = str(heroText, GameData.BASE_HEROS[i][0].heroName)
 		else:
 			heroText = str(heroText, ", ", GameData.BASE_HEROS[i][0].heroName)
 	heroText = str(heroText, "\n")
 	
 	var villainText = "Villains: "
-	for i in $"..".villains:
+	for i in $"../..".villains:
 		if "team" in i.keys():
 			villainText = str(villainText, i.name)
 		else:
 			villainText = str(villainText, i.keys()[0].team)
-		if i != $"..".villains[-1]:
+		if i != $"../..".villains[-1]:
 			villainText = str(villainText, ", ")
 	villainText = str(villainText, "\n")
 	
 	await appear()
 	l.position = Vector2(1000, 500)
-	l.text = str(schemeText, mastermindText, heroText, villainText, "Player Count: ", $"..".PLAYER_COUNT)
+	l.text = str(schemeText, mastermindText, heroText, villainText, "Player Count: ", $"../..".playerCount)
 	
-	await get_tree().create_timer(6.0).timeout
+	await get_tree().create_timer(3.0).timeout
 	l.position = Vector2(1225, 2025)
 	await disappear()

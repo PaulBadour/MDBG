@@ -1,9 +1,6 @@
 extends Node2D
 
-var scheme
-var mastermind
-var villains
-var heros
+
 var PLAYER_COUNT
 var username
 var host
@@ -12,10 +9,10 @@ var yourTurn = false
 # Called when the node enters the scene tree for the first time.
 func _init():
 	randomize()
-	scheme = GameData.PowerCosmicCube
-	mastermind = GameData.RED_SKULL
-	villains = [GameData.HYDRA_VILLAINS, GameData.HENCHMAN_SENTINEL]
-	heros = [GameData.Heros.IRON_MAN, GameData.Heros.CYCLOPS, GameData.Heros.HAWKEYE]
+	#scheme = GameData.PowerCosmicCube
+	#mastermind = GameData.RED_SKULL
+	#villains = [GameData.RADIATION_VILLAINS, GameData.RADIATION_VILLAINS, GameData.HENCHMAN_SENTINEL]
+	#heros = [GameData.Heros.IRON_MAN, GameData.Heros.CYCLOPS, GameData.Heros.HAWKEYE, GameData.Heros.WOLVERINE, GameData.Heros.SPIDER_MAN]
 
 func start():
 	PLAYER_COUNT = $"..".playerCount
@@ -48,3 +45,6 @@ func newTurn():
 		yourTurn = false
 		$EndTurn.visible = false
 	$City.drawVilCard()
+
+#func setupComplete():
+	#emit_signal("setupDone")

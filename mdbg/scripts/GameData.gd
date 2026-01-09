@@ -293,18 +293,54 @@ static var BASE_HEROS = {
 }
 
 
-static var RED_SKULL = {
-	mName = "Red Skull",
-	leads = HYDRA_VILLAINS,
-	attack = 7,
-	vp = 5,
-	spritePath = "res://cards/Base/Masterminds/Mastermind-RedSkull.png",
-	tactics = {
-		"Endless Resources" : "res://cards/Base/Masterminds/RedSkull-EndlessResources.png",
-		"Hydra Conspiracy" : "res://cards/Base/Masterminds/RedSkull-HydraConspiracy.png",
-		"Negablast Grenades" : "res://cards/Base/Masterminds/RedSkull-NegablastGrenades.png",
-		"Ruthless Dictator" : "res://cards/Base/Masterminds/RedSkull-RuthlessDictator.png"
-	}
+
+
+
+
+
+
+
+
+
+
+
+static var ABOMINATION = {
+	name = "Abomination",
+	attack = 5,
+	team = "Radiation",
+	vp = 3,
+	spritePath = "res://cards/Base/Villains/Radiation-Abomination.png"
+}
+
+static var THE_LEADER = {
+	name = "The Leader",
+	attack = 4,
+	team = "Radiation",
+	vp = 2,
+	spritePath = "res://cards/Base/Villains/Radiation-TheLeader.png"
+}
+
+static var MAESTRO = {
+	name = "Maestro",
+	attack = 6,
+	team = "Radiation",
+	vp = 4,
+	spritePath = "res://cards/Base/Villains/Radiation-Maestro.png"
+}
+
+static var ZZZAX = {
+	name = "Zzzax",
+	attack = 5,
+	team = "Radiation",
+	vp = 3,
+	spritePath = "res://cards/Base/Villains/Radiation-Zzzax.png"
+}
+
+static var RADIATION_VILLAINS = {
+	ABOMINATION : 8,
+	THE_LEADER : 2,
+	MAESTRO : 2,
+	ZZZAX : 2
 }
 
 static var ENDLESS_ARMIES_HYDRA = {
@@ -340,7 +376,7 @@ static var VIPER = {
 }
 
 static var HYDRA_VILLAINS = {
-	ENDLESS_ARMIES_HYDRA : 10,
+	ENDLESS_ARMIES_HYDRA : 3,
 	HYDRA_KIDNAPPERS : 3,
 	SUPREME_HYDRA : 1,
 	VIPER : 1
@@ -385,6 +421,12 @@ static var SPIDERFOES_VILLAINS = {
 	VENOM : 2
 }
 
+static var BASE_VILLAINS = [
+	SPIDERFOES_VILLAINS,
+	HYDRA_VILLAINS,
+	RADIATION_VILLAINS
+]
+
 static var HENCHMAN_SENTINEL = {
 	name = "Sentinel",
 	attack = 3,
@@ -393,16 +435,62 @@ static var HENCHMAN_SENTINEL = {
 	spritePath = "res://cards/Base/Villains/Henchman-Sentinel.png"
 }
 
+static var HENCHMAN_HANDNINJA = {
+	name = "Hand Ninja",
+	attack = 3,
+	team = "Henchmen",
+	vp = 1,
+	spritePath = "res://cards/Base/Villains/Henchman-HandNinja.png"
+}
+
 static var BASE_HENCHMEN = [
-	HENCHMAN_SENTINEL
+	HENCHMAN_SENTINEL,
+	HENCHMAN_HANDNINJA
 ]
 
-static var SCHEMES = [
-	PowerCosmicCube
+
+
+
+
+
+
+
+
+static var RED_SKULL = {
+	mName = "Red Skull",
+	leads = HYDRA_VILLAINS,
+	attack = 7,
+	vp = 5,
+	spritePath = "res://cards/Base/Masterminds/Mastermind-RedSkull.png",
+	tactics = {
+		"Endless Resources" : "res://cards/Base/Masterminds/RedSkull-EndlessResources.png",
+		"Hydra Conspiracy" : "res://cards/Base/Masterminds/RedSkull-HydraConspiracy.png",
+		"Negablast Grenades" : "res://cards/Base/Masterminds/RedSkull-NegablastGrenades.png",
+		"Ruthless Dictator" : "res://cards/Base/Masterminds/RedSkull-RuthlessDictator.png"
+	}
+}
+
+
+
+static var BASE_MASTERMINDS = [
+	RED_SKULL
 ]
+
+
+
+
+
+
+
+
+
 
 static var PowerCosmicCube = {
 	sName = "Unleash the Power of the Cosmic Cube",
 	twistCount = 8,
 	spritePath = "res://cards/Base/Schemes/PowerCosmicCube.png"
 }
+
+static var BASE_SCHEMES = [
+	PowerCosmicCube
+]

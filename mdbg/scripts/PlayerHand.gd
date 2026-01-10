@@ -41,13 +41,13 @@ func _ready() -> void:
 	drawHand()
 
 func _input(event):
-	#if event is InputEventKey and event.keycode == KEY_W and event.is_pressed():
-		#$"../BlackScreen".customChoices(["Choice 1", "Choice 2"], [null, null])
-	if event is InputEventKey and event.keycode == KEY_H and event.is_pressed():
-		print("--------------")
-		for i in playerHand:
-			print(str("Card in Hand: ", i, ": path - ", i.spritePath))
-		print("--------------")
+	if event is InputEventKey and event.keycode == KEY_W and event.is_pressed():
+		$"../City".addBystander()
+	#if event is InputEventKey and event.keycode == KEY_H and event.is_pressed():
+		#print("--------------")
+		#for i in playerHand:
+			#print(str("Card in Hand: ", i, ": path - ", i.spritePath))
+		#print("--------------")
 
 func isCardInHand(card):
 	for i in playerHand:
@@ -216,12 +216,26 @@ func countWoundsInHand():
 		if i.identifier == "Wound":
 			count += 1
 	return count
-	
+
 func addWound(num):
-	print("Adding wound")
+	var divingBlockInHand = false
+	for i in playerHand:
+		if i.identifier == "Hero" and i.getFuncName() == "Captain America-Diving Block":
+			divingBlockInHand = true
+			break
+	if !divingBlockInHand:
+		for i in played:
+			if i.identifier == "Hero" and i.getFuncName() == "Captain America-Diving Block":
+				divingBlockInHand = true
+				break
+	
+	
 	for i in num:
-		deck.discard.append($"../Wounds".draw())
-	deck.updateDiscardCount()
+		if divingBlockInHand:
+			await $"../EffectManager".Diving_Block()
+		else:
+			deck.discard.append($"../Wounds".draw())
+			deck.updateDiscardCount()
 
 func autoplay():
 	var limit = 0

@@ -250,8 +250,10 @@ func setup(c = null):
 	
 	# Scheme, Mastermind, Vils, Henchmen, Heros
 	if not c:
+		# GameData.BASE_VILLAINS.find(GameData.BROTHERHOOD_VILLAINS)
+		# GameData.BASE_HENCHMEN.find(GameData.HENCHMAN_DOOMBOTLEGION)
 		var hench = []
-		var vils = [GameData.BASE_VILLAINS.find(GameData.BROTHERHOOD_VILLAINS)]
+		var vils = []
 		var code = []
 		code.append_array(generateChoices(1, GameData.BASE_SCHEMES.size()))
 		code.append_array(generateChoices(1, GameData.BASE_MASTERMINDS.size()))

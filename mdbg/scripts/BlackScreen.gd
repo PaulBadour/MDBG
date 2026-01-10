@@ -49,7 +49,7 @@ func showCards(cards, clickable=false):
 	if clickable:
 		isClickable = true
 	
-	print(cards)
+	#print(cards)
 	for i in cards:
 		
 		lastLocations.append(i.position)
@@ -68,7 +68,7 @@ func showCards(cards, clickable=false):
 func stopShowCards():
 	
 	for i in range(shownCards.size()):
-		if !shownCards[i] in clicked:
+		if !shownCards[i] in clicked or shownCards[i].identifier == "Mastermind":
 			shownCards[i].position = lastLocations[i]
 		shownCards[i].z_index = lastIndexes[i]
 		
@@ -231,6 +231,7 @@ func KOFromDeck(minKO, maxKO, number):
 	for i in clicked:
 		
 		$"../KODeck".addCards(i)
+		i.position = Vector2(-5, -500)
 		deck.cards.erase(i)
 	deck.updateDrawCount()
 

@@ -1,4 +1,3 @@
-
 class_name GameData
 
 
@@ -9,7 +8,10 @@ enum Heros {
 	CYCLOPS,
 	HAWKEYE,
 	EMMA_FROST,
-	NICK_FURY
+	NICK_FURY,
+	HULK,
+	CAPTAIN_AMERICA,
+	BLACK_WIDOW
 }
 
 enum Classes{
@@ -373,6 +375,138 @@ static var PURE_FURY = {
 	spritePath = "res://cards/Base/Heros/Nick Fury/NickFury-PureFury.png"
 }
 
+static var UNSTOPPABLE_HULK = {
+	attack = 2,
+	recruit = null,
+	cost = 4,
+	team = Teams.AVENGERS,
+	hClass = Classes.INSTINCT,
+	heroName = "Hulk",
+	cardName = "Unstoppable Hulk",
+	spritePath = "res://cards/Base/Heros/Hulk/Hulk-UnstoppableHulk.png"
+}
+
+static var GROWING_ANGER = {
+	attack = 2,
+	recruit = null,
+	cost = 3,
+	team = Teams.AVENGERS,
+	hClass = Classes.STRENGTH,
+	heroName = "Hulk",
+	cardName = "Growing Anger",
+	spritePath = "res://cards/Base/Heros/Hulk/Hulk-GrowingAnger.png"
+}
+
+static var CRAZED_RAMPAGE = {
+	attack = 4,
+	recruit = null,
+	cost = 5,
+	team = Teams.AVENGERS,
+	hClass = Classes.STRENGTH,
+	heroName = "Hulk",
+	cardName = "Crazed Rampage",
+	spritePath = "res://cards/Base/Heros/Hulk/Hulk-CrazedRampage.png"
+}
+
+static var HULK_SMASH = {
+	attack = 5,
+	recruit = null,
+	cost = 8,
+	team = Teams.AVENGERS,
+	hClass = Classes.STRENGTH,
+	heroName = "Hulk",
+	cardName = "Hulk Smash!",
+	spritePath = "res://cards/Base/Heros/Hulk/Hulk-HulkSmash.png"
+}
+
+static var AVENGERS_ASSEMBLE = {
+	attack = null,
+	recruit = 0,
+	cost = 3,
+	team = Teams.AVENGERS,
+	hClass = Classes.INSTINCT,
+	heroName = "Captain America",
+	cardName = "Avengers Assemble!",
+	spritePath = "res://cards/Base/Heros/Captain America/CaptainAmerica-AvengersAssemble.png"
+}
+
+static var PERFECT_TEAMWORK = {
+	attack = 0,
+	recruit = null,
+	cost = 4,
+	team = Teams.AVENGERS,
+	hClass = Classes.STRENGTH,
+	heroName = "Captain America",
+	cardName = "Perfect Teamwork",
+	spritePath = "res://cards/Base/Heros/Captain America/CaptainAmerica-PerfectTeamwork.png"
+}
+
+static var DIVING_BLOCK = {
+	attack = 4,
+	recruit = null,
+	cost = 6,
+	team = Teams.AVENGERS,
+	hClass = Classes.TECH,
+	heroName = "Captain America",
+	cardName = "Diving Block",
+	spritePath = "res://cards/Base/Heros/Captain America/CaptainAmerica-DivingBlock.png"
+}
+
+static var A_DAY_UNLIKE_ANY_OTHER = {
+	attack = 3,
+	recruit = null,
+	cost = 7,
+	team = Teams.AVENGERS,
+	hClass = Classes.COVERT,
+	heroName = "Captain America",
+	cardName = "A Day Unlike Any Other",
+	spritePath = "res://cards/Base/Heros/Captain America/CaptainAmerica-ADayUnlikeAnyOther.png"
+}
+
+static var DANGEROUS_RESCUE = {
+	attack = 2,
+	recruit = null,
+	cost = 3,
+	team = Teams.AVENGERS,
+	hClass = Classes.COVERT,
+	heroName = "Black Widow",
+	cardName = "Dangerous Rescue",
+	spritePath = "res://cards/Base/Heros/Black Widow/BlackWidow-DangerousRescue.png"
+}
+
+static var MISSION_ACCOMPLISHED = {
+	attack = null,
+	recruit = null,
+	cost = 2,
+	team = Teams.AVENGERS,
+	hClass = Classes.TECH,
+	heroName = "Black Widow",
+	cardName = "Mission Accomplished",
+	spritePath = "res://cards/Base/Heros/Black Widow/BlackWidow-MissionAccomplished.png"
+}
+
+static var COVERT_OPERATION = {
+	attack = 0,
+	recruit = null,
+	cost = 4,
+	team = Teams.AVENGERS,
+	hClass = Classes.COVERT,
+	heroName = "Black Widow",
+	cardName = "Covert Operation",
+	spritePath = "res://cards/Base/Heros/Black Widow/BlackWidow-CovertOperation.png"
+}
+
+static var SILENT_SNIPER = {
+	attack = 4,
+	recruit = null,
+	cost = 7,
+	team = Teams.AVENGERS,
+	hClass = Classes.COVERT,
+	heroName = "Black Widow",
+	cardName = "Silent Sniper",
+	spritePath = "res://cards/Base/Heros/Black Widow/BlackWidow-SilentSniper.png"
+}
+
 # Cards are in the order of common(5), common(5), uncommon(3), rare(1)
 static var BASE_HEROS = {
 	Heros.IRON_MAN : [REPULSOR_RAYS, ENDLESS_INVENTION, ARC_REACTOR, QUANTUM_BREAKTHROUGH],
@@ -381,7 +515,10 @@ static var BASE_HEROS = {
 	Heros.CYCLOPS : [OPTIC_BLAST, DETERMINATION, UNENDING_ENERGY, XMEN_UNITED],
 	Heros.HAWKEYE : [TEAM_PLAYER, QUICK_DRAW, COVERING_FIRE, IMPOSSIBLE_TRICKSHOT],
 	Heros.EMMA_FROST : [SHADOWED_THOUGHTS, MENTAL_DISCIPLINE, PSYCHIC_LINK, DIAMOND_FORM],
-	Heros.NICK_FURY : [BATTLEFIELD_PROMOTION, HIGHTECH_WEAPONRY, LEGENDARY_COMMANDER, PURE_FURY]
+	Heros.NICK_FURY : [BATTLEFIELD_PROMOTION, HIGHTECH_WEAPONRY, LEGENDARY_COMMANDER, PURE_FURY],
+	Heros.HULK : [UNSTOPPABLE_HULK, GROWING_ANGER, CRAZED_RAMPAGE, HULK_SMASH],
+	Heros.CAPTAIN_AMERICA : [AVENGERS_ASSEMBLE, PERFECT_TEAMWORK, DIVING_BLOCK, A_DAY_UNLIKE_ANY_OTHER],
+	Heros.BLACK_WIDOW : [DANGEROUS_RESCUE, MISSION_ACCOMPLISHED, COVERT_OPERATION, SILENT_SNIPER]
 }
 
 
@@ -429,7 +566,7 @@ static var ZZZAX = {
 }
 
 static var RADIATION_VILLAINS = {
-	ABOMINATION : 8,
+	ABOMINATION : 2,
 	THE_LEADER : 2,
 	MAESTRO : 2,
 	ZZZAX : 2

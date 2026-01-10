@@ -34,8 +34,8 @@ func tie():
 	print("You tied")
 	get_tree().quit()
 
-func shouldSend():
-	return host and PLAYER_COUNT > 1
+#func shouldSend():
+	#return host and PLAYER_COUNT > 1
 
 func newTurn():
 	if $"..".turn == $"..".username:

@@ -45,7 +45,19 @@ var links = {
 	"Nick Fury-Battlefield Promotion" : Battlefield_Promotion,
 	"Nick Fury-High-Tech Weaponry" : HighTech_Weaponry,
 	"Nick Fury-Legendary Commander" : Legendary_Commander,
-	"Nick Fury-Pure Fury" : Pure_Fury
+	"Nick Fury-Pure Fury" : Pure_Fury,
+	"Hulk-Unstoppable Hulk" : Unstoppable_Hulk,
+	"Hulk-Growing Anger" : Growing_Anger,
+	"Hulk-Crazed Rampage" : Crazed_Rampage,
+	"Hulk-Hulk Smash!" : Hulk_Smash,
+	"Captain America-Avengers Assemble!" : Avengers_Assemble,
+	"Captain America-Perfect Teamwork" : Perfect_Teamwork,
+	"Captain America-Diving Block" : nullFunc,
+	"Captain America-A Day Unlike Any Other" : A_Day_Unlike_Any_Other,
+	"Black Widow-Dangerous Rescue" : Dangerous_Rescue,
+	"Black Widow-Mission Accomplished" : Mission_Accomplished,
+	"Black Widow-Covert Operation" : Covert_Operation,
+	"Black Widow-Silent Sniper" : Silent_Sniper
 }
 
 var prereqs = {
@@ -56,7 +68,8 @@ var prereqs = {
 var aop_effects = {
 	"Hawkeye-Covering Fire" : Covering_Fire_aop,
 	"Emma Frost-Shadowed Thoughts" : Shadowed_Thoughts_aop,
-	"Emma Frost-Psychic Link" : Psychic_Link
+	"Emma Frost-Psychic Link" : Psychic_Link,
+	"Hulk-Crazed Rampage" : Crazed_Rampage
 }
 
 # Iron Man
@@ -289,6 +302,104 @@ func Pure_Fury():
 	var indind = cards.find(select)
 	await $"../City"._on_fight_button_down(inds[indind])
 
+
+# Hulk
+
+func Unstoppable_Hulk():
+	var r = await $"../BlackScreen".chooseCardKO(0, 1, ["hand", "discard"], woundFilter)
+	if r:
+		res.addAttack(2)
+
+func Growing_Anger():
+	if $"../PlayerHand".classCount(GameData.Classes.STRENGTH, true, false) > 0:
+		res.addAttack(1)
+
+func Crazed_Rampage(choice=1):
+	assert(int(choice) == 1)
+	if $"../..".playerCount > 1 and $"..".yourTurn:
+		#print($"..".username, " sending message")
+		$"../..".socket.send_text("CardEffect:Hulk-Crazed Rampage:1")
+	$"../PlayerHand".addWound(1)
+
+
+func Hulk_Smash():
+	if $"../PlayerHand".classCount(GameData.Classes.STRENGTH, true, false) > 0:
+		res.addAttack(5)
+
+
+# Captain America
+
+func Avengers_Assemble():
+	var count = 0
+	for i in GameData.Heros.values():
+		if $"../PlayerHand".classCount(i, false, true) > 0:
+			count += 1
+	res.addRecruit(count)
+
+func Perfect_Teamwork():
+	var count = 0
+	for i in GameData.Heros.values():
+		if $"../PlayerHand".classCount(i, false, true) > 0:
+			count += 1
+	res.addAttack(count)
+
+# Fuinction called on wound adding
+func Diving_Block():
+	var f1 = func():
+		$"../PlayerHand".drawCard()
+		$"../PlayerHand".deck.updateDrawCount()
+		emit_signal("finishCustom")
+	var f2 = func():
+		$"../PlayerHand".deck.discard.append($"../Wounds".draw())
+		$"../PlayerHand".deck.updateDiscardCount()
+		emit_signal("finishCustom")
+	await $"../BlackScreen".customChoices(["Draw Card", "Add Wound"], [f1, f2])
+
+func A_Day_Unlike_Any_Other():
+	var count = $"../PlayerHand".teamCount(GameData.Teams.AVENGERS, true, false)
+	if count > 0:
+		res.addAttack(3 * count)
+
+# Black Widow
+
+func Dangerous_Rescue():
+	if $"../PlayerHand".classCount(GameData.Classes.COVERT, true, false) > 0:
+		var r = await $"../BlackScreen".chooseCardKO(0, 1, ["hand", "discard"])
+		if r:
+			hand.saveBystander()
+
+func Mission_Accomplished():
+	$"../PlayerHand".drawCard()
+	if $"../PlayerHand".classCount(GameData.Classes.TECH, true, false) > 0:
+		hand.saveBystander()
+
+func Covert_Operation():
+	var count = 0
+	for i in $"../PlayerHand".vicPile:
+		if i.identifier == "Bystander":
+			count += 1
+	res.addAttack(count)
+
+func Silent_Sniper():
+	var cards = []
+	var inds = []
+	
+	if $"../Mastermind".bystanders.size() > 0:
+		inds.append(-1)
+		cards.append($"../Mastermind".mCard)
+	
+	for i in range($"../City".city.size()):
+		if $"../City".city[i] != null and $"../City".city[i].bystanders.size() > 0:
+			inds.append(i)
+			cards.append($"../City".city[i])
+
+	if cards.size() == 0:
+		return
+	var select = await $"../BlackScreen".customCardChoices(1, 1, "Defeat", cards.duplicate(true))
+	var indind = cards.find(select)
+	await $"../City"._on_fight_button_down(inds[indind])
+
+
 # General funcs
 
 func effect(card, args=[]):
@@ -401,6 +512,8 @@ func DoombotLegion_fight():
 func SavageLandMutates_fight():
 	$"../PlayerHand".handSize += 1
 
+
+
 func Endless_Armies_Hydra_fight():
 	await $"../City".drawVilCard()
 	await $"../City".drawVilCard()
@@ -429,9 +542,7 @@ func GreenGoblin_ambush():
 	var v = $"../City".addedVil
 	var b = $"../Bystanders".draw()
 	if b:
-		print("Adding bystander")
-		v.bystanders += 1
-		v.bList.append(b)
+		v.bystanders.append(b)
 	else:
 		print("Could not draw bystander")
 

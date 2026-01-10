@@ -3,8 +3,8 @@ extends "res://scripts/Card.gd"
 var cardName
 var attack
 var team
-var bystanders = 0
-var bList = []
+#var bystanders = 0
+var bystanders = []
 
 signal bystanderLabel
 signal removeBystanderLabel
@@ -26,8 +26,8 @@ func initVil(info: Dictionary):
 	get_parent().connectBystanderSignal(self)
 
 func displayBystanders(on):
-	if on and bystanders > 0:
-		emit_signal("bystanderLabel", str("Bystanders: ", bystanders))
+	if on and bystanders.size() > 0:
+		emit_signal("bystanderLabel", str("Bystanders: ", bystanders.size()))
 
 	elif !on:
 		emit_signal("removeBystanderLabel")

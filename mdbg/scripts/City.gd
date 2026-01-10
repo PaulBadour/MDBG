@@ -112,7 +112,7 @@ func _on_fight_button_down(autoKill=null) -> void:
 			if !skipChecks:
 				$"../Resources".addAttack(-attack)
 			$"../PlayerHand".vicPile.append(card)
-			for i in card.bList:
+			for i in card.bystanders:
 				$"../PlayerHand".vicPile.append(i)
 			$"../PlayerHand".killOrRecruit = true
 
@@ -171,8 +171,7 @@ func addToCity(c):
 func addBystander():
 	for i in city:
 		if i:
-			i.bystanders += 1
-			i.bList.append($"../Bystanders".draw())
+			i.bystanders.append($"../Bystanders".draw())
 			return
 	$"../Mastermind".bystanders.append($"../Bystanders".draw())
 

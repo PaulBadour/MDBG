@@ -68,6 +68,12 @@ offset_right = 402.0
 offset_bottom = 645.0
 placeholder_text = "Username"
 
+[node name="MemberLabel" type="Label" parent="."]
+offset_left = 929.0
+offset_top = 456.0
+offset_right = 1154.0
+offset_bottom = 588.0
+
 [connection signal="button_down" from="JoinButton" to="." method="_on_button_button_down"]
 [connection signal="button_down" from="HostButton" to="." method="_on_host_button_button_down"]
 [connection signal="button_down" from="SingleButton" to="." method="_on_single_button_button_down"]

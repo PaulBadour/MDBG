@@ -49,6 +49,7 @@ func showCards(cards, clickable=false):
 	if clickable:
 		isClickable = true
 	
+	print(cards)
 	for i in cards:
 		
 		lastLocations.append(i.position)
@@ -119,7 +120,7 @@ func chooseCardKO(minKO, maxKO, locations, filter=null):
 	var hand = $"../PlayerHand".playerHand
 	
 	var stack = []
-	print(locations)
+	#print(locations)
 	for i in locations:
 		if i == "hand":
 			print("hand")
@@ -139,11 +140,13 @@ func chooseCardKO(minKO, maxKO, locations, filter=null):
 			if filter.call(i):
 				newStack.append(i)
 		stack = newStack
-	print(stack)
 	maxClick = maxKO
 	if stack.size() == 0:
 		return false
-
+	
+	if stack.size() < minKO:
+		minKO = stack.size()
+	
 	showCards(stack, true)
 	get_node("KOButton").position = BUTTON_LOCATION
 	var valid = false
@@ -158,14 +161,15 @@ func chooseCardKO(minKO, maxKO, locations, filter=null):
 	for i in clicked:
 		
 		$"../KODeck".addCards(i)
+		#print("Adding ", i, " To KO")
 		if i in hand:
 			#print("Removing hand wound")
-			await $"../PlayerHand".deleteCard(i)
+			$"../PlayerHand".deleteCard(i)
 			await $"../PlayerHand".updateHandPositions()
 			i.position = Vector2(-500, -500)
 		if i in $"../PlayerHand".deck.discard:
 			#print("Removing deck wound")
-			await $"../PlayerHand".deck.discard.erase(i)
+			$"../PlayerHand".deck.discard.erase(i)
 			i.position = Vector2(-500, -500)
 			$"../PlayerHand".updateDiscardCount($"../PlayerHand".deck.discard.size())
 		if i in $"../PlayerHand".played:
@@ -174,9 +178,10 @@ func chooseCardKO(minKO, maxKO, locations, filter=null):
 		
 
 	$"../PlayerHand".updateHandPositions()
+	var c = clicked.size()
 	stopShowCards()
 
-	if clicked.size() == 0:
+	if c == 0:
 		return false
 	
 	return true
@@ -292,6 +297,24 @@ func customChoices(text : Array, funcs : Array):
 	
 	deleteCustomButtons()
 	disappear()
+
+func customCardChoices(minChoices, maxChoices, buttonText, cards):
+	maxClick = maxChoices
+	showCards(cards, true)
+	
+	var button = $DiscardButton.duplicate()
+	add_child(button)
+	button.text = buttonText
+	button.position = BUTTON_LOCATION
+	var valid = false
+	while !valid:
+		await button.pressed
+		if clicked.size() >= minChoices:
+			valid = true
+	var c = clicked.duplicate(true)
+	button.queue_free()
+	stopShowCards()
+	return c
 
 func deleteCustomButtons():
 	for i in customButtons:

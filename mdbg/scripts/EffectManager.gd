@@ -37,7 +37,15 @@ var links = {
 	"Hawkeye-Quick Draw" : Quick_Draw,
 	"Hawkeye-Team Player" : Team_Player,
 	"Hawkeye-Impossible Trick Shot" : Impossible_Trickshot,
-	"Hawkeye-Covering Fire" : Covering_Fire
+	"Hawkeye-Covering Fire" : Covering_Fire,
+	"Emma Frost-Shadowed Thoughts" : Shadowed_Thoughts,
+	"Emma Frost-Mental Discipline" : Mental_Discipline,
+	"Emma Frost-Psychic Link" : Psychic_Link,
+	"Emma Frost-Diamond Form" : Diamond_Form,
+	"Nick Fury-Battlefield Promotion" : Battlefield_Promotion,
+	"Nick Fury-High-Tech Weaponry" : HighTech_Weaponry,
+	"Nick Fury-Legendary Commander" : Legendary_Commander,
+	"Nick Fury-Pure Fury" : Pure_Fury
 }
 
 var prereqs = {
@@ -46,7 +54,9 @@ var prereqs = {
 }
 
 var aop_effects = {
-	"Hawkeye-Covering Fire" : Covering_Fire_aop
+	"Hawkeye-Covering Fire" : Covering_Fire_aop,
+	"Emma Frost-Shadowed Thoughts" : Shadowed_Thoughts_aop,
+	"Emma Frost-Psychic Link" : Psychic_Link
 }
 
 # Iron Man
@@ -159,7 +169,7 @@ func Optic_Blast_prereq():
 # Unending Energy
 
 func XMen_United():
-	var c = hand.teamCount(GameData.Teams.XMEN)
+	var c = hand.teamCount(GameData.Teams.XMEN, true, false)
 	res.addAttack(c * 2)
 	return true
 
@@ -169,17 +179,19 @@ func Covering_Fire():
 	if hand.classCount(GameData.Classes.TECH) >= 1:
 		var f1 = func():
 			$"../PlayerHand".drawCard()
-			$"../..".socket.send_text("CardEffect:Hawkeye-Covering Fire:1")
+			if $"../..".playerCount > 1:
+				$"../..".socket.send_text("CardEffect:Hawkeye-Covering Fire:1")
 			emit_signal("finishCustom")
 			
 		var f2 = func():
-			$"../..".socket.send_text("CardEffect:Hawkeye-Covering Fire:2")
+			if $"../..".playerCount > 1:
+				$"../..".socket.send_text("CardEffect:Hawkeye-Covering Fire:2")
 			$"../BlackScreen".disappear()
 			$"../BlackScreen".deleteCustomButtons()
 			await $"../BlackScreen".chooseCardDiscard(1, 1)
 			emit_signal("finishCustom")
 			
-		$"../BlackScreen".customChoices(["Draw", "Discard"], [f1, f2])
+		await $"../BlackScreen".customChoices(["Draw", "Discard"], [f1, f2])
 
 func Covering_Fire_aop(choice):
 	if choice == "1":
@@ -188,10 +200,7 @@ func Covering_Fire_aop(choice):
 		await $"../BlackScreen".chooseCardDiscard(1, 1)
 
 func Impossible_Trickshot():
-	if "Impossible Trickshot" in $"../PlayerHand".eventCards:
-		$"../PlayerHand".eventCards["Impossible Trickshot"] += 1
-	else:
-		$"../PlayerHand".eventCards["Impossible Trickshot"] = 1
+	addCardEvent("Impossible Trickshot")
 
 func Quick_Draw():
 	await hand.drawCard()
@@ -202,6 +211,83 @@ func Team_Player():
 		res.addAttack(1)
 	return true
 
+# Emma Frost
+
+func Mental_Discipline():
+	$"../PlayerHand".drawCard()
+	
+func Shadowed_Thoughts():
+	var count = $"../PlayerHand".classCount(GameData.Classes.COVERT, true, false)
+	if count > 0:
+		var f1 = func():
+			if $"../..".playerCount > 1:
+				$"../..".socket.send_text("CardEffect:Emma Frost-Shadowed Thoughts:1")
+			emit_signal("finishCustom")
+			await $"../City".drawVilCard()
+			res.addAttack(2)
+		var f2 = func():
+			emit_signal("finishCustom")
+		await $"../BlackScreen".customChoices(["Play Villain Card", "Dont play villain card"], [f1, f2])
+
+func Shadowed_Thoughts_aop(choice):
+	assert(int(choice) == 1, "Fucked up staop")
+	await $"../City".drawVilCard()
+
+func Psychic_Link(choice=0):
+	if $"../..".playerCount > 1 and $"..".yourTurn:
+		assert(choice == 0, "Fucked up pl")
+		$"../..".socket.send_text("CardEffect:Emma Frost-Psychic Link:1")
+	var count = $"../PlayerHand".teamCount(GameData.Teams.XMEN, true, true)
+	if count > 0:
+		hand.drawCard()
+
+
+func Diamond_Form():
+	addCardEvent("Diamond Form")
+
+
+# Nick Fury
+
+func Battlefield_Promotion():
+	var r = await $"../BlackScreen".chooseCardKO(0, 1, ["hand", "discard"], shieldFilter)
+	if r:
+		var f1 = func():
+			$"../HQ".addOfficer()
+			emit_signal("finishCustom")
+
+		var f2 = func():
+			emit_signal("finishCustom")
+			
+		await $"../BlackScreen".customChoices(["Add Officer", "Nothing"], [f1, f2])
+
+func HighTech_Weaponry():
+	if hand.classCount(GameData.Classes.TECH):
+		res.addAttack(1)
+
+func Legendary_Commander():
+	var count = hand.teamCount(GameData.Teams.SHIELD)
+	res.addAttack(count)
+
+func Pure_Fury():
+	var cards = []
+	var inds = []
+	var count = 0
+	for i in $"../KODeck".cards:
+		if shieldFilter(i):
+			count += 1
+	if $"../Mastermind".attack < count:
+		inds.append(-1)
+		cards.append($"../Mastermind".mCard)
+	
+	for i in range($"../City".city.size()):
+		if $"../City".city[i] != null and $"../City".city[i].attack < count:
+			inds.append(i)
+			cards.append($"../City".city[i])
+	if cards.size() == 0:
+		return
+	var select = await $"../BlackScreen".customCardChoices(1, 1, "Defeat", cards.duplicate(true))
+	var indind = cards.find(select)
+	await $"../City"._on_fight_button_down(inds[indind])
 
 # General funcs
 
@@ -211,6 +297,12 @@ func effect(card, args=[]):
 		return await links[s].call(args)
 	else:
 		return await links[s].call()
+
+func addCardEvent(event):
+	if event in $"../PlayerHand".eventCards:
+		$"../PlayerHand".eventCards[event] += 1
+	else:
+		$"../PlayerHand".eventCards[event] = 1
 
 func prereq(card, args=[]):
 	for i in prereqs:
@@ -229,6 +321,9 @@ func heroFilter(c):
 	
 func sixCostFilter(c):
 	return c.cost <= 6
+
+func shieldFilter(c):
+	return heroFilter(c) and c.team == GameData.Teams.SHIELD
 
 func nullFunc():
 	return true
@@ -251,17 +346,21 @@ func nullFunc():
 
 
 var villain_prereqs = {
-	"Spider Foes-Venom" : Venom_prereq
+	"Spider Foes-Venom" : Venom_prereq,
+	"Brotherhood-Blob" : Blob_prereq
 }
 
 var villain_ambush = {
 	"Spider Foes-Green Goblin" : GreenGoblin_ambush,
-	"Radiation-The Leader" : TheLeader_ambush
+	"Radiation-The Leader" : TheLeader_ambush,
+	"Brotherhood-Juggernaut" : Juggernaut_ambush
 }
 
 var villain_fight = {
 	"Henchmen-Sentinel" : Sentinel_Fight,
 	"Henchmen-Hand Ninja" : HandNinja_Fight,
+	"Henchmen-Doombot Legion" : DoombotLegion_fight,
+	"Henchmen-Savage Land Mutates" : SavageLandMutates_fight,
 	"HYDRA-Endless Armies of Hydra" : Endless_Armies_Hydra_fight,
 	"HYDRA-Viper" : Viper_fight_esc,
 	"HYDRA-Hydra Kidnappers" : Kidnapper_fight,
@@ -269,27 +368,38 @@ var villain_fight = {
 	"Spider Foes-The Lizard" : Lizard_fight,
 	"Radiation-Abomination" : Abomination_fight,
 	"Radiation-Maestro" : Maestro_fight,
-	"Radiation-Zzzax" : Zzzax_fight_esc
+	"Radiation-Zzzax" : Zzzax_fight_esc,
+	"Brotherhood-Sabretooth" : Sabretooth_fight_esc
 }
 
 var villain_escape = {
 	"HYDRA-Viper" : Viper_fight_esc,
 	"Spider Foes-Venom" : Venom_esc,
-	"Radiation-Zzzax" : Zzzax_fight_esc
+	"Radiation-Zzzax" : Zzzax_fight_esc,
+	"Brotherhood-Juggernaut" : Juggernaut_esc,
+	"Brotherhood-Mystique" : Mystique_esc,
+	"Brotherhood-Sabretooth" : Sabretooth_fight_esc
 }
 
 var villain_aopfight = {
 	"HYDRA-Endless Armies of Hydra" : Endless_Armies_Hydra_fight,
 	"HYDRA-Viper" : Viper_fight_esc,
 	"Spider Foes-The Lizard" : Lizard_fight,
-	"Radiation-Zzzax" : Zzzax_fight_esc
+	"Radiation-Zzzax" : Zzzax_fight_esc,
+	"Brotherhood-Sabretooth" : Sabretooth_fight_esc
 }
 
 func Sentinel_Fight():
-	$"../BlackScreen".chooseCardKO(1, 1, ["hand", "played"], heroFilter)
+	await $"../BlackScreen".chooseCardKO(1, 1, ["hand", "played"], heroFilter)
 
 func HandNinja_Fight():
 	res.addRecruit(1)
+
+func DoombotLegion_fight():
+	await $"../BlackScreen".KOFromDeck(1, 1, 2)
+
+func SavageLandMutates_fight():
+	$"../PlayerHand".handSize += 1
 
 func Endless_Armies_Hydra_fight():
 	await $"../City".drawVilCard()
@@ -304,14 +414,13 @@ func Viper_fight_esc():
 
 func Kidnapper_fight():
 	var f1 = func():
-		print("f1")
 		$"../HQ".addOfficer()
 		emit_signal("finishCustom")
 		
 	var f2 = func():
 		emit_signal("finishCustom")
 		
-	$"../BlackScreen".customChoices(["Add Officer", "Nothing"], [f1, f2])
+	await $"../BlackScreen".customChoices(["Add Officer", "Nothing"], [f1, f2])
 
 func DocOc_fight():
 	$"../PlayerHand".handSize += 2
@@ -359,6 +468,23 @@ func Zzzax_fight_esc():
 	if count == 0:
 		await $"../PlayerHand".addWound(1)
 
+func Blob_prereq():
+	return $"../PlayerHand".teamCount(GameData.Teams.XMEN, false, true) > 0
+
+func Juggernaut_ambush():
+	await $"../BlackScreen".chooseCardKO(2, 2, ["discard"], heroFilter)
+
+func Juggernaut_esc():
+	await $"../BlackScreen".chooseCardKO(2, 2, ["hand"], heroFilter)
+
+func Mystique_esc():
+	await $"../Scheme".twist()
+
+func Sabretooth_fight_esc():
+	if $"../PlayerHand".teamCount(GameData.Teams.XMEN, false, true) == 0:
+		$"../PlayerHand".addWound(1)
+
+
 
 
 
@@ -369,7 +495,7 @@ var mastermind_strikes = {
 }
 
 func Red_Skull_Strike():
-	$"../BlackScreen".chooseCardKO(1, 1, ["hand"], heroFilter)
+	await $"../BlackScreen".chooseCardKO(1, 1, ["hand"], heroFilter)
 
 var mastermind_prereqs = {
 	

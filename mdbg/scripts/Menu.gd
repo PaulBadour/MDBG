@@ -127,6 +127,9 @@ func _process(delta: float) -> void:
 						for i in range(codeStr.size()):
 							codeStr[i] = int(codeStr[i])
 						setup(codeStr)
+					elif packet_text.begins_with("Lobby:"):
+						var lText = packet_text.substr(6, -1)
+						$MemberLabel.text = lText
 					elif host:
 						print("Host: ", packet_text)
 					else:
@@ -155,6 +158,7 @@ func _on_host_button_button_down() -> void:
 	$HostButton.visible = false
 	$BackButton.visible = false
 	$StartButton.visible = true
+	$MemberLabel.text = username
 	host = true
 	#username = "host"
 	socket.send_text("Create Lobby")
@@ -247,18 +251,19 @@ func setup(c = null):
 	# Scheme, Mastermind, Vils, Henchmen, Heros
 	if not c:
 		var hench = []
-		var vils = []
+		var vils = [GameData.BASE_VILLAINS.find(GameData.BROTHERHOOD_VILLAINS)]
 		var code = []
 		code.append_array(generateChoices(1, GameData.BASE_SCHEMES.size()))
 		code.append_array(generateChoices(1, GameData.BASE_MASTERMINDS.size()))
 		var mmind = GameData.BASE_MASTERMINDS[code[1]]
 		var leads = mmind.leads
 		
+		if playerCount > 1:
 		# is henchman
-		if "team" in leads.keys():
-			hench.append(GameData.BASE_HENCHMEN.find(mmind.leads))
-		else:
-			vils.append(GameData.BASE_VILLAINS.find(mmind.leads))
+			if "team" in leads.keys():
+				hench.append(GameData.BASE_HENCHMEN.find(mmind.leads))
+			else:
+				vils.append(GameData.BASE_VILLAINS.find(mmind.leads))
 
 		code.append_array(generateChoices(vilCount, GameData.BASE_VILLAINS.size(), vils))
 		code.append_array(generateChoices(henchCount, GameData.BASE_HENCHMEN.size(), hench))

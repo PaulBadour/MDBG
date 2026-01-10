@@ -18,7 +18,7 @@ const CARD_SIZE_Y = 225
 const CHECK_Y_MIN = y - (CARD_SIZE_Y / 2.0)
 const CHECK_Y_MAX = y + (CARD_SIZE_Y / 2.0)
 
-var officerCount = 2
+var officerCount = 30
 var displayOfficer
 const OFFICER_ZONE = [290, 510]
 const officerPos = Vector2(400, y)

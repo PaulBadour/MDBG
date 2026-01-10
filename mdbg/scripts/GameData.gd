@@ -7,7 +7,9 @@ enum Heros {
 	SPIDER_MAN,
 	WOLVERINE,
 	CYCLOPS,
-	HAWKEYE
+	HAWKEYE,
+	EMMA_FROST,
+	NICK_FURY
 }
 
 enum Classes{
@@ -283,13 +285,103 @@ static var IMPOSSIBLE_TRICKSHOT = {
 	spritePath = "res://cards/Base/Heros/Hawkeye/Hawkeye-ImpossibleTrickShot.png"
 }
 
+static var SHADOWED_THOUGHTS = {
+	attack = 2,
+	recruit = null,
+	cost = 4,
+	team = Teams.XMEN,
+	hClass = Classes.COVERT,
+	heroName = "Emma Frost",
+	cardName = "Shadowed Thoughts",
+	spritePath = "res://cards/Base/Heros/Emma Frost/EmmaFrost-ShadowedThoughts.png"
+}
+
+static var MENTAL_DISCIPLINE = {
+	attack = null,
+	recruit = 1,
+	cost = 3,
+	team = Teams.XMEN,
+	hClass = Classes.RANGED,
+	heroName = "Emma Frost",
+	cardName = "Mental Discipline",
+	spritePath = "res://cards/Base/Heros/Emma Frost/EmmaFrost-MentalDiscipline.png"
+}
+
+static var PSYCHIC_LINK = {
+	attack = 3,
+	recruit = null,
+	cost = 5,
+	team = Teams.XMEN,
+	hClass = Classes.INSTINCT,
+	heroName = "Emma Frost",
+	cardName = "Psychic Link",
+	spritePath = "res://cards/Base/Heros/Emma Frost/EmmaFrost-PsychicLink.png"
+}
+
+static var DIAMOND_FORM = {
+	attack = 5,
+	recruit = null,
+	cost = 7,
+	team = Teams.XMEN,
+	hClass = Classes.STRENGTH,
+	heroName = "Emma Frost",
+	cardName = "Diamond Form",
+	spritePath = "res://cards/Base/Heros/Emma Frost/EmmaFrost-DiamondForm.png"
+}
+
+static var BATTLEFIELD_PROMOTION = {
+	attack = null,
+	recruit = null,
+	cost = 4,
+	team = Teams.SHIELD,
+	hClass = Classes.COVERT,
+	heroName = "Nick Fury",
+	cardName = "Battlefield Promotion",
+	spritePath = "res://cards/Base/Heros/Nick Fury/NickFury-BattlefieldPromotion.png"
+}
+
+static var HIGHTECH_WEAPONRY = {
+	attack = 2,
+	recruit = null,
+	cost = 3,
+	team = Teams.SHIELD,
+	hClass = Classes.TECH,
+	heroName = "Nick Fury",
+	cardName = "High-Tech Weaponry",
+	spritePath = "res://cards/Base/Heros/Nick Fury/NickFury-HighTechWeaponry.png"
+}
+
+static var LEGENDARY_COMMANDER = {
+	attack = 1,
+	recruit = null,
+	cost = 6,
+	team = Teams.SHIELD,
+	hClass = Classes.STRENGTH,
+	heroName = "Nick Fury",
+	cardName = "Legendary Commander",
+	spritePath = "res://cards/Base/Heros/Nick Fury/NickFury-LegendaryCommander.png"
+}
+
+static var PURE_FURY = {
+	attack = null,
+	recruit = null,
+	cost = 8,
+	team = Teams.SHIELD,
+	hClass = Classes.TECH,
+	heroName = "Nick Fury",
+	cardName = "Pure Fury",
+	spritePath = "res://cards/Base/Heros/Nick Fury/NickFury-PureFury.png"
+}
+
 # Cards are in the order of common(5), common(5), uncommon(3), rare(1)
 static var BASE_HEROS = {
 	Heros.IRON_MAN : [REPULSOR_RAYS, ENDLESS_INVENTION, ARC_REACTOR, QUANTUM_BREAKTHROUGH],
 	Heros.SPIDER_MAN : [ASTONISHING_STRENGTH, GREAT_RESPONSIBILITY, WEB_SHOOTERS, THE_AMAZING_SPIDERMAN],
 	Heros.WOLVERINE : [HEALING_FACTOR, KEEN_SENSES, FRENZIED_SLASHING, BERSERKER_RAGE],
 	Heros.CYCLOPS : [OPTIC_BLAST, DETERMINATION, UNENDING_ENERGY, XMEN_UNITED],
-	Heros.HAWKEYE : [TEAM_PLAYER, QUICK_DRAW, COVERING_FIRE, IMPOSSIBLE_TRICKSHOT]
+	Heros.HAWKEYE : [TEAM_PLAYER, QUICK_DRAW, COVERING_FIRE, IMPOSSIBLE_TRICKSHOT],
+	Heros.EMMA_FROST : [SHADOWED_THOUGHTS, MENTAL_DISCIPLINE, PSYCHIC_LINK, DIAMOND_FORM],
+	Heros.NICK_FURY : [BATTLEFIELD_PROMOTION, HIGHTECH_WEAPONRY, LEGENDARY_COMMANDER, PURE_FURY]
 }
 
 
@@ -421,10 +513,50 @@ static var SPIDERFOES_VILLAINS = {
 	VENOM : 2
 }
 
+static var BLOB = {
+	name = "Blob",
+	attack = 4,
+	team = "Brotherhood",
+	vp = 2,
+	spritePath = "res://cards/Base/Villains/Brotherhood-Blob.png"
+}
+
+static var JUGGERNAUT = {
+	name = "Juggernaut",
+	attack = 6,
+	team = "Brotherhood",
+	vp = 4,
+	spritePath = "res://cards/Base/Villains/Brotherhood-Juggernaut.png"
+}
+
+static var MYSTIQUE = {
+	name = "Mystique",
+	attack = 5,
+	team = "Brotherhood",
+	vp = 3,
+	spritePath = "res://cards/Base/Villains/Brotherhood-Mystique.png"
+}
+
+static var SABRETOOTH = {
+	name = "Sabretooth",
+	attack = 5,
+	team = "Brotherhood",
+	vp = 3,
+	spritePath = "res://cards/Base/Villains/Brotherhood-Sabretooth.png"
+}
+
+static var BROTHERHOOD_VILLAINS = {
+	BLOB : 2,
+	JUGGERNAUT : 2,
+	MYSTIQUE : 2,
+	SABRETOOTH : 2
+}
+
 static var BASE_VILLAINS = [
 	SPIDERFOES_VILLAINS,
 	HYDRA_VILLAINS,
-	RADIATION_VILLAINS
+	RADIATION_VILLAINS,
+	BROTHERHOOD_VILLAINS
 ]
 
 static var HENCHMAN_SENTINEL = {
@@ -443,9 +575,27 @@ static var HENCHMAN_HANDNINJA = {
 	spritePath = "res://cards/Base/Villains/Henchman-HandNinja.png"
 }
 
+static var HENCHMAN_DOOMBOTLEGION = {
+	name = "Doombot Legion",
+	attack = 3,
+	team = "Henchmen",
+	vp = 1,
+	spritePath = "res://cards/Base/Villains/Henchman-DoombotLegion.png"
+}
+
+static var HENCHMAN_SAVAGELANDMUTATES = {
+	name = "Savage Land Mutates",
+	attack = 3,
+	team = "Henchmen",
+	vp = 1,
+	spritePath = "res://cards/Base/Villains/Henchman-SavageLandMutates.png"
+}
+
 static var BASE_HENCHMEN = [
 	HENCHMAN_SENTINEL,
-	HENCHMAN_HANDNINJA
+	HENCHMAN_HANDNINJA,
+	HENCHMAN_DOOMBOTLEGION,
+	HENCHMAN_SAVAGELANDMUTATES
 ]
 
 

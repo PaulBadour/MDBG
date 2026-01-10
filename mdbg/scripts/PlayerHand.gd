@@ -184,11 +184,18 @@ func classCount(c, skipPlayed = true, countHand = false):
 				count += 1
 	return count
 
-func teamCount(c):
+func teamCount(c, skipPlayed = true, countHand = false):
 	var count = 0
-	for i in range(1, played.size()):
+	var start = 0
+	if skipPlayed:
+		start = 1
+	for i in range(start, played.size()):
 		if played[i].team == c:
 			count += 1
+	if countHand:
+		for i in playerHand:
+			if i.identifier == "Hero" and i.team == c:
+				count += 1
 	return count
 
 func saveBystander():

@@ -65,17 +65,22 @@ func _input(event: InputEvent) -> void:
 		elif pos.x > MM_ZONE[0] and pos.x < MM_ZONE[1]:
 			focus(-1)
 
-func _on_fight_button_down() -> void:
+func _on_fight_button_down(autoKill=null) -> void:
 	var currAttack = $"../Resources".attack
 	var attack
+	var skipChecks = false
+	if autoKill != null:
+		focused = autoKill
+		skipChecks = true
 	if focused == -1:
 		attack = $"../Mastermind".attack
-		if currAttack >= attack:
+		if currAttack >= attack or skipChecks:
 			
-			if $"../Mastermind".getFuncName() in $"../EffectManager".mastermind_prereqs.keys():
+			if !skipChecks and $"../Mastermind".getFuncName() in $"../EffectManager".mastermind_prereqs.keys():
 				if !$"../EffectManager".mastermind_prereqs[$"../Mastermind".getFuncName()].call():
 					return
-			$"../Resources".addAttack(-attack)
+			if !skipChecks:
+				$"../Resources".addAttack(-attack)
 			var t = $"../Mastermind".drawTactic()
 			$"../PlayerHand".vicPile.append(t)
 			for i in $"../Mastermind".bystanders:
@@ -92,9 +97,9 @@ func _on_fight_button_down() -> void:
 			
 	else:
 		attack = city[focused].attack
-		if currAttack >= attack:
+		if skipChecks or currAttack >= attack:
 			
-			if city[focused].getFuncName() in $"../EffectManager".villain_prereqs.keys():
+			if !skipChecks and city[focused].getFuncName() in $"../EffectManager".villain_prereqs.keys():
 				if !$"../EffectManager".villain_prereqs[city[focused].getFuncName()].call():
 					return
 			if $"..".PLAYER_COUNT > 1:
@@ -104,7 +109,8 @@ func _on_fight_button_down() -> void:
 			card.position = OOS
 			if card.getFuncName() in $"../EffectManager".villain_fight.keys():
 				await $"../EffectManager".villain_fight[card.getFuncName()].call()
-			$"../Resources".addAttack(-attack)
+			if !skipChecks:
+				$"../Resources".addAttack(-attack)
 			$"../PlayerHand".vicPile.append(card)
 			for i in card.bList:
 				$"../PlayerHand".vicPile.append(i)
@@ -115,6 +121,10 @@ func _on_fight_button_down() -> void:
 			$"../PlayerHand".saveBystander()
 			$"../PlayerHand".saveBystander()
 			$"../PlayerHand".saveBystander()
+	
+	if "Diamond Form" in $"../PlayerHand".eventCards:
+		for i in range($"../PlayerHand".eventCards["Diamond Form"]):
+			$"../Resources".addRecruit(3)
 	_on_cancel_button_down()
 
 

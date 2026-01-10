@@ -42,14 +42,14 @@ func _input(event):
 			$"../BlackScreen".showCards($"../PlayerHand".played, false)
 		else:
 			$"../BlackScreen".stopShowCards()
+	if event is InputEventKey and event.keycode == KEY_K and !event.is_echo():
+		if event.is_pressed():
+			$"../BlackScreen".showCards($"../KODeck".cards, false)
+		else:
+			$"../BlackScreen".stopShowCards()
 	if event is InputEventKey and event.keycode == KEY_A and !event.is_echo() and $"..".yourTurn:
 		if event.is_pressed():
 			$"../PlayerHand".autoplay()
-	# DEBUG
-	if event is InputEventKey and event.keycode == KEY_N and !event.is_echo() and event.is_pressed():
-		var c = findCard(false)
-		if c:
-			print(c)
 	if event is InputEventKey and event.keycode == KEY_SPACE and !event.is_echo():
 		#$"../BlackScreen".appear()
 		if event.is_pressed() and !cardDragged:
@@ -90,6 +90,11 @@ func _input(event):
 			elif $"../PlayerHand".isCardInHand(cardDragged):
 				$"../PlayerHand".animateCard(cardDragged, cardDragged.handPos)
 			cardDragged = null
+	# DEBUG
+	if event is InputEventKey and event.keycode == KEY_N and !event.is_echo() and event.is_pressed():
+		var c = findCard(false)
+		if c:
+			print(c)
 
 func findCard(first=true):
 	var space_state = get_world_2d().direct_space_state

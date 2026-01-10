@@ -11,7 +11,7 @@ func initStarterDeck():
 	var heroScene = preload("res://Scenes/Hero.tscn")
 	for i in range(6): # 8
 		var newCard = heroScene.instantiate()
-		newCard.initHero(GameData.ARC_REACTOR) # SHIELD_AGENT
+		newCard.initHero(GameData.IMPOSSIBLE_TRICKSHOT) # SHIELD_AGENT
 		get_parent().addCardToManager(newCard)
 		addCards(newCard)
 

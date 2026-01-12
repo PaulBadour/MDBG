@@ -1,7 +1,7 @@
 extends Node2D
 
 '''
-A = Autoplay*
+A = Autoplay
 D = Discard
 V = Vicpile
 P = Played
@@ -47,6 +47,11 @@ func _input(event):
 			$"../BlackScreen".showCards($"../KODeck".cards, false)
 		else:
 			$"../BlackScreen".stopShowCards()
+	if event is InputEventKey and event.keycode == KEY_I and !event.is_echo():
+		if event.is_pressed():
+			$"../BlackScreen".showInfoPanel()
+		else:
+			$"../BlackScreen".stopShowInfoPanel()
 	if event is InputEventKey and event.keycode == KEY_A and !event.is_echo() and $"..".yourTurn:
 		if event.is_pressed():
 			$"../PlayerHand".autoplay()
@@ -60,23 +65,15 @@ func _input(event):
 				c.position = Vector2(screenSize.x / 2.0, screenSize.y / 2.0)
 				c.scale = Vector2(ZOOM_SCALE, ZOOM_SCALE)
 				c.z_index = 5
-				if c.identifier == "Villain":
-					c.displayBystanders(true)
-				elif c.identifier == "Mastermind":
-					$"../Mastermind".displayBystanders(true)
-				elif cardZoomed.identifier == "Scheme":
-					$"../Scheme".displayTwists(true)
+				$"../ExtraLabels".showLabel(c.getExtraText())
+
 		elif event.is_released() and cardZoomed:
 			cardZoomed.position = oldZoomPos
 			cardZoomed.scale = Vector2(BASE_SIZE, BASE_SIZE)
 			cardZoomed.z_index = 3
 			hoverOff(cardZoomed)
-			if cardZoomed.identifier == "Villain":
-				cardZoomed.displayBystanders(false)
-			elif cardZoomed.identifier == "Mastermind":
-				$"../Mastermind".displayBystanders(false)
-			elif cardZoomed.identifier == "Scheme":
-				$"../Scheme".displayTwists(false)
+			$"../ExtraLabels".removeLabel()
+
 			cardZoomed = null
 
 	if event is InputEventMouseButton and event.button_index == MOUSE_BUTTON_LEFT and !cardZoomed:
@@ -85,7 +82,7 @@ func _input(event):
 			if c and $"../PlayerHand".isCardInHand(c) and $"..".yourTurn:
 				cardDragged = c
 		elif cardDragged:
-			if cardDragged.position.y < PLAY_ZONE:
+			if cardDragged.position.y < PLAY_ZONE and cardDragged.identifier == "Hero":
 				$"../PlayerHand".playCard(cardDragged)
 			elif $"../PlayerHand".isCardInHand(cardDragged):
 				$"../PlayerHand".animateCard(cardDragged, cardDragged.handPos)
@@ -148,10 +145,6 @@ func highlightCard(card, hovered):
 func connectCardSignals(card):
 	card.connect("hovOn", hoverOn)
 	card.connect("hovOff", hoverOff)
-
-func connectBystanderSignal(card):
-	card.connect("bystanderLabel", $"../ExtraLabels".showLabel)
-	card.connect("removeBystanderLabel", $"../ExtraLabels".removeLabel)
 
 # Called when the node enters the scene tree for the first time.
 func _ready() -> void:

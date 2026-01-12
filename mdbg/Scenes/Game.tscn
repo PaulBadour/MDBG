@@ -1,4 +1,4 @@
-[gd_scene load_steps=21 format=3 uid="uid://dokr14biam1hj"]
+[gd_scene load_steps=22 format=3 uid="uid://dokr14biam1hj"]
 
 [ext_resource type="Script" uid="uid://bvjanc1l5qt86" path="res://scripts/Main.gd" id="1_tfod6"]
 [ext_resource type="Script" uid="uid://btkeam6yo7pba" path="res://scripts/EffectManager.gd" id="2_rajel"]
@@ -20,6 +20,7 @@
 [ext_resource type="Script" uid="uid://b0u7bdwgaemy6" path="res://scripts/Mastermind.gd" id="18_4eqlp"]
 [ext_resource type="Script" uid="uid://dvbvsv34bvpfx" path="res://scripts/Scheme.gd" id="19_18uti"]
 [ext_resource type="Script" uid="uid://coqq2aj6xwp0u" path="res://scripts/ExtraLabels.gd" id="20_khy6b"]
+[ext_resource type="Script" uid="uid://c16bu5wag6g3o" path="res://scripts/ModifierManager.gd" id="21_rajel"]
 
 [node name="Game" type="Node2D"]
 script = ExtResource("1_tfod6")
@@ -144,6 +145,46 @@ offset_bottom = 255.0
 focus_mode = 0
 text = "Fight"
 
+[node name="Label" type="Label" parent="City"]
+offset_left = 1394.0
+offset_top = 63.0
+offset_right = 1575.0
+offset_bottom = 95.0
+text = "Sewers"
+horizontal_alignment = 1
+
+[node name="Label2" type="Label" parent="City"]
+offset_left = 1205.0
+offset_top = 63.0
+offset_right = 1386.0
+offset_bottom = 95.0
+text = "Bank"
+horizontal_alignment = 1
+
+[node name="Label3" type="Label" parent="City"]
+offset_left = 1005.0
+offset_top = 62.0
+offset_right = 1186.0
+offset_bottom = 94.0
+text = "Rooftops"
+horizontal_alignment = 1
+
+[node name="Label4" type="Label" parent="City"]
+offset_left = 805.0
+offset_top = 64.0
+offset_right = 986.0
+offset_bottom = 96.0
+text = "Streets"
+horizontal_alignment = 1
+
+[node name="Label5" type="Label" parent="City"]
+offset_left = 605.0
+offset_top = 63.0
+offset_right = 786.0
+offset_bottom = 95.0
+text = "Bridge"
+horizontal_alignment = 1
+
 [node name="HeroDeck" type="Node2D" parent="."]
 script = ExtResource("11_iyesh")
 
@@ -220,6 +261,9 @@ offset_left = -534.0
 offset_top = 583.0
 offset_right = -394.0
 offset_bottom = 751.0
+
+[node name="ModifierManager" type="Node2D" parent="."]
+script = ExtResource("21_rajel")
 
 [connection signal="addAttack" from="PlayerHand" to="Resources" method="_on_player_hand_add_attack"]
 [connection signal="addRecruit" from="PlayerHand" to="Resources" method="_on_player_hand_add_recruit"]

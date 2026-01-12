@@ -67,9 +67,11 @@ func _on_recruit_button_down() -> void:
 	$"../PlayerHand".killOrRecruit = true
 	_on_cancel_button_down()
 
-func addOfficer(fake=false):
+func addOfficer(fake = false):
 	if officerCount == 1:
 		if fake:
+			if $"../CardManager".cardZoomed == displayOfficer:
+				$"../CardManager".oldZoomPos = Vector2(1626, -310)
 			displayOfficer.position = Vector2(1626, -310)
 		else:
 			$"../PlayerHand".deck.discardCard(displayOfficer)
@@ -83,6 +85,8 @@ func addOfficer(fake=false):
 
 func removeHero(ind):
 	hq[ind].position = Vector2(-324, 1626)
+	if $"../CardManager".cardZoomed == hq[ind]:
+		$"../CardManager".oldZoomPos = Vector2(-324, 1626)
 	hq[ind] = null
 	fillHQ()
 

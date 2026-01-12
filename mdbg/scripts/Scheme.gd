@@ -25,15 +25,18 @@ func _ready() -> void:
 	sCard.z_index = 5
 	sCard.position = cardPos
 	$"../PlayerHand".addCardToManager(sCard)
+	sCard.extraText.append(str("Scheme Twists: ", playedTwists))
+	
 
 func twist():
 	playedTwists += 1
+	sCard.extraText[0] = str("Scheme Twists: ", playedTwists)
 	$"../EffectManager".SchemeTwistLinks[sName].call(playedTwists)
 	if $"../..".playerCount == 1:
 		await $"../BlackScreen".KOfromHQ($"../EffectManager".sixCostFilter)
 
-func displayTwists(on):
-	if on:
-		$"../ExtraLabels".showLabel(str("Scheme Twists: ", playedTwists))
-	else:
-		$"../ExtraLabels".removeLabel()
+#func displayTwists(on):
+	#if on:
+		#$"../ExtraLabels".showLabel(str("Scheme Twists: ", playedTwists))
+	#else:
+		#$"../ExtraLabels".removeLabel()

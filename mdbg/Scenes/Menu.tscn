@@ -76,6 +76,7 @@ offset_bottom = 588.0
 
 [connection signal="button_down" from="JoinButton" to="." method="_on_button_button_down"]
 [connection signal="button_down" from="HostButton" to="." method="_on_host_button_button_down"]
+[connection signal="button_down" from="BackButton" to="." method="_on_back_button_button_down"]
 [connection signal="button_down" from="SingleButton" to="." method="_on_single_button_button_down"]
 [connection signal="button_down" from="MultiplayerButton" to="." method="_on_multiplayer_button_button_down"]
 [connection signal="button_down" from="StartButton" to="." method="_on_start_button_button_down"]

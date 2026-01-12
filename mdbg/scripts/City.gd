@@ -29,7 +29,6 @@ const OOS = Vector2(1217, -1224)
 
 # Called when the node enters the scene tree for the first time.
 func _ready() -> void:
-	#escaped = null
 	for i in range(5):
 		cityZones[i] = [(START_X - (i*DECR)) - (CARD_SIZE_X/2.0), (START_X - (i*DECR)) + (CARD_SIZE_X/2.0)]
 
@@ -79,13 +78,14 @@ func _on_fight_button_down(autoKill=null) -> void:
 			if !skipChecks and $"../Mastermind".getFuncName() in $"../EffectManager".mastermind_prereqs.keys():
 				if !$"../EffectManager".mastermind_prereqs[$"../Mastermind".getFuncName()].call():
 					return
-			if !skipChecks:
+			if !skipChecks and attack > 0:
 				$"../Resources".addAttack(-attack)
 			var t = $"../Mastermind".drawTactic()
 			$"../PlayerHand".vicPile.append(t)
 			for i in $"../Mastermind".bystanders:
 				$"../PlayerHand".vicPile.append(i)
-			$"../Mastermind".bystanders.clear()
+			
+			$"../Mastermind".clearBystanders()
 			$"../PlayerHand".killOrRecruit = true
 
 			var fName = str($"../Mastermind".mName, "-", t.tName)
@@ -109,7 +109,7 @@ func _on_fight_button_down(autoKill=null) -> void:
 			card.position = OOS
 			if card.getFuncName() in $"../EffectManager".villain_fight.keys():
 				await $"../EffectManager".villain_fight[card.getFuncName()].call()
-			if !skipChecks:
+			if !skipChecks and attack > 0:
 				$"../Resources".addAttack(-attack)
 			$"../PlayerHand".vicPile.append(card)
 			for i in card.bystanders:
@@ -142,13 +142,16 @@ func addToCity(c):
 			#await $"../EffectManager".villain_ambush[c.getFuncName()].call()
 		if city[i] == null:
 			city[i] = c
-			c.position = Vector2(START_X - (i * DECR), y)
+			c.position = calcCardPosition(i)
 			c.z_index = 3
+			$"../ModifierManager".applyCityPosition(i)
 			esc = false
 			break
+		$"../ModifierManager".removeCityPosition(i)
 		var newC = city[i]
 		city[i] = c
-		c.position = Vector2(START_X - (i * DECR), y)
+		$"../ModifierManager".applyCityPosition(i)
+		c.position = calcCardPosition(i)
 		if i == 0:
 			c.z_index = 3
 		c = newC
@@ -161,21 +164,23 @@ func addToCity(c):
 		if $"..".yourTurn:
 			await $"../BlackScreen".KOfromHQ($"../EffectManager".sixCostFilter)
 
-		if c.bystanders > 0:
+		if c.bystanders.size() > 0:
 			await $"../BlackScreen".chooseCardDiscard(1, 1, false)
 	
 	if addedVil.getFuncName() in $"../EffectManager".villain_ambush.keys():
 		await $"../EffectManager".villain_ambush[addedVil.getFuncName()].call()
 
 
-func addBystander():
+func addBystander(b):
 	for i in city:
 		if i:
-			i.bystanders.append($"../Bystanders".draw())
+			i.captureBystander(b)
 			return
-	$"../Mastermind".bystanders.append($"../Bystanders".draw())
+	$"../Mastermind".captureBystander(b)
 
 func removeVil(ind):
+	if $"../CardManager".cardZoomed == city[ind]:
+		$"../CardManager".oldZoomPos = Vector2(-255, 1726)
 	var card = city[ind]
 	card.position = Vector2(-255, 1726)
 	city[ind] = null
@@ -197,6 +202,9 @@ func reveal(c):
 	c.z_index = oldz
 	c.scale = oldScale
 
+func calcCardPosition(ind):
+	return Vector2(START_X - (ind * DECR), y)
+
 func drawVilCard():
 	var vc = $"../VillainDeck".draw()
 	if !vc:
@@ -215,6 +223,6 @@ func drawVilCard():
 	elif vc.identifier == "Bystander":
 		
 		print("Bystander")
-		addBystander()
+		addBystander(vc)
 	else:
 		print(vc.identifier)

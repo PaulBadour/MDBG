@@ -57,7 +57,11 @@ var links = {
 	"Black Widow-Dangerous Rescue" : Dangerous_Rescue,
 	"Black Widow-Mission Accomplished" : Mission_Accomplished,
 	"Black Widow-Covert Operation" : Covert_Operation,
-	"Black Widow-Silent Sniper" : Silent_Sniper
+	"Black Widow-Silent Sniper" : Silent_Sniper,
+	"Storm-Lightning Bolt" : Lightning_Bolt,
+	"Storm-Gathering Storm Clouds" : Gathering_Storm_Clouds,
+	"Storm-Spinning Cyclone" : Spinning_Cyclone,
+	"Storm-Tidal Wave" : Tidal_Wave
 }
 
 var prereqs = {
@@ -400,6 +404,74 @@ func Silent_Sniper():
 	await $"../City"._on_fight_button_down(inds[indind])
 
 
+# Storm
+
+func Lightning_Bolt():
+	$"../ModifierManager".citySpotModifier($"../ModifierManager".LightningBolt, 2)
+
+func Gathering_Storm_Clouds():
+	if classAbility(GameData.Classes.RANGED):
+		$"../PlayerHand".drawCard()
+
+func Spinning_Cyclone():
+	var c = []
+	for i in $"../City".city:
+		if i:
+			c.append(i)
+	if c == []:
+		return
+	var h = await $"../BlackScreen".customCardChoices(0, 1, "Move", c)
+	if h == []:
+		return
+	h = h[0]
+	
+	
+	while h.bystanders.size() > 0:
+		$"../PlayerHand".vicPile.append(h.bystanders.pop_front())
+	
+	var ind = $"../City".city.find(h)
+	$"../ModifierManager".removeCityPosition(ind)
+	$"../City".city[ind] = null
+	var moveFunc = func(card, l, prevInd):
+		if $"../City".city[l]:
+			$"../ModifierManager".removeCityPosition(l)
+			$"../City".city[prevInd] = $"../City".city[l]
+			$"../City".city[prevInd].position = $"../City".calcCardPosition(prevInd)
+			$"../ModifierManager".removeCityPosition(prevInd)
+		$"../City".city[l] = card
+		card.position = $"../City".calcCardPosition(l)
+		$"../ModifierManager".applyCityPosition(l)
+	
+	var sewersMove = func():
+		moveFunc.call(h, 0, ind)
+		emit_signal("finishCustom")
+	var bankMove = func():
+		moveFunc.call(h, 1, ind)
+		emit_signal("finishCustom")
+	var rooftopsMove = func():
+		moveFunc.call(h, 2, ind)
+		emit_signal("finishCustom")
+	var streetsMove = func():
+		moveFunc.call(h, 3, ind)
+		emit_signal("finishCustom")
+	var bridgeMove = func():
+		moveFunc.call(h, 4, ind)
+		emit_signal("finishCustom")
+	
+	var funcs = [sewersMove, bankMove, rooftopsMove, streetsMove, bridgeMove]
+	var text = ["Sewers", "Bank", "Rooftops", "Streets", "Bridge"]
+	funcs.remove_at(ind)
+	text.remove_at(ind)
+	
+	await $"../BlackScreen".customChoices(text, funcs)
+	print($"../City".city)
+	
+
+func Tidal_Wave():
+	$"../ModifierManager".citySpotModifier($"../ModifierManager".TidalWaveBridge, 4)
+	if classAbility(GameData.Classes.RANGED):
+		$"../ModifierManager".createModifier($"../ModifierManager".TidalWaveMasterMind, $"../Mastermind")
+
 # General funcs
 
 func effect(card, args=[]):
@@ -414,6 +486,9 @@ func addCardEvent(event):
 		$"../PlayerHand".eventCards[event] += 1
 	else:
 		$"../PlayerHand".eventCards[event] = 1
+
+func classAbility(c, count=1):
+	return $"../PlayerHand".classCount(c, true, false) >= count
 
 func prereq(card, args=[]):
 	for i in prereqs:
@@ -542,7 +617,7 @@ func GreenGoblin_ambush():
 	var v = $"../City".addedVil
 	var b = $"../Bystanders".draw()
 	if b:
-		v.bystanders.append(b)
+		v.captureBystander(b)
 	else:
 		print("Could not draw bystander")
 

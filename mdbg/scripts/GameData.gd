@@ -11,7 +11,8 @@ enum Heros {
 	NICK_FURY,
 	HULK,
 	CAPTAIN_AMERICA,
-	BLACK_WIDOW
+	BLACK_WIDOW,
+	STORM
 }
 
 enum Classes{
@@ -507,6 +508,50 @@ static var SILENT_SNIPER = {
 	spritePath = "res://cards/Base/Heros/Black Widow/BlackWidow-SilentSniper.png"
 }
 
+static var LIGHTNING_BOLT = {
+	attack = 2,
+	recruit = null,
+	cost = 4,
+	team = Teams.XMEN,
+	hClass = Classes.RANGED,
+	heroName = "Storm",
+	cardName = "Lightning Bolt",
+	spritePath = "res://cards/Base/Heros/Storm/Storm-LightningBolt.png"
+}
+
+static var GATHERING_STORM_CLOUDS = {
+	attack = null,
+	recruit = 2,
+	cost = 3,
+	team = Teams.XMEN,
+	hClass = Classes.RANGED,
+	heroName = "Storm",
+	cardName = "Gathering Storm Clouds",
+	spritePath = "res://cards/Base/Heros/Storm/Storm-GatheringStormClouds.png"
+}
+
+static var SPINNING_CYLCONE = {
+	attack = 4,
+	recruit = null,
+	cost = 6,
+	team = Teams.XMEN,
+	hClass = Classes.COVERT,
+	heroName = "Storm",
+	cardName = "Spinning Cyclone",
+	spritePath = "res://cards/Base/Heros/Storm/Storm-SpinningCyclone.png"
+}
+
+static var TIDAL_WAVE = {
+	attack = 5,
+	recruit = null,
+	cost = 7,
+	team = Teams.XMEN,
+	hClass = Classes.RANGED,
+	heroName = "Storm",
+	cardName = "Tidal Wave",
+	spritePath = "res://cards/Base/Heros/Storm/Storm-TidalWave.png"
+}
+
 # Cards are in the order of common(5), common(5), uncommon(3), rare(1)
 static var BASE_HEROS = {
 	Heros.IRON_MAN : [REPULSOR_RAYS, ENDLESS_INVENTION, ARC_REACTOR, QUANTUM_BREAKTHROUGH],
@@ -518,7 +563,8 @@ static var BASE_HEROS = {
 	Heros.NICK_FURY : [BATTLEFIELD_PROMOTION, HIGHTECH_WEAPONRY, LEGENDARY_COMMANDER, PURE_FURY],
 	Heros.HULK : [UNSTOPPABLE_HULK, GROWING_ANGER, CRAZED_RAMPAGE, HULK_SMASH],
 	Heros.CAPTAIN_AMERICA : [AVENGERS_ASSEMBLE, PERFECT_TEAMWORK, DIVING_BLOCK, A_DAY_UNLIKE_ANY_OTHER],
-	Heros.BLACK_WIDOW : [DANGEROUS_RESCUE, MISSION_ACCOMPLISHED, COVERT_OPERATION, SILENT_SNIPER]
+	Heros.BLACK_WIDOW : [DANGEROUS_RESCUE, MISSION_ACCOMPLISHED, COVERT_OPERATION, SILENT_SNIPER],
+	Heros.STORM : [LIGHTNING_BOLT, GATHERING_STORM_CLOUDS, SPINNING_CYLCONE, TIDAL_WAVE]
 }
 
 

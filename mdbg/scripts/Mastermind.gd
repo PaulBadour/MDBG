@@ -4,15 +4,13 @@ var mCard
 
 const cardPos = Vector2(400, 225)
 
-signal bystanderLabel
-signal removeBystanderLabel
-
 var leads
 var masterStrike
 var tactics = []
 var attack
 var mName
 var bystanders = []
+var identifier = "MMHandler"
 
 @onready
 var info = $"../..".mastermind
@@ -23,7 +21,6 @@ func _ready() -> void:
 	
 	attack = info.attack
 	mName = info.mName
-	$"../CardManager".connectBystanderSignal(self)
 	var cardScene = preload("res://Scenes/Card.tscn")
 	mCard = cardScene.instantiate()
 	mCard.identifier = "Mastermind"
@@ -49,23 +46,24 @@ func drawTactic():
 
 func removeTactic(ind):
 	tactics.pop_at(ind)
-	print("Remaining tactics:")
-	for i in tactics:
-		print(i.tName)
-	print("-------------")
 
 func strike():
-	print("Drew strike")
+	#print("Drew strike")
 	$"../EffectManager".mastermind_strikes[getFuncName()].call()
 
 func getFuncName():
 	return str("Mastermind-", mName)
 
-func displayBystanders(on):
-	if on and bystanders.size() > 0:
-		emit_signal("bystanderLabel", str("Bystanders: ", bystanders.size()))
-		#b.text = str("Bystanders: ", bystanders)
-		#b.position = Vector2(1500, 500)
-	elif !on:
-		emit_signal("removeBystanderLabel")
-		#b.position = Vector2(-1500, -500)
+func clearBystanders():
+	if bystanders.size() > 0:
+		bystanders.clear()
+		mCard.extraText.pop_front()
+		mCard.extraLabels.pop_front()
+
+func captureBystander(b):
+	bystanders.append(b)
+	if bystanders.size() == 1:
+		mCard.extraText.push_front("Bystanders: 1")
+		mCard.extraLabels.push_front("Bystanders")
+	else:
+		mCard.extraText[0] = str("Bystanders: ", bystanders.size())

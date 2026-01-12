@@ -25,8 +25,10 @@ func _input(event):
 		var c = $"../CardManager".findCard()
 		if c in clicked:
 			clicked.erase(c)
+			c.get_node("Highlight").visible = false
 		elif c and (clicked.size() < maxClick or maxClick == 0):
 			clicked.append(c)
+			c.get_node("Highlight").visible = true
 
 func _ready():
 	get_node("Drapes").color = Color(0.0, 0.0, 0.0, TRANSPARENCY)
@@ -68,6 +70,8 @@ func showCards(cards, clickable=false):
 func stopShowCards():
 	
 	for i in range(shownCards.size()):
+		if shownCards[i] in clicked:
+			shownCards[i].get_node("Highlight").visible = false
 		if !shownCards[i] in clicked or shownCards[i].identifier == "Mastermind":
 			shownCards[i].position = lastLocations[i]
 		shownCards[i].z_index = lastIndexes[i]
@@ -340,13 +344,15 @@ func KOfromHQ(filter):
 			valid = true
 
 	get_node("KOButton").position = Vector2(1000, -200)
-	
+	var ind = $"../HQ".hq.find(clicked[0])
 	$"../HQ".KOhero(clicked[0])
+	if $"../..".playerCount > 1:
+		$"../..".socket.send_text(str("Recruited:", ind))
 	
 	stopShowCards()
 	return true
 
-func infoPanel():
+func showInfoPanel():
 	var l = get_node("Info")
 	var schemeText = str("Scheme: ", $"../..".scheme.sName, "\n")
 	var mastermindText = str("Mastermind: ", $"../..".mastermind.mName, "\n")
@@ -372,7 +378,8 @@ func infoPanel():
 	await appear()
 	l.position = Vector2(1000, 500)
 	l.text = str(schemeText, mastermindText, heroText, villainText, "Player Count: ", $"../..".playerCount)
-	
-	await get_tree().create_timer(3.0).timeout
+
+func stopShowInfoPanel():
+	var l = get_node("Info")
 	l.position = Vector2(1225, 2025)
 	await disappear()

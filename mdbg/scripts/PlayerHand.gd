@@ -42,7 +42,9 @@ func _ready() -> void:
 
 func _input(event):
 	if event is InputEventKey and event.keycode == KEY_W and event.is_pressed():
-		$"../City".addBystander()
+		$"../City".addBystander($"../Bystanders".draw())
+		addWound(1)
+		#$"../ModifierManager".citySpotModifier($"../ModifierManager".TidalWaveBridge, 0)
 	#if event is InputEventKey and event.keycode == KEY_H and event.is_pressed():
 		#print("--------------")
 		#for i in playerHand:
@@ -154,7 +156,6 @@ func _on_button_button_down() -> void:
 		if countWoundsInHand() > 0:
 			#print("wounds found")
 			await $"../BlackScreen".chooseCardKO(0, 0, ["hand"], $"../EffectManager".woundFilter)
-			#print(str("Hand size after KO: ", playerHand.size()))
 	emit_signal("endTurn")
 	discardHand()
 	killOrRecruit = false
@@ -165,6 +166,7 @@ func _on_button_button_down() -> void:
 
 	drawHand()
 	eventCards.clear()
+	$"../ModifierManager".removeModifiers($"../ModifierManager".Timing.END_OF_TURN)
 	if $"..".PLAYER_COUNT > 1:
 		$"../..".socket.send_text("End Turn")
 	else:

@@ -1,6 +1,9 @@
 import asyncio
 import websockets
 
+ip = "localhost"
+port = 9080
+
 players = {}
 
 class Lobby():
@@ -87,9 +90,9 @@ async def handleMessage(websocket):
 
 async def main():
     # The 'serve' function creates a server on the specified host and port.
-    async with websockets.serve(handleMessage, "localhost", 9080):
+    async with websockets.serve(handleMessage, ip, port):
         await asyncio.Future() # Run forever
 
 if __name__ == "__main__":
-    print("WebSocket server running on ws://localhost:9080")
+    print(f"WebSocket server running on ws://{ip}:{port}")
     asyncio.run(main())

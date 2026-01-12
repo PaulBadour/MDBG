@@ -6,7 +6,7 @@ var villains
 var heros
 
 
-var websocket_url = "ws://localhost:9080"
+var websocket_url = "ws://localhost:8080"
 var socket = WebSocketPeer.new()
 var host
 
@@ -180,6 +180,8 @@ func _on_start_button_button_down() -> void:
 
 # Single player button
 func _on_single_button_button_down() -> void:
+	if $Username.text == "":
+		return
 	username = $Username.text
 	host = true
 	playerCount = 1
@@ -294,6 +296,8 @@ func setup(c = null):
 
 
 func _on_multiplayer_button_button_down() -> void:
+	if $Username.text == "":
+		return
 	username = $Username.text
 	connectMultiplayer()
 	$SingleButton.visible = false
@@ -302,3 +306,14 @@ func _on_multiplayer_button_button_down() -> void:
 	$JoinButton.visible = true
 	$BackButton.visible = true
 	$Username.editable = false
+
+
+func _on_back_button_button_down() -> void:
+	connected = false
+	socket.close()
+	$SingleButton.visible = true
+	$MultiplayerButton.visible = true
+	$HostButton.visible = false
+	$JoinButton.visible = false
+	$BackButton.visible = false
+	$Username.editable = true

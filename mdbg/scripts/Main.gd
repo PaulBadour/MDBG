@@ -18,7 +18,9 @@ func start():
 	PLAYER_COUNT = $"..".playerCount
 	username = $"..".username
 	host = $"..".host
-	await $BlackScreen.infoPanel()
+	$BlackScreen.showInfoPanel()
+	await get_tree().create_timer(5.0).timeout
+	$BlackScreen.stopShowInfoPanel()
 	newTurn()
 
 func win():

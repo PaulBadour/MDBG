@@ -9,15 +9,15 @@ const OOS = Vector2(-500, 500)
 
 func initStarterDeck():
 	var heroScene = preload("res://Scenes/Hero.tscn")
-	for i in range(6): # 8
+	for i in range(8): # 8
 		var newCard = heroScene.instantiate()
-		newCard.initHero(GameData.DANGEROUS_RESCUE) # SHIELD_AGENT
+		newCard.initHero(GameData.SPINNING_CYLCONE) # SHIELD_AGENT
 		get_parent().addCardToManager(newCard)
 		addCards(newCard)
 
-	for i in range(6): # 4
+	for i in range(4): # 4
 		var newCard = heroScene.instantiate()
-		newCard.initHero(GameData.SILENT_SNIPER) # SHIELD_TROOPER
+		newCard.initHero(GameData.GATHERING_STORM_CLOUDS) # SHIELD_TROOPER
 		get_parent().addCardToManager(newCard)
 		addCards(newCard)
 

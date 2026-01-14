@@ -1,4 +1,4 @@
-[gd_scene load_steps=22 format=3 uid="uid://dokr14biam1hj"]
+[gd_scene load_steps=23 format=3 uid="uid://dokr14biam1hj"]
 
 [ext_resource type="Script" uid="uid://bvjanc1l5qt86" path="res://scripts/Main.gd" id="1_tfod6"]
 [ext_resource type="Script" uid="uid://btkeam6yo7pba" path="res://scripts/EffectManager.gd" id="2_rajel"]
@@ -13,6 +13,7 @@
 [ext_resource type="Script" uid="uid://m4h1jp75jtrx" path="res://scripts/HeroDeck.gd" id="11_iyesh"]
 [ext_resource type="Script" uid="uid://cr0jam5chkls2" path="res://scripts/BlackScreen.gd" id="12_i1pr2"]
 [ext_resource type="Script" uid="uid://b5wpv6b1xk6qe" path="res://scripts/KODeck.gd" id="13_4f4ik"]
+[ext_resource type="Script" uid="uid://cxsnusqjmnx83" path="res://scripts/AttRecSliders.gd" id="13_vvhu1"]
 [ext_resource type="Script" uid="uid://dc42lnh0jh83d" path="res://scripts/Wounds.gd" id="14_khs3t"]
 [ext_resource type="Script" uid="uid://bj33fsh78563c" path="res://scripts/VillainDeck.gd" id="15_0iyqm"]
 [ext_resource type="Script" uid="uid://cc3pje6hbw6fr" path="res://scripts/Bystanders.gd" id="16_jn8rg"]
@@ -27,6 +28,12 @@ script = ExtResource("1_tfod6")
 
 [node name="EffectManager" type="Node2D" parent="."]
 script = ExtResource("2_rajel")
+
+[node name="ModifierManager" type="Node2D" parent="."]
+script = ExtResource("21_rajel")
+
+[node name="Scheme" type="Node2D" parent="."]
+script = ExtResource("19_18uti")
 
 [node name="CardManager" type="Node2D" parent="."]
 script = ExtResource("3_vvhu1")
@@ -188,6 +195,13 @@ horizontal_alignment = 1
 [node name="HeroDeck" type="Node2D" parent="."]
 script = ExtResource("11_iyesh")
 
+[node name="HeroLabel" type="Label" parent="HeroDeck"]
+offset_left = 1703.0
+offset_top = 132.0
+offset_right = 1799.0
+offset_bottom = 155.0
+text = "Hero Deck: "
+
 [node name="BlackScreen" type="Node2D" parent="."]
 script = ExtResource("12_i1pr2")
 
@@ -231,17 +245,97 @@ offset_top = 13.0
 offset_right = -16.0
 offset_bottom = 36.0
 
+[node name="Sliders" type="Node2D" parent="BlackScreen"]
+visible = false
+z_index = 21
+position = Vector2(60, 0)
+script = ExtResource("13_vvhu1")
+
+[node name="Attack Slider" type="VSlider" parent="BlackScreen/Sliders"]
+offset_left = 1121.0
+offset_top = 284.0
+offset_right = 1171.0
+offset_bottom = 768.0
+max_value = 10.0
+value = 5.0
+rounded = true
+tick_count = 11
+ticks_on_borders = true
+ticks_position = 2
+
+[node name="Recruit Slider" type="VSlider" parent="BlackScreen/Sliders"]
+offset_left = 1300.0
+offset_top = 284.0
+offset_right = 1350.0
+offset_bottom = 768.0
+max_value = 10.0
+value = 5.0
+rounded = true
+tick_count = 11
+ticks_on_borders = true
+ticks_position = 2
+
+[node name="AttackLabel" type="Label" parent="BlackScreen/Sliders"]
+offset_left = 1113.0
+offset_top = 236.0
+offset_right = 1192.0
+offset_bottom = 262.0
+text = "Attack: "
+
+[node name="RecruitLabel" type="Label" parent="BlackScreen/Sliders"]
+offset_left = 1287.0
+offset_top = 233.0
+offset_right = 1366.0
+offset_bottom = 259.0
+text = "Recruit: "
+
+[node name="CostLabel" type="Label" parent="BlackScreen/Sliders"]
+offset_left = 1199.0
+offset_top = 182.0
+offset_right = 1334.0
+offset_bottom = 211.0
+text = "Cost: 15"
+
+[node name="Fight" type="Button" parent="BlackScreen/Sliders"]
+offset_left = 1461.0
+offset_top = 419.0
+offset_right = 1576.0
+offset_bottom = 461.0
+text = "Fight"
+
+[node name="Cancel" type="Button" parent="BlackScreen/Sliders"]
+offset_left = 1462.0
+offset_top = 550.0
+offset_right = 1577.0
+offset_bottom = 592.0
+text = "Cancel
+"
+
 [node name="KODeck" type="Node2D" parent="."]
 script = ExtResource("13_4f4ik")
 
 [node name="Wounds" type="Node2D" parent="."]
 script = ExtResource("14_khs3t")
 
-[node name="VillainDeck" type="Node2D" parent="."]
-script = ExtResource("15_0iyqm")
+[node name="WoundLabel" type="Label" parent="Wounds"]
+offset_left = 1705.0
+offset_top = 69.0
+offset_right = 1888.0
+offset_bottom = 104.0
+text = "Wounds: "
 
 [node name="Bystanders" type="Node2D" parent="."]
 script = ExtResource("16_jn8rg")
+
+[node name="VillainDeck" type="Node2D" parent="."]
+script = ExtResource("15_0iyqm")
+
+[node name="VilLabel" type="Label" parent="VillainDeck"]
+offset_left = 1703.0
+offset_top = 98.0
+offset_right = 1797.0
+offset_bottom = 121.0
+text = "Villain Deck:"
 
 [node name="EscapePile" type="Node2D" parent="."]
 script = ExtResource("17_umnjm")
@@ -249,21 +343,15 @@ script = ExtResource("17_umnjm")
 [node name="Mastermind" type="Node2D" parent="."]
 script = ExtResource("18_4eqlp")
 
-[node name="Scheme" type="Node2D" parent="."]
-script = ExtResource("19_18uti")
-
 [node name="ExtraLabels" type="Node2D" parent="."]
 script = ExtResource("20_khy6b")
 
 [node name="CardInfo" type="Label" parent="ExtraLabels"]
-z_index = 10
+z_index = 21
 offset_left = -534.0
 offset_top = 583.0
 offset_right = -394.0
 offset_bottom = 751.0
-
-[node name="ModifierManager" type="Node2D" parent="."]
-script = ExtResource("21_rajel")
 
 [connection signal="addAttack" from="PlayerHand" to="Resources" method="_on_player_hand_add_attack"]
 [connection signal="addRecruit" from="PlayerHand" to="Resources" method="_on_player_hand_add_recruit"]
@@ -278,3 +366,7 @@ script = ExtResource("21_rajel")
 [connection signal="button_down" from="City/Cancel" to="City" method="_on_cancel_button_down"]
 [connection signal="button_down" from="City/Fight" to="City" method="_on_fight_button_down"]
 [connection signal="SetupHQ" from="HeroDeck" to="HQ" method="_on_hero_deck_setup_hq"]
+[connection signal="value_changed" from="BlackScreen/Sliders/Attack Slider" to="BlackScreen/Sliders" method="_on_attack_slider_value_changed"]
+[connection signal="value_changed" from="BlackScreen/Sliders/Recruit Slider" to="BlackScreen/Sliders" method="_on_recruit_slider_value_changed"]
+[connection signal="pressed" from="BlackScreen/Sliders/Fight" to="BlackScreen/Sliders" method="_on_fight_pressed"]
+[connection signal="pressed" from="BlackScreen/Sliders/Cancel" to="BlackScreen/Sliders" method="_on_cancel_pressed"]

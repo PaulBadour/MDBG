@@ -5,8 +5,9 @@ var mastermind
 var villains
 var heros
 
+var scheme_override = {}
 
-var websocket_url = "ws://localhost:8080"
+var websocket_url = "ws://0.0.0.0:8080"
 var socket = WebSocketPeer.new()
 var host
 
@@ -49,7 +50,7 @@ func connectMultiplayer():
 		await get_tree().create_timer(.2).timeout
 
 		# Send data.
-		print("> Sending test packet.")
+		#print("> Sending test packet.")
 		socket.send_text("ping")
 		await connectedSignal
 		
@@ -84,6 +85,7 @@ func _process(delta: float) -> void:
 						playerCount = int(packet_text[-1])
 						startGame()
 					elif packet_text.begins_with("HeroDeck:"):
+						#print("Got hero deck")
 						var codeStr = packet_text.substr(9, packet_text.length())
 						codeStr = JSON.parse_string(codeStr)
 						for i in range(codeStr.size()):
@@ -91,6 +93,7 @@ func _process(delta: float) -> void:
 						heroShuffleCode = codeStr
 						emit_signal("heroShuffleCodeRecieved")
 					elif packet_text.begins_with("VillainDeck:"):
+						#print("Got villain deck")
 						var codeStr = packet_text.substr(12, packet_text.length())
 						codeStr = JSON.parse_string(codeStr)
 						for i in range(codeStr.size()):
@@ -113,9 +116,11 @@ func _process(delta: float) -> void:
 						var f = int(packet_text.substr(7, packet_text.length()))
 						gNode.get_node("City").removeVil(f)
 					elif packet_text.begins_with("Tactic:"):
-						print("Tactic received : ", packet_text)
+						#print("Tactic received : ", packet_text)
 						var f = int(packet_text.substr(7, packet_text.length()))
 						gNode.get_node("Mastermind").removeTactic(f)
+					elif packet_text.begins_with("Wound"):
+						gNode.get_node("Wounds").draw(false)
 					elif packet_text.begins_with("CardEffect:"):
 						var eff = packet_text.substr(11, packet_text.length())
 						var cName = eff.substr(0, eff.find(":"))
@@ -202,8 +207,10 @@ func startGame():
 		if not scheme:
 			await setupCodeReceived
 		if not heroShuffleCode:
+			#print("Waiting hero")
 			await heroShuffleCodeRecieved
 		if not villainShuffleCode:
+			#print("Waiting villain")
 			await villainShuffleCodeRecieved
 	else:
 		setup()
@@ -257,7 +264,15 @@ func setup(c = null):
 		var hench = []
 		var vils = []
 		var code = []
-		code.append_array(generateChoices(1, GameData.BASE_SCHEMES.size()))
+		var hlist = []
+		var snum = generateChoices(1, GameData.BASE_SCHEMES.size())
+		if playerCount == 1:
+			while !GameData.BASE_SCHEMES[snum[0]].solo:
+				snum = generateChoices(1, GameData.BASE_SCHEMES.size())
+		code.append_array(snum)
+		var tempS = GameData.BASE_SCHEMES[code[0]]
+		if tempS.sName == "Negative Zone Prison Breakout":
+			henchCount += 1
 		code.append_array(generateChoices(1, GameData.BASE_MASTERMINDS.size()))
 		var mmind = GameData.BASE_MASTERMINDS[code[1]]
 		var leads = mmind.leads
@@ -271,13 +286,18 @@ func setup(c = null):
 
 		code.append_array(generateChoices(vilCount, GameData.BASE_VILLAINS.size(), vils))
 		code.append_array(generateChoices(henchCount, GameData.BASE_HENCHMEN.size(), hench))
-		code.append_array(generateChoices(heroCount, GameData.BASE_HEROS.size()))
+		code.append_array(generateChoices(heroCount, GameData.BASE_HEROS.size(), hlist))
 		
 		if playerCount > 1:
 			socket.send_text(str("SetupCode:", JSON.stringify(code)))
 		setup(code)
 	else:
+		#print("Received code ", c)
 		scheme = GameData.BASE_SCHEMES[c.pop_front()]
+		
+		if scheme.sName == "Negative Zone Prison Breakout":
+			henchCount += 1
+			
 		mastermind = GameData.BASE_MASTERMINDS[c.pop_front()]
 		for i in range(vilCount):
 			if i == 0:

@@ -12,7 +12,8 @@ enum Heros {
 	HULK,
 	CAPTAIN_AMERICA,
 	BLACK_WIDOW,
-	STORM
+	STORM,
+	THOR
 }
 
 enum Classes{
@@ -541,6 +542,50 @@ static var SPINNING_CYLCONE = {
 	spritePath = "res://cards/Base/Heros/Storm/Storm-SpinningCyclone.png"
 }
 
+static var SURGE_OF_POWER = {
+	attack = 0,
+	recruit = 2,
+	cost = 4,
+	team = Teams.AVENGERS,
+	hClass = Classes.RANGED,
+	heroName = "Thor",
+	cardName = "Surge of Power",
+	spritePath = "res://cards/Base/Heros/Thor/Thor-SurgeOfPower.png"
+}
+
+static var ODINSON = {
+	attack = null,
+	recruit = 2,
+	cost = 3,
+	team = Teams.AVENGERS,
+	hClass = Classes.STRENGTH,
+	heroName = "Thor",
+	cardName = "Odinson",
+	spritePath = "res://cards/Base/Heros/Thor/Thor-Odinson.png"
+}
+
+static var CALL_LIGHTNING = {
+	attack = 3,
+	recruit = null,
+	cost = 6,
+	team = Teams.AVENGERS,
+	hClass = Classes.RANGED,
+	heroName = "Thor",
+	cardName = "Call Lightning",
+	spritePath = "res://cards/Base/Heros/Thor/Thor-CallLightning.png"
+}
+
+static var GOD_OF_THUNDER = {
+	attack = 0,
+	recruit = 5,
+	cost = 8,
+	team = Teams.AVENGERS,
+	hClass = Classes.RANGED,
+	heroName = "Thor",
+	cardName = "God of Thunder",
+	spritePath = "res://cards/Base/Heros/Thor/Thor-GodOfThunder.png"
+}
+
 static var TIDAL_WAVE = {
 	attack = 5,
 	recruit = null,
@@ -564,7 +609,8 @@ static var BASE_HEROS = {
 	Heros.HULK : [UNSTOPPABLE_HULK, GROWING_ANGER, CRAZED_RAMPAGE, HULK_SMASH],
 	Heros.CAPTAIN_AMERICA : [AVENGERS_ASSEMBLE, PERFECT_TEAMWORK, DIVING_BLOCK, A_DAY_UNLIKE_ANY_OTHER],
 	Heros.BLACK_WIDOW : [DANGEROUS_RESCUE, MISSION_ACCOMPLISHED, COVERT_OPERATION, SILENT_SNIPER],
-	Heros.STORM : [LIGHTNING_BOLT, GATHERING_STORM_CLOUDS, SPINNING_CYLCONE, TIDAL_WAVE]
+	Heros.STORM : [LIGHTNING_BOLT, GATHERING_STORM_CLOUDS, SPINNING_CYLCONE, TIDAL_WAVE],
+	Heros.THOR : [SURGE_OF_POWER, ODINSON, CALL_LIGHTNING, GOD_OF_THUNDER]
 }
 
 
@@ -742,6 +788,10 @@ static var BASE_VILLAINS = [
 	BROTHERHOOD_VILLAINS
 ]
 
+
+
+
+
 static var HENCHMAN_SENTINEL = {
 	name = "Sentinel",
 	attack = 3,
@@ -803,10 +853,40 @@ static var RED_SKULL = {
 	}
 }
 
+static var DR_DOOM = {
+	mName = "Dr. Doom",
+	leads = HENCHMAN_DOOMBOTLEGION,
+	attack = 9,
+	vp = 5,
+	spritePath = "res://cards/Base/Masterminds/Mastermind-DrDoom.png",
+	tactics = {
+		"Treasures of Latveria" : "res://cards/Base/Masterminds/DrDoom-TreasuresOfLatveria.png",
+		"Dark Technology" : "res://cards/Base/Masterminds/DrDoom-DarkTechnology.png",
+		"Secrets of Time Travel" : "res://cards/Base/Masterminds/DrDoom-SecretsOfTimeTravel.png",
+		"Monarch's Decree" : "res://cards/Base/Masterminds/DrDoom-MonarchsDecree.png"
+	}
+}
+
+static var MAGNETO = {
+	mName = "Magneto",
+	leads = BROTHERHOOD_VILLAINS,
+	attack = 8,
+	vp = 5,
+	spritePath = "res://cards/Base/Masterminds/Mastermind-Magneto.png",
+	tactics = {
+		"Bitter Captor" : "res://cards/Base/Masterminds/Magneto-BitterCaptor.png",
+		"Crushing Shockwave" : "res://cards/Base/Masterminds/Magneto-CrushingShockwave.png",
+		"Electromagnetic Bubble" : "res://cards/Base/Masterminds/Magneto-ElectromagneticBubble.png",
+		"Xavier's Nemesis" : "res://cards/Base/Masterminds/Magneto-XaviersNemesis.png"
+	}
+}
+
 
 
 static var BASE_MASTERMINDS = [
-	RED_SKULL
+	RED_SKULL,
+	DR_DOOM,
+	MAGNETO
 ]
 
 
@@ -821,9 +901,56 @@ static var BASE_MASTERMINDS = [
 static var PowerCosmicCube = {
 	sName = "Unleash the Power of the Cosmic Cube",
 	twistCount = 8,
-	spritePath = "res://cards/Base/Schemes/PowerCosmicCube.png"
+	overrides = {},
+	spritePath = "res://cards/Base/Schemes/PowerCosmicCube.png",
+	solo=true
+}
+
+static var LegacyVirus = {
+	sName = "The Legacy Virus",
+	twistCount = 8,
+	overrides = {},
+	spritePath = "res://cards/Base/Schemes/LegacyVirus.png",
+	solo=true
+}
+
+static var NegativeZoneBreakout = {
+	sName = "Negative Zone Prison Breakout",
+	twistCount = 8,
+	overrides = {},
+	spritePath = "res://cards/Base/Schemes/NegativeZoneBreakout.png",
+	solo=false
+}
+
+static var SuperHeroCivilWar = {
+	sName = "Super Hero Civil War",
+	twistCount = 8,
+	overrides = {},
+	spritePath = "res://cards/Base/Schemes/SuperHeroCivilWar.png",
+	solo=false
+}
+
+static var PortalsDarkDimension = {
+	sName = "Portals to the Dark Dimension",
+	twistCount = 7,
+	overrides = {},
+	spritePath = "res://cards/Base/Schemes/PortalsDarkDimension.png",
+	solo=true
+}
+
+static var MidtownBankRobbery = {
+	sName = "Midtown Bank Robbery",
+	twistCount = 8,
+	overrides = {"Bystanders":12},
+	spritePath = "res://cards/Base/Schemes/MidtownBankRobbery.png",
+	solo=true
 }
 
 static var BASE_SCHEMES = [
-	PowerCosmicCube
+	#PowerCosmicCube,
+	#LegacyVirus,
+	#NegativeZoneBreakout,
+	#SuperHeroCivilWar,
+	#PortalsDarkDimension,
+	MidtownBankRobbery
 ]

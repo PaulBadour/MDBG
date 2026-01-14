@@ -34,6 +34,7 @@ func _ready() -> void:
 		t.identifier = "Tactic"
 		t.initSprite(info.tactics[i])
 		t.tName = i
+		t.vp = info.vp
 		t.position = OOS
 		$"../PlayerHand".addCardToManager(t)
 		tactics.append(t)
@@ -46,9 +47,10 @@ func drawTactic():
 
 func removeTactic(ind):
 	tactics.pop_at(ind)
+	if tactics.size() == 0:
+		$"..".win()
 
 func strike():
-	#print("Drew strike")
 	$"../EffectManager".mastermind_strikes[getFuncName()].call()
 
 func getFuncName():
@@ -57,13 +59,11 @@ func getFuncName():
 func clearBystanders():
 	if bystanders.size() > 0:
 		bystanders.clear()
-		mCard.extraText.pop_front()
-		mCard.extraLabels.pop_front()
+		mCard.removeExtraText("Bystanders")
 
 func captureBystander(b):
 	bystanders.append(b)
 	if bystanders.size() == 1:
-		mCard.extraText.push_front("Bystanders: 1")
-		mCard.extraLabels.push_front("Bystanders")
+		mCard.addExtraText("Bystanders: 1", "Bystanders")
 	else:
-		mCard.extraText[0] = str("Bystanders: ", bystanders.size())
+		mCard.editExtraText(str("Bystanders: ", bystanders.size()), "Bystanders")

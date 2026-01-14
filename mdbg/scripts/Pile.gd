@@ -20,12 +20,12 @@ func count():
 	return cards.size()
 
 func getTop(num=1):
-	print("In getTop")
+	#print("In getTop")
 	if cards.size() == 0:
-		print("returning null")
+		#print("returning null")
 		return null
 	if num == 1:
-		print("returning 1")
+		#print("returning 1")
 		return cards[0]
 	print(cards)
 	var c = cards.slice(0, num)

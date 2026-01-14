@@ -1,6 +1,5 @@
 extends Node2D
 
-
 const CARD_WIDTH = 190
 const HAND_Y_POS = 800
 
@@ -12,11 +11,14 @@ var deck
 var played = []
 var vicPile = []
 
+var holdover = []
+
 var killOrRecruit = false
 
 var cardBeingPlayed
 
 var extraDraws = 0
+var extraTurn = 0
 
 var centerScreenx
 
@@ -41,15 +43,11 @@ func _ready() -> void:
 	drawHand()
 
 func _input(event):
-	if event is InputEventKey and event.keycode == KEY_W and event.is_pressed():
+	if event is InputEventKey and event.keycode == KEY_W and event.is_pressed() and !event.is_echo():
+		#return
 		$"../City".addBystander($"../Bystanders".draw())
-		addWound(1)
-		#$"../ModifierManager".citySpotModifier($"../ModifierManager".TidalWaveBridge, 0)
-	#if event is InputEventKey and event.keycode == KEY_H and event.is_pressed():
-		#print("--------------")
-		#for i in playerHand:
-			#print(str("Card in Hand: ", i, ": path - ", i.spritePath))
-		#print("--------------")
+		#addWound(1)
+		#print(deck.cards)
 
 func isCardInHand(card):
 	for i in playerHand:
@@ -68,6 +66,7 @@ func playCard(card):
 	cardBeingPlayed = card
 	var pr = await $"../EffectManager".prereq(card)
 	if !pr:
+		print("Failed prereq")
 		updateHandPositions()
 		return
 	
@@ -141,16 +140,26 @@ func drawHand():
 		drawCard()
 	extraDraws = 0
 	handSize = 6
+	while holdover.size() > 0:
+		addCardToHand(holdover.pop_front())
+	updateDeckCount()
+	updateHandPositions()
 
-func updateDeckCount(num):
-	emit_signal("deckCount", num)
+func updateDeckCount(num=null):
+	if num:
+		emit_signal("deckCount", num)
+	else:
+		emit_signal("deckCount", deck.cards.size())
 
-func updateDiscardCount(num):
-	emit_signal("discardCount", num)
+func updateDiscardCount(num=null):
+	if num:
+		emit_signal("discardCount", num)
+	else:
+		emit_signal("discardCount", deck.discard.size())
 
 # End of turn
 func _on_button_button_down() -> void:
-	print("EOT button hit")
+	$"../CardManager".unzoomCard()
 	if !killOrRecruit:
 		#print("no kill/recruit")
 		if countWoundsInHand() > 0:
@@ -162,15 +171,36 @@ func _on_button_button_down() -> void:
 	while played.size() > 0:
 		var c = played[0]
 		played.erase(c)
-		deck.discardCard(c)
+		if c not in holdover:
+			deck.discardCard(c)
 
 	drawHand()
 	eventCards.clear()
 	$"../ModifierManager".removeModifiers($"../ModifierManager".Timing.END_OF_TURN)
 	if $"..".PLAYER_COUNT > 1:
-		$"../..".socket.send_text("End Turn")
+		if extraTurn > 0:
+			extraTurn -= 1
+			$"../..".socket.send_text("Rewind Turn")
+		else:
+			$"../..".socket.send_text("End Turn")
 	else:
 		$"..".newTurn()
+	#if extraTurn > 0:
+		#if $"..".PLAYER_COUNT > 1:
+			#$"../..".socket.send_text("Rewind Turn")
+		#else:
+			#$"..".newTurn()
+	#else:
+		#if $"..".PLAYER_COUNT > 1:
+			#$"../..".socket.send_text("End Turn")
+		#else:
+			#$"..".newTurn()
+
+func holdoverCard(c):
+	if c in playerHand:
+		removeFromHand(c)
+	holdover.append(c)
+	c.position = Vector2(-1127, 113)
 
 func classCount(c, skipPlayed = true, countHand = false):
 	var count = 0

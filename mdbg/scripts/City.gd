@@ -68,14 +68,35 @@ func _on_fight_button_down(autoKill=null) -> void:
 	var currAttack = $"../Resources".attack
 	var attack
 	var skipChecks = false
+	var didPrereq = false
+	var killed = false
 	if autoKill != null:
 		focused = autoKill
 		skipChecks = true
 	if focused == -1:
 		attack = $"../Mastermind".attack
+		if !skipChecks and "God of Thunder" in $"../PlayerHand".eventCards.keys() and $"../Resources".recruit > 0 and $"../Resources".recruit + $"../Resources".attack >= attack:
+			var converting = 0
+			if !didPrereq and !skipChecks and $"../Mastermind".getFuncName() in $"../EffectManager".mastermind_prereqs.keys():
+				if !$"../EffectManager".mastermind_prereqs[$"../Mastermind".getFuncName()].call():
+					return
+			didPrereq = true
+			if $"../Resources".recruit + $"../Resources".attack == attack:
+				converting = $"../Resources".recruit
+			else:
+				converting = await $"../BlackScreen".attackRecruitSplit(attack)
+				if converting == null:
+					return
+				else:
+					converting = int(converting)
+			
+			$"../Resources".addRecruit(-converting, false)
+			$"../Resources".addAttack(converting, false)
+			currAttack = $"../Resources".attack
+
 		if currAttack >= attack or skipChecks:
 			
-			if !skipChecks and $"../Mastermind".getFuncName() in $"../EffectManager".mastermind_prereqs.keys():
+			if !didPrereq and !skipChecks and $"../Mastermind".getFuncName() in $"../EffectManager".mastermind_prereqs.keys():
 				if !$"../EffectManager".mastermind_prereqs[$"../Mastermind".getFuncName()].call():
 					return
 			if !skipChecks and attack > 0:
@@ -87,44 +108,71 @@ func _on_fight_button_down(autoKill=null) -> void:
 			
 			$"../Mastermind".clearBystanders()
 			$"../PlayerHand".killOrRecruit = true
+			killed = true
 
 			var fName = str($"../Mastermind".mName, "-", t.tName)
 			if fName in $"../EffectManager".tactic_fight.keys():
-				$"../EffectManager".tactic_fight[fName].call()
+				await $"../EffectManager".tactic_fight[fName].call()
 			
 			if $"../Mastermind".tactics.size() == 0:
 				$"..".win()
 			
 	else:
 		attack = city[focused].attack
-		if skipChecks or currAttack >= attack:
-			
+		if !skipChecks and "God of Thunder" in $"../PlayerHand".eventCards.keys() and $"../Resources".recruit > 0 and $"../Resources".recruit + $"../Resources".attack >= attack:
+			var converting = 0
 			if !skipChecks and city[focused].getFuncName() in $"../EffectManager".villain_prereqs.keys():
 				if !$"../EffectManager".villain_prereqs[city[focused].getFuncName()].call():
 					return
+			didPrereq = true
+			if $"../Resources".recruit + $"../Resources".attack == attack:
+				converting = $"../Resources".recruit
+			else:
+				converting = await $"../BlackScreen".attackRecruitSplit(attack)
+				if converting == null:
+					return
+				else:
+					converting = int(converting)
+			
+			$"../Resources".addRecruit(-converting, false)
+			$"../Resources".addAttack(converting, false)
+			currAttack = $"../Resources".attack
+		
+		if skipChecks or currAttack >= attack:
+			if !didPrereq and !skipChecks and city[focused].getFuncName() in $"../EffectManager".villain_prereqs.keys():
+				if !$"../EffectManager".villain_prereqs[city[focused].getFuncName()].call():
+					return
+			
+
 			if $"..".PLAYER_COUNT > 1:
 				$"../..".socket.send_text(str("Fought:", focused))
 			var card = city[focused]
 			city[focused] = null
 			card.position = OOS
-			if card.getFuncName() in $"../EffectManager".villain_fight.keys():
-				await $"../EffectManager".villain_fight[card.getFuncName()].call()
 			if !skipChecks and attack > 0:
 				$"../Resources".addAttack(-attack)
+			if card.getFuncName() in $"../EffectManager".villain_fight.keys():
+				await $"../EffectManager".villain_fight[card.getFuncName()].call()
 			$"../PlayerHand".vicPile.append(card)
-			for i in card.bystanders:
-				$"../PlayerHand".vicPile.append(i)
+			#if card.bystanders.size() > 0:
+				#card.removeExtraText("Bystanders")
+			#for i in card.bystanders:
+				#$"../PlayerHand".vicPile.append(i)
+			while card.bystanders.size() > 0:
+				$"../PlayerHand".vicPile.append(card.rescueBystander())
 			$"../PlayerHand".killOrRecruit = true
+			killed = true
 
-	if "Impossible Trickshot" in $"../PlayerHand".eventCards:
-		for i in range($"../PlayerHand".eventCards["Impossible Trickshot"]):
-			$"../PlayerHand".saveBystander()
-			$"../PlayerHand".saveBystander()
-			$"../PlayerHand".saveBystander()
-	
-	if "Diamond Form" in $"../PlayerHand".eventCards:
-		for i in range($"../PlayerHand".eventCards["Diamond Form"]):
-			$"../Resources".addRecruit(3)
+	if killed:
+		if "Impossible Trickshot" in $"../PlayerHand".eventCards:
+			for i in range($"../PlayerHand".eventCards["Impossible Trickshot"]):
+				$"../PlayerHand".saveBystander()
+				$"../PlayerHand".saveBystander()
+				$"../PlayerHand".saveBystander()
+		
+		if "Diamond Form" in $"../PlayerHand".eventCards:
+			for i in range($"../PlayerHand".eventCards["Diamond Form"]):
+				$"../Resources".addRecruit(3)
 	_on_cancel_button_down()
 
 
@@ -165,6 +213,8 @@ func addToCity(c):
 			await $"../BlackScreen".KOfromHQ($"../EffectManager".sixCostFilter)
 
 		if c.bystanders.size() > 0:
+			for i in c.bystanders:
+				$"../EscapePile".addCards(i)
 			await $"../BlackScreen".chooseCardDiscard(1, 1, false)
 	
 	if addedVil.getFuncName() in $"../EffectManager".villain_ambush.keys():
@@ -198,6 +248,8 @@ func reveal(c):
 	c.z_index = 10
 	c.scale = Vector2(2, 2)
 	await get_tree().create_timer(1.5).timeout
+	if $"../CardManager".cardZoomed == c:
+		$"../CardManager".unzoomCard()
 	c.position = Vector2(-500, 0)
 	c.z_index = oldz
 	c.scale = oldScale
@@ -208,21 +260,21 @@ func calcCardPosition(ind):
 func drawVilCard():
 	var vc = $"../VillainDeck".draw()
 	if !vc:
-		print("Game over")
+		#print("Game over")
 		return
 	await reveal(vc)
 	if vc.identifier == "Villain":
-		print("Vil")
+		#print("Vil")
 		await addToCity(vc)
 	elif vc.identifier == "Twist":
-		print("Twist!")
+		#print("Twist!")
 		await $"../Scheme".twist()
 	elif vc.identifier == "Master Strike":
-		print("Strike")
+		#print("Strike")
 		await $"../Mastermind".strike()
 	elif vc.identifier == "Bystander":
 		
-		print("Bystander")
+		#print("Bystander")
 		addBystander(vc)
 	else:
 		print(vc.identifier)

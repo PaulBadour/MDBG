@@ -44,21 +44,25 @@ func makeDeck():
 		c4.position = OOS
 		
 	if !$"../..".host:
-		print("Not host")
+		#print("Not host")
 		shuffle($"../..".heroShuffleCode)
 	elif $"../..".playerCount > 1:
-		print("Making code")
+		#print("Making code")
 		var hsc = shuffle()
-		print("Sending: ", hsc)
+		#print("Sending: ", hsc)
 		$"../..".socket.send_text(str("HeroDeck:", JSON.stringify(hsc)))
 	else:
-		print("Singleplayer")
+		#print("Singleplayer")
 		shuffle()
 	
+	$HeroLabel.text = str("Hero Deck: ", cards.size())
 	emit_signal("SetupHQ")
 
 func draw():
 	var c = super()
+	$HeroLabel.text = str("Hero Deck: ", cards.size())
 	if !c:
+		if $"../Scheme".sName == "Super Hero Civil War":
+			$"..".lose()
 		$"..".tie()
 	return c

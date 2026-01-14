@@ -48,6 +48,11 @@ func removeExtraText(label):
 			extraLabels.remove_at(i)
 			return
 
+func editExtraText(text, label):
+	for i in range(extraText.size()):
+		if extraLabels[i] == label:
+			extraText[i] = text
+			return
 
 #func debugPos(p):
 	#print(self)

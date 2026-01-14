@@ -1,7 +1,8 @@
 extends Node2D
 
 enum Timing {
-	END_OF_TURN
+	END_OF_TURN,
+	INDEFINITE
 }
 
 var modifiers = {}
@@ -36,8 +37,9 @@ func citySpotModifier(info, ind):
 		m.apply($"../City".city[ind])
 
 func applyCityPosition(ind):
-	for i in city_positions[ind]:
-		i.apply($"../City".city[ind])
+	if city_positions[ind]:
+		for i in city_positions[ind]:
+			i.apply($"../City".city[ind])
 
 func removeCityPosition(ind):
 	if city_positions[ind]:
@@ -70,7 +72,7 @@ var TidalWaveBridge = {
 	onEffect = TidalWaveBridge_On,
 	offEffect = TidalWaveBridge_Off,
 	timing = Timing.END_OF_TURN,
-	text = "Tidal Wave: -2 attack this turn",
+	text = "Tidal Wave: -2 Attack this turn",
 	mmover=false
 }
 
@@ -79,6 +81,36 @@ var LightningBolt = {
 	onEffect = TidalWaveBridge_On,
 	offEffect = TidalWaveBridge_Off,
 	timing = Timing.END_OF_TURN,
-	text = "Lightning Bolt: -2 attack this turn",
+	text = "Lightning Bolt: -2 Attack this turn",
+	mmover=false
+}
+
+func DarkPortal_On(c):
+	c.attack += 1
+
+func DarkPortal_Off(c):
+	c.attack -= 1
+
+var DarkPortal = {
+	mName = "DarkPortal",
+	onEffect = DarkPortal_On,
+	offEffect = DarkPortal_Off,
+	timing = Timing.INDEFINITE,
+	text = "Dark Portal: +1 Attack",
+	mmover=false
+}
+
+func MidtownBankRobbery_On(c):
+	c.attack += 1
+
+func MidtownBankRobbery_Off(c):
+	c.attack -= 1
+
+var MidtownBankRobbery = {
+	mName = "MidtownBankRobbery",
+	onEffect = MidtownBankRobbery_On,
+	offEffect = MidtownBankRobbery_Off,
+	timing = Timing.INDEFINITE,
+	text = "Midtown Bank Robbery: +1 Attack per Bystander Captured",
 	mmover=false
 }

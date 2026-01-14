@@ -26,7 +26,7 @@ func _input(event):
 		if c in clicked:
 			clicked.erase(c)
 			c.get_node("Highlight").visible = false
-		elif c and (clicked.size() < maxClick or maxClick == 0):
+		elif c and (clicked.size() < maxClick or maxClick == 0) and c in shownCards:
 			clicked.append(c)
 			c.get_node("Highlight").visible = true
 
@@ -68,7 +68,8 @@ func showCards(cards, clickable=false):
 	#print(lastLocations)
 
 func stopShowCards():
-	
+	if $"../CardManager".cardZoomed:
+		$"../CardManager".unzoomCard()
 	for i in range(shownCards.size()):
 		if shownCards[i] in clicked:
 			shownCards[i].get_node("Highlight").visible = false
@@ -92,7 +93,7 @@ func stopShowCards():
 # Bug if played card is played where a choice may be
 
 func chooseCardDiscard(minDisc, maxDisc, exclude=true):
-	var hand = $"../PlayerHand".playerHand
+	var hand = $"../PlayerHand".playerHand.duplicate(true)
 	if exclude:
 		hand.erase($"../PlayerHand".cardBeingPlayed)
 	maxClick = maxDisc
@@ -114,9 +115,10 @@ func chooseCardDiscard(minDisc, maxDisc, exclude=true):
 		await $"../PlayerHand".discardCard(i)
 		i.position = Vector2(-500, -500)
 
-	$"../PlayerHand".updateHandPositions()
+	
 	
 	stopShowCards()
+	$"../PlayerHand".updateHandPositions()
 	return true
 
 # possible locations: "hand", "discard", "Played"
@@ -124,21 +126,18 @@ func chooseCardKO(minKO, maxKO, locations, filter=null):
 	var hand = $"../PlayerHand".playerHand
 	
 	var stack = []
-	#print(locations)
+
 	for i in locations:
 		if i == "hand":
-			print("hand")
 			stack.append_array(hand)
 		if i == "discard":
-			#print("discard")
 			stack.append_array($"../PlayerHand".deck.discard)
 		if i == "played":
-			print("played")
 			stack.append_array($"../PlayerHand".played)
 	
-	#print(stack)
+
 	if filter:
-		#print("filtering")
+
 		var newStack = []
 		for i in stack:
 			if filter.call(i):
@@ -181,10 +180,10 @@ func chooseCardKO(minKO, maxKO, locations, filter=null):
 			i.position = Vector2(-500, -500)
 		
 
-	$"../PlayerHand".updateHandPositions()
+	
 	var c = clicked.size()
 	stopShowCards()
-
+	$"../PlayerHand".updateHandPositions()
 	if c == 0:
 		return false
 	
@@ -304,6 +303,12 @@ func customChoices(text : Array, funcs : Array):
 	disappear()
 
 func customCardChoices(minChoices, maxChoices, buttonText, cards):
+	if cards.size() < maxChoices:
+		maxChoices = cards.size()
+	if minChoices > maxChoices:
+		minChoices = maxChoices
+	if maxChoices == 0:
+		return null
 	maxClick = maxChoices
 	showCards(cards, true)
 	
@@ -344,13 +349,26 @@ func KOfromHQ(filter):
 			valid = true
 
 	get_node("KOButton").position = Vector2(1000, -200)
-	var ind = $"../HQ".hq.find(clicked[0])
+	#var ind = $"../HQ".hq.find(clicked[0])
 	$"../HQ".KOhero(clicked[0])
-	if $"../..".playerCount > 1:
-		$"../..".socket.send_text(str("Recruited:", ind))
+	
 	
 	stopShowCards()
 	return true
+
+func attackRecruitSplit(cost):
+	appear()
+	$Sliders.setup(cost, $"../Resources".attack, $"../Resources".recruit)
+	var r = await $Sliders.sliderFinished
+	disappear()
+	return r
+
+func endGameScreen(text):
+	appear()
+	var l = get_node("Info").duplicate()
+	add_child(l)
+	l.position = Vector2(1000, 500)
+	l.text = text
 
 func showInfoPanel():
 	var l = get_node("Info")

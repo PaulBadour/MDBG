@@ -135,11 +135,13 @@ func fillHQ():
 			card.z_index = 3
 			hq[i] = card
 
-func KOhero(c):
+func KOhero(c, send=true):
 	var ind = hq.find(c)
 	$"../KODeck".addCards(hq[ind])
 	hq[ind].position = Vector2(200, -420)
 	hq[ind] = null
+	if $"../..".playerCount > 1 and send:
+		$"../..".socket.send_text(str("Recruited:", ind))
 	fillHQ()
 
 func _on_hero_deck_setup_hq() -> void:

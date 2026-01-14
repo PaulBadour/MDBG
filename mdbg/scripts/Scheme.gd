@@ -7,6 +7,7 @@ const cardPos = Vector2(150, 225)
 var sName
 var twistCount
 var playedTwists = 0
+var overrides
 
 @onready
 var info = $"../..".scheme
@@ -17,7 +18,9 @@ func _ready() -> void:
 	
 	sName = info.sName
 	twistCount = info.twistCount
-	
+	overrides = info.overrides
+	if sName in $"../EffectManager".SchemeSetupLinks:
+		$"../EffectManager".SchemeSetupLinks[sName].call()
 	var cardScene = preload("res://Scenes/Card.tscn")
 	sCard = cardScene.instantiate()
 	sCard.identifier = "Scheme"
@@ -26,12 +29,11 @@ func _ready() -> void:
 	sCard.position = cardPos
 	$"../PlayerHand".addCardToManager(sCard)
 	sCard.extraText.append(str("Scheme Twists: ", playedTwists))
-	
 
 func twist():
 	playedTwists += 1
 	sCard.extraText[0] = str("Scheme Twists: ", playedTwists)
-	$"../EffectManager".SchemeTwistLinks[sName].call(playedTwists)
+	await $"../EffectManager".SchemeTwistLinks[sName].call(playedTwists)
 	if $"../..".playerCount == 1:
 		await $"../BlackScreen".KOfromHQ($"../EffectManager".sixCostFilter)
 

@@ -2,7 +2,7 @@ import asyncio
 import websockets
 
 ip = "localhost"
-port = 9080
+port = 8080
 
 players = {}
 
@@ -66,21 +66,14 @@ async def parseMsg(websocket, message):
         await Lobby.lobbies[0].startGame()
     elif message == "End Turn":
         await Lobby.lobbies[0].sendTurn(True)
-    elif message.startswith("HeroDeck") or message.startswith("VillainDeck"):
-        await Lobby.lobbies[0].sendDeckCode(message)
-    elif message.startswith("Recruited:"):
-        await Lobby.lobbies[0].msgAllOthers(message, websocket)
-    elif message.startswith("Fought:"):
-        await Lobby.lobbies[0].msgAllOthers(message, websocket)
-    elif message.startswith("Tactic:"):
-        await Lobby.lobbies[0].msgAllOthers(message, websocket)
-    elif message.startswith("CardEffect:"):
-        await Lobby.lobbies[0].msgAllOthers(message, websocket)
-    elif message.startswith("SetupCode:"):
-        await Lobby.lobbies[0].msgAllOthers(message, websocket)
+    elif message == "Rewind Turn":
+        await Lobby.lobbies[0].sendTurn(False)
     elif message.startswith("Uname:"):
         uname = message[message.index(":") + 1:]
         players[websocket] = uname
+    else:
+        await Lobby.lobbies[0].msgAllOthers(message, websocket)
+
 
 async def handleMessage(websocket):
     async for message in websocket:

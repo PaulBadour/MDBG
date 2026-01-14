@@ -17,7 +17,7 @@ func initStarterDeck():
 
 	for i in range(4): # 4
 		var newCard = heroScene.instantiate()
-		newCard.initHero(GameData.GATHERING_STORM_CLOUDS) # SHIELD_TROOPER
+		newCard.initHero(GameData.SHIELD_TROOPER) # SHIELD_TROOPER
 		get_parent().addCardToManager(newCard)
 		addCards(newCard)
 

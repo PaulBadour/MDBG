@@ -26,14 +26,16 @@ func start():
 func win():
 	print("You win!")
 	print("VP : ", get_node("PlayerHand").getVP())
-	get_tree().quit()
+	$BlackScreen.endGameScreen(str("you win, vp=", $PlayerHand.getVP()))
+	#get_tree().quit()
 
 func lose():
 	print("You lose!")
-	get_tree().quit()
+	$BlackScreen.endGameScreen("you lose")
+	#get_tree().quit()
 
 func tie():
-	print("You tied")
+	$BlackScreen.endGameScreen("you tied")
 	get_tree().quit()
 
 #func shouldSend():

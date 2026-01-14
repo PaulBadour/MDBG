@@ -14,17 +14,20 @@ func _ready() -> void:
 	var vilScene = preload("res://Scenes/Villain.tscn")
 	var cardScene = preload("res://Scenes/Card.tscn")
 	
-	match $"../..".playerCount:
-		1:
-			bystanderCount = 1
-		2:
-			bystanderCount = 2
-		3:
-			bystanderCount = 8
-		4:
-			bystanderCount = 8
-		5:
-			bystanderCount = 12
+	if "Bystanders" in $"../Scheme".overrides.keys():
+		bystanderCount = $"../Scheme".overrides["Bystanders"]
+	else:
+		match $"../..".playerCount:
+			1:
+				bystanderCount = 1
+			2:
+				bystanderCount = 2
+			3:
+				bystanderCount = 8
+			4:
+				bystanderCount = 8
+			5:
+				bystanderCount = 12
 			
 	if $"../..".playerCount == 1:
 		masterStrikeCount = 1
@@ -59,14 +62,9 @@ func _ready() -> void:
 		addCards(ms)
 		ms.position = OOS
 	
-	#print("good unitl bystanders")
-	await $"../Bystanders".ready
-	
+
 	for i in range(bystanderCount):
 		addCards($"../Bystanders".draw())
-	
-	#print("good unitl scheme")
-	await $"../Scheme".ready
 	
 	
 	for i in range($"../Scheme".twistCount):
@@ -78,7 +76,7 @@ func _ready() -> void:
 		addCards(t)
 		
 	if !$"../..".host:
-		#print("Not host")
+		print("Not host")
 		shuffle($"../..".villainShuffleCode)
 	elif $"../..".playerCount > 1:
 		#print("Making code")
@@ -88,10 +86,12 @@ func _ready() -> void:
 	else:
 		#print("Singleplayer")
 		shuffle()
+	$VilLabel.text = str("Villain Deck: ", cards.size())
 
 
 func draw():
 	var c = super()
+	$VilLabel.text = str("Villain Deck: ", cards.size())
 	if !c:
 		$"..".tie()
 	return c

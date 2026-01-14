@@ -26,8 +26,8 @@ var links = {
 	"Spiderman-Great Responsibility" : Great_Responsibility,
 	"Spiderman-Web Shooters" : Web_Shooters,
 	"Spiderman-The Amazing Spiderman" : The_Amazing_Spiderman, # This kinda works, some bug with too many cards and card overlap
-	"Wolverine-Berserker Rage" : Berserker_Rage, # Some issue with drawing too many cards
-	"Wolverine-Frenzied Slashing" : Frenzied_Slashing, # Some issue with drawing too many cards
+	"Wolverine-Berserker Rage" : Berserker_Rage,
+	"Wolverine-Frenzied Slashing" : Frenzied_Slashing,
 	"Wolverine-Keen Senses" : Keen_Senses,
 	"Wolverine-Healing Factor" : Healing_Factor,
 	"Cyclops-XMen United" : XMen_United,
@@ -61,7 +61,11 @@ var links = {
 	"Storm-Lightning Bolt" : Lightning_Bolt,
 	"Storm-Gathering Storm Clouds" : Gathering_Storm_Clouds,
 	"Storm-Spinning Cyclone" : Spinning_Cyclone,
-	"Storm-Tidal Wave" : Tidal_Wave
+	"Storm-Tidal Wave" : Tidal_Wave,
+	"Thor-Surge of Power" : Surge_of_Power,
+	"Thor-Odinson" : Odinson,
+	"Thor-Call Lightning" : Call_Lightning,
+	"Thor-God of Thunder" : God_of_Thunder
 }
 
 var prereqs = {
@@ -69,11 +73,15 @@ var prereqs = {
 	"Cyclops-Optic Blast" : Optic_Blast_prereq
 }
 
+# Can count MM aops also
 var aop_effects = {
 	"Hawkeye-Covering Fire" : Covering_Fire_aop,
 	"Emma Frost-Shadowed Thoughts" : Shadowed_Thoughts_aop,
 	"Emma Frost-Psychic Link" : Psychic_Link,
-	"Hulk-Crazed Rampage" : Crazed_Rampage
+	"Hulk-Crazed Rampage" : Crazed_Rampage,
+	"Storm-Spinning Cyclone" : Spinning_Cyclone_aop,
+	"Dr. Doom-Monarch's Decree" : Monarchs_Decree_aop,
+	"Magneto-Crushing Shockwave" : Crushing_Shockwave_aop
 }
 
 # Iron Man
@@ -193,9 +201,9 @@ func XMen_United():
 # Hawkeye
 
 func Covering_Fire():
-	if hand.classCount(GameData.Classes.TECH) >= 1:
+	if hand.classCount(GameData.Classes.TECH) >= 1 and $"../..".playerCount > 1:
 		var f1 = func():
-			$"../PlayerHand".drawCard()
+			#$"../PlayerHand".drawCard()
 			if $"../..".playerCount > 1:
 				$"../..".socket.send_text("CardEffect:Hawkeye-Covering Fire:1")
 			emit_signal("finishCustom")
@@ -203,9 +211,9 @@ func Covering_Fire():
 		var f2 = func():
 			if $"../..".playerCount > 1:
 				$"../..".socket.send_text("CardEffect:Hawkeye-Covering Fire:2")
-			$"../BlackScreen".disappear()
-			$"../BlackScreen".deleteCustomButtons()
-			await $"../BlackScreen".chooseCardDiscard(1, 1)
+			#$"../BlackScreen".disappear()
+			#$"../BlackScreen".deleteCustomButtons()
+			#await $"../BlackScreen".chooseCardDiscard(1, 1)
 			emit_signal("finishCustom")
 			
 		await $"../BlackScreen".customChoices(["Draw", "Discard"], [f1, f2])
@@ -425,9 +433,10 @@ func Spinning_Cyclone():
 		return
 	h = h[0]
 	
-	
+	if h.bystanders.size() > 0:
+		h.removeExtraText("Bystanders")
 	while h.bystanders.size() > 0:
-		$"../PlayerHand".vicPile.append(h.bystanders.pop_front())
+		$"../PlayerHand".vicPile.append(h.rescueBystander())
 	
 	var ind = $"../City".city.find(h)
 	$"../ModifierManager".removeCityPosition(ind)
@@ -464,13 +473,51 @@ func Spinning_Cyclone():
 	text.remove_at(ind)
 	
 	await $"../BlackScreen".customChoices(text, funcs)
-	print($"../City".city)
+	if $"../..".playerCount > 1:
+		$"../..".socket.send_text(str("CardEffect:Storm-Spinning Cyclone:", ind, ",", $"../City".city.find(h)))
+
+func Spinning_Cyclone_aop(c):
+	var one = int(c[0])
+	var two = int(c[2])
+	#if $"../City".city[one].bystanders.size() > 0:
+		#$"../City".city[one].removeExtraText("Bystanders")
+	while $"../City".city[one].bystanders.size() > 0:
+		$"../City".city[one].rescueBystander()
+	$"../ModifierManager".removeCityPosition(one)
+	$"../ModifierManager".removeCityPosition(two)
 	
+	var temp = $"../City".city[one].position
+	$"../City".city[one].position = $"../City".city[two].position
+	$"../City".city[two].position = temp
+	
+	temp = $"../City".city[one]
+	$"../City".city[one] = $"../City".city[two]
+	$"../City".city[two] = temp
+	$"../ModifierManager".applyCityPosition(one)
+	$"../ModifierManager".applyCityPosition(two)
 
 func Tidal_Wave():
 	$"../ModifierManager".citySpotModifier($"../ModifierManager".TidalWaveBridge, 4)
 	if classAbility(GameData.Classes.RANGED):
 		$"../ModifierManager".createModifier($"../ModifierManager".TidalWaveMasterMind, $"../Mastermind")
+
+# Thor
+
+func Surge_of_Power():
+	if res.totRecruit >= 8:
+		print("Total Recruit: ", res.totRecruit)
+		res.addAttack(3)
+
+func Odinson():
+	if classAbility(GameData.Classes.STRENGTH):
+		res.addRecruit(2)
+
+func Call_Lightning():
+	if classAbility(GameData.Classes.RANGED):
+		res.addAttack(3)
+
+func God_of_Thunder():
+	addCardEvent("God of Thunder")
 
 # General funcs
 
@@ -677,11 +724,36 @@ func Sabretooth_fight_esc():
 
 
 var mastermind_strikes = {
-	"Mastermind-Red Skull" : Red_Skull_Strike
+	"Mastermind-Red Skull" : Red_Skull_Strike,
+	"Mastermind-Dr. Doom" : DrDoom_strike,
+	"Mastermind-Magneto" : Magneto_strike
 }
 
 func Red_Skull_Strike():
 	await $"../BlackScreen".chooseCardKO(1, 1, ["hand"], heroFilter)
+
+func DrDoom_strike():
+	if $"../PlayerHand".playerHand.size() == 6:
+		if $"../PlayerHand".classCount(GameData.Classes.TECH, false, true) == 0:
+			var c = await $"../BlackScreen".customCardChoices(1, 1, "Put on top of deck", $"../PlayerHand".playerHand)
+			if c:
+				c = c[0]
+				$"../PlayerHand".removeFromHand(c)
+				c.postion = Vector2(111, -514)
+				$"../PlayerHand".deck.cards.push_front(c)
+				$"../PlayerHand".updateDeckCount()
+				c = await $"../BlackScreen".customCardChoices(1, 1, "Put on top of deck", $"../PlayerHand".playerHand)
+				if c:
+					c = c[0]
+					$"../PlayerHand".removeFromHand(c)
+					c.postion = Vector2(111, -514)
+					$"../PlayerHand".deck.cards.push_front(c)
+					$"../PlayerHand".updateDeckCount()
+
+func Magneto_strike():
+	if $"../PlayerHand".teamCount(GameData.Teams.XMEN, false, true) == 0:
+		var dCount = $"../PlayerHand".playerHand.size() - 4
+		await $"../BlackScreen".chooseCardDiscard(dCount, dCount, false)
 
 var mastermind_prereqs = {
 	
@@ -691,8 +763,20 @@ var tactic_fight = {
 	"Red Skull-Endless Resources" : Endless_Resources,
 	"Red Skull-Hydra Conspiracy" : Hydra_Conspiracy,
 	"Red Skull-Negablast Grenades" : Negablast_Grenades,
-	"Red Skull-Ruthless Dictator" : Ruthless_Dictator
+	"Red Skull-Ruthless Dictator" : Ruthless_Dictator,
+	"Dr. Doom-Treasures of Latveria" : Treasures_of_Latveria,
+	"Dr. Doom-Dark Technology" : Dark_Technology,
+	"Dr. Doom-Secrets of Time Travel" : Secrets_of_Time_Travel,
+	"Dr. Doom-Monarch's Decree" : Monarchs_Decree,
+	"Magneto-Bitter Captor" : Bitter_Captor,
+	"Magneto-Crushing Shockwave" : Crushing_Shockwave,
+	"Magneto-Electromagnetic Bubble" : Electromagnetic_Bubble,
+	"Magneto-Xavier's Nemesis" : Xaviers_Nemesis,
 }
+
+
+# Red Skull
+
 
 func Endless_Resources():
 	res.addRecruit(4)
@@ -712,11 +796,101 @@ func Ruthless_Dictator():
 	await $"../BlackScreen".discardFromDeck(1, 1, 2)
 
 
+# Dr Doom
 
 
+func Treasures_of_Latveria():
+	$"../PlayerHand".handSize += 3
+
+func Dark_Technology():
+	var h = $"../HQ".hq
+	var choices = []
+	for i in h:
+		if i.hClass == GameData.Classes.TECH or i.hClass == GameData.Classes.RANGED:
+			choices.append(i) 
+	var c = await $"../BlackScreen".customCardChoices(0, 1, "Recruit", choices)
+	if c:
+		c = c[0]
+		var ind = $"../HQ".hq.find(c)
+		$"../HQ".hq[ind] = null
+		$"../PlayerHand".deck.discardCard(c)
+		$"../HQ".fillHQ()
+		if $"..".PLAYER_COUNT > 1:
+			$"../..".socket.send_text(str("Recruited:", ind))
+
+func Secrets_of_Time_Travel():
+	$"../PlayerHand".extraTurn += 1
+
+func Monarchs_Decree():
+	if hand.classCount(GameData.Classes.TECH) >= 1 and $"../..".playerCount > 1:
+		var f1 = func():
+			#$"../PlayerHand".drawCard()
+			if $"../..".playerCount > 1:
+				$"../..".socket.send_text("CardEffect:Dr. Doom-Monarch's Decree:1")
+			emit_signal("finishCustom")
+			
+		var f2 = func():
+			if $"../..".playerCount > 1:
+				$"../..".socket.send_text("CardEffect:Dr. Doom-Monarch's Decree:2")
+			#$"../BlackScreen".disappear()
+			#$"../BlackScreen".deleteCustomButtons()
+			#await $"../BlackScreen".chooseCardDiscard(1, 1)
+			emit_signal("finishCustom")
+			
+		await $"../BlackScreen".customChoices(["Draw", "Discard"], [f1, f2])
+
+func Monarchs_Decree_aop(choice):
+	if choice == "1":
+		$"../PlayerHand".drawCard()
+	else:
+		await $"../BlackScreen".chooseCardDiscard(1, 1)
 
 
+# Magneto
 
+
+func Bitter_Captor():
+	var h = $"../HQ".hq
+	var choices = []
+	for i in h:
+		if i.team == GameData.Teams.XMEN:
+			choices.append(i) 
+	var c = await $"../BlackScreen".customCardChoices(0, 1, "Recruit", choices)
+	if c:
+		c = c[0]
+		var ind = $"../HQ".hq.find(c)
+		$"../HQ".hq[ind] = null
+		$"../PlayerHand".deck.discardCard(c)
+		$"../HQ".fillHQ()
+		if $"..".PLAYER_COUNT > 1:
+			$"../..".socket.send_text(str("Recruited:", ind))
+
+func Crushing_Shockwave():
+	if $"../..".playerCount > 1:
+		$"../..".socket.send_text("CardEffect:Magneto-Crushing Shockwave:1")
+
+func Crushing_Shockwave_aop(choice):
+	assert(int(choice) == 1)
+	if $"../PlayerHand".teamCount(GameData.Teams.XMEN, false, true) == 0:
+		$"../PlayerHand".addWound(2)
+
+func Electromagnetic_Bubble():
+	var c = []
+	for i in $"../PlayerHand".playerHand:
+		if i.team == GameData.Teams.XMEN:
+			c.append(i)
+	for i in $"../PlayerHand".played:
+		if i.team == GameData.Teams.XMEN:
+			c.append(i)
+	var choice = await $"../BlackScreen".customCardChoices(1, 1, "Holdover", c)
+	if choice:
+		choice = choice[0]
+		$"../PlayerHand".holdoverCard(choice)
+
+func Xaviers_Nemesis():
+	var count = $"../PlayerHand".teamCount(GameData.Teams.XMEN, false, true)
+	for i in range(count):
+		$"../PlayerHand".saveBystander()
 
 
 
@@ -729,7 +903,17 @@ func Ruthless_Dictator():
 
 
 var SchemeTwistLinks = {
-	"Unleash the Power of the Cosmic Cube" : PowerCosmicCube_twist
+	"Unleash the Power of the Cosmic Cube" : PowerCosmicCube_twist,
+	"The Legacy Virus" : LegacyVirus_twist,
+	"Negative Zone Prison Breakout" : NegativeZoneBreakout_twist,
+	"Super Hero Civil War" : SuperHeroCivilWar_twist,
+	"Portals to the Dark Dimension" : PortalsDarkDimenstion_twist,
+	"Midtown Bank Robbery" : MidtownBankRobbery_twist
+}
+
+var SchemeSetupLinks = {
+	"The Legacy Virus" : LegacyVirus_setup,
+	"Super Hero Civil War" : SuperHeroCivilWar_setup
 }
 
 
@@ -744,3 +928,44 @@ func PowerCosmicCube_twist(t : int):
 		#$"../PlayerHand".deck.updateDiscardCount()
 	elif t == 8:
 		$"..".lose()
+
+func LegacyVirus_setup():
+	$"../Scheme".overrides["Wounds"] = 6 * $"../..".playerCount
+
+func LegacyVirus_twist(t : int):
+	assert(t > 0)
+	if $"../PlayerHand".classCount(GameData.Classes.TECH, false, true) == 0:
+		await $"../PlayerHand".addWound(1)
+
+func NegativeZoneBreakout_twist(t : int):
+	assert(t > 0)
+	await $"../City".drawVilCard()
+	await $"../City".drawVilCard()
+
+func SuperHeroCivilWar_setup():
+	if $"../..".playerCount > 3:
+		$"../Scheme".twistCount = 5
+
+func SuperHeroCivilWar_twist(t: int):
+	assert(t > 0)
+	for i in range(5):
+		await $"../HQ".KOhero($"../HQ".hq[i], false)
+
+func PortalsDarkDimenstion_twist(t: int):
+	if t == 1:
+		$"../ModifierManager".createModifier($"../ModifierManager".DarkPortal, $"../Mastermind")
+	elif t == 7:
+		$"..".lose()
+	else:
+		$"../ModifierManager".citySpotModifier($"../ModifierManager".DarkPortal, 6 - t)
+
+func MidtownBankRobbery_twist(t: int):
+	assert (t>0)
+	if $"../City".city[1]:
+		var b = $"../Bystanders".draw()
+		if b:
+			$"../City".city[1].captureBystander(b)
+			b = $"../Bystanders".draw()
+			if b:
+				$"../City".city[1].captureBystander(b)
+	await $"../City".drawVilCard()

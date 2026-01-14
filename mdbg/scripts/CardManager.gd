@@ -5,15 +5,23 @@ A = Autoplay
 D = Discard
 V = Vicpile
 P = Played
+K = KO Pile
+I = Info
+T = Tactic
+S = Escape
+W = Debug (in Player hnad)
 '''
 
 var isFocused = false
+
+var seeingDeck = null
 
 var cardDragged
 var screenSize
 var isHovering
 var cardZoomed
 var oldZoomPos
+var oldZoomZ
 
 const BASE_SIZE = .5
 const HIGHLIGHT_SIZE = .75
@@ -23,58 +31,92 @@ const ZOOM_SCALE = 2
 func _input(event):
 	if event.is_action_pressed("ui_cancel"):
 		get_tree().quit()
-	if $"../BlackScreen".isClickable:
-		return
-	if isFocused:
-		return
-	if event is InputEventKey and event.keycode == KEY_D and !event.is_echo():
-		if event.is_pressed():
-			$"../BlackScreen".showCards($"../PlayerHand".deck.discard, false)
-		else:
-			$"../BlackScreen".stopShowCards()
-	if event is InputEventKey and event.keycode == KEY_V and !event.is_echo():
-		if event.is_pressed():
-			$"../BlackScreen".showCards($"../PlayerHand".vicPile, false)
-		else:
-			$"../BlackScreen".stopShowCards()
-	if event is InputEventKey and event.keycode == KEY_P and !event.is_echo():
-		if event.is_pressed():
-			$"../BlackScreen".showCards($"../PlayerHand".played, false)
-		else:
-			$"../BlackScreen".stopShowCards()
-	if event is InputEventKey and event.keycode == KEY_K and !event.is_echo():
-		if event.is_pressed():
-			$"../BlackScreen".showCards($"../KODeck".cards, false)
-		else:
-			$"../BlackScreen".stopShowCards()
-	if event is InputEventKey and event.keycode == KEY_I and !event.is_echo():
-		if event.is_pressed():
-			$"../BlackScreen".showInfoPanel()
-		else:
-			$"../BlackScreen".stopShowInfoPanel()
-	if event is InputEventKey and event.keycode == KEY_A and !event.is_echo() and $"..".yourTurn:
-		if event.is_pressed():
-			$"../PlayerHand".autoplay()
 	if event is InputEventKey and event.keycode == KEY_SPACE and !event.is_echo():
-		#$"../BlackScreen".appear()
 		if event.is_pressed() and !cardDragged:
 			var c = findCard()
 			if c:
 				cardZoomed = c
 				oldZoomPos = c.position
+				oldZoomZ = c.z_index
 				c.position = Vector2(screenSize.x / 2.0, screenSize.y / 2.0)
 				c.scale = Vector2(ZOOM_SCALE, ZOOM_SCALE)
-				c.z_index = 5
+				c.z_index = 100
 				$"../ExtraLabels".showLabel(c.getExtraText())
-
 		elif event.is_released() and cardZoomed:
 			cardZoomed.position = oldZoomPos
 			cardZoomed.scale = Vector2(BASE_SIZE, BASE_SIZE)
-			cardZoomed.z_index = 3
+			cardZoomed.z_index = oldZoomZ
 			hoverOff(cardZoomed)
 			$"../ExtraLabels".removeLabel()
-
 			cardZoomed = null
+	# DEBUG
+	if event is InputEventKey and event.keycode == KEY_N and !event.is_echo() and event.is_pressed():
+		var c = findCard(false)
+		if c:
+			c = c[0]
+			print(c)
+			if c.identifier == "Villain":
+				print(c.bystanders)
+
+	if $"../BlackScreen".isClickable:
+		return
+	if isFocused:
+		return
+	if event is InputEventKey and event.keycode == KEY_D and !event.is_echo():
+		if event.is_pressed() and !seeingDeck:
+			$"../BlackScreen".showCards($"../PlayerHand".deck.discard, false)
+			seeingDeck = "D"
+		elif seeingDeck == "D":
+			$"../BlackScreen".stopShowCards()
+			seeingDeck = null
+	if event is InputEventKey and event.keycode == KEY_V and !event.is_echo():
+		if event.is_pressed() and !seeingDeck:
+			$"../BlackScreen".showCards($"../PlayerHand".vicPile, false)
+			seeingDeck = "V"
+		elif seeingDeck == "V":
+			$"../BlackScreen".stopShowCards()
+			seeingDeck = null
+	if event is InputEventKey and event.keycode == KEY_P and !event.is_echo():
+		if event.is_pressed() and !seeingDeck:
+			$"../BlackScreen".showCards($"../PlayerHand".played, false)
+			seeingDeck = "P"
+		elif seeingDeck == "P":
+			$"../BlackScreen".stopShowCards()
+			seeingDeck = null
+	if event is InputEventKey and event.keycode == KEY_K and !event.is_echo():
+		if event.is_pressed() and !seeingDeck:
+			$"../BlackScreen".showCards($"../KODeck".cards, false)
+			seeingDeck = "K"
+		elif seeingDeck == "K":
+			$"../BlackScreen".stopShowCards()
+			seeingDeck = null
+	if event is InputEventKey and event.keycode == KEY_I and !event.is_echo():
+		if event.is_pressed() and !seeingDeck:
+			$"../BlackScreen".showInfoPanel()
+			seeingDeck = "I"
+		elif seeingDeck == "I":
+			$"../BlackScreen".stopShowInfoPanel()
+			seeingDeck = null
+	if event is InputEventKey and event.keycode == KEY_T and !event.is_echo():
+		if event.is_pressed() and !seeingDeck:
+			$"../BlackScreen".showCards($"../Mastermind".tactics, false)
+			seeingDeck = "T"
+		elif seeingDeck == "T":
+			$"../BlackScreen".stopShowCards()
+			seeingDeck = null
+	if event is InputEventKey and event.keycode == KEY_S and !event.is_echo():
+		if event.is_pressed() and !seeingDeck:
+			$"../BlackScreen".showCards($"../EscapePile".cards, false)
+			seeingDeck = "S"
+		elif seeingDeck == "S":
+			$"../BlackScreen".stopShowCards()
+			seeingDeck = null
+	if event is InputEventKey and event.keycode == KEY_A and !event.is_echo() and $"..".yourTurn:
+		if event.is_pressed():
+			$"../PlayerHand".autoplay()
+	if event is InputEventKey and event.keycode == KEY_E and !event.is_echo() and $"..".yourTurn:
+		if event.is_pressed() and !seeingDeck:
+			$"../PlayerHand"._on_button_button_down()
 
 	if event is InputEventMouseButton and event.button_index == MOUSE_BUTTON_LEFT and !cardZoomed:
 		if event.is_pressed():
@@ -87,11 +129,24 @@ func _input(event):
 			elif $"../PlayerHand".isCardInHand(cardDragged):
 				$"../PlayerHand".animateCard(cardDragged, cardDragged.handPos)
 			cardDragged = null
-	# DEBUG
-	if event is InputEventKey and event.keycode == KEY_N and !event.is_echo() and event.is_pressed():
-		var c = findCard(false)
-		if c:
-			print(c)
+
+func unzoomCard():
+	if cardZoomed:
+		cardZoomed.position = oldZoomPos
+		cardZoomed.scale = Vector2(BASE_SIZE, BASE_SIZE)
+		cardZoomed.z_index = oldZoomZ
+		hoverOff(cardZoomed)
+		$"../ExtraLabels".removeLabel()
+		cardZoomed = null
+
+func _notification(what: int) -> void:
+	if what == NOTIFICATION_WM_WINDOW_FOCUS_OUT:
+		unzoomCard()
+		if seeingDeck and seeingDeck != "I":
+			$"../BlackScreen".stopShowCards()
+		elif seeingDeck == "I":
+			$"../BlackScreen".stopShowInfoPanel()
+		seeingDeck = null
 
 func findCard(first=true):
 	var space_state = get_world_2d().direct_space_state

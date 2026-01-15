@@ -20,6 +20,7 @@ var city = [null, null, null, null, null]
 var cityZones = [null, null, null, null, null]
 
 var addedVil
+var foughtVil
 
 const MM_ZONE = [290, 510]
 
@@ -147,13 +148,18 @@ func _on_fight_button_down(autoKill=null) -> void:
 			if $"..".PLAYER_COUNT > 1:
 				$"../..".socket.send_text(str("Fought:", focused))
 			var card = city[focused]
+			foughtVil = card
 			city[focused] = null
 			card.position = OOS
 			if !skipChecks and attack > 0:
 				$"../Resources".addAttack(-attack)
 			if card.getFuncName() in $"../EffectManager".villain_fight.keys():
 				await $"../EffectManager".villain_fight[card.getFuncName()].call()
-			$"../PlayerHand".vicPile.append(card)
+			
+			if card.team == "SecretSkrulls":
+				$"../PlayerHand".deck.discardCard(card.extraData)
+			else:
+				$"../PlayerHand".vicPile.append(card)
 			#if card.bystanders.size() > 0:
 				#card.removeExtraText("Bystanders")
 			#for i in card.bystanders:
@@ -162,6 +168,7 @@ func _on_fight_button_down(autoKill=null) -> void:
 				$"../PlayerHand".vicPile.append(card.rescueBystander())
 			$"../PlayerHand".killOrRecruit = true
 			killed = true
+			foughtVil = null
 
 	if killed:
 		if "Impossible Trickshot" in $"../PlayerHand".eventCards:
@@ -233,12 +240,13 @@ func removeVil(ind):
 		$"../CardManager".oldZoomPos = Vector2(-255, 1726)
 	var card = city[ind]
 	card.position = Vector2(-255, 1726)
+	foughtVil = card
 	city[ind] = null
 	if card.getFuncName() in $"../EffectManager".villain_aopfight.keys():
 		focused = ind
 		await $"../EffectManager".villain_aopfight[card.getFuncName()].call()
 		focused = null
-	
+	foughtVil = null
 	
 
 func reveal(c):
@@ -277,4 +285,4 @@ func drawVilCard():
 		#print("Bystander")
 		addBystander(vc)
 	else:
-		print(vc.identifier)
+		print("Unidentified: ", vc.identifier)

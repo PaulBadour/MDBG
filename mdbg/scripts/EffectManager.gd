@@ -73,7 +73,7 @@ var prereqs = {
 	"Cyclops-Optic Blast" : Optic_Blast_prereq
 }
 
-# Can count MM aops also
+# Can count MM aops and Villain special aops
 var aop_effects = {
 	"Hawkeye-Covering Fire" : Covering_Fire_aop,
 	"Emma Frost-Shadowed Thoughts" : Shadowed_Thoughts_aop,
@@ -81,7 +81,11 @@ var aop_effects = {
 	"Hulk-Crazed Rampage" : Crazed_Rampage,
 	"Storm-Spinning Cyclone" : Spinning_Cyclone_aop,
 	"Dr. Doom-Monarch's Decree" : Monarchs_Decree_aop,
-	"Magneto-Crushing Shockwave" : Crushing_Shockwave_aop
+	"Magneto-Crushing Shockwave" : Crushing_Shockwave_aop,
+	"Enemies of Asgard-Ymir, Frost Giant King" : Ymir_fight_aop,
+	"Loki-Vanishing Illusions" : Vanishing_Illusions_aop,
+	"Loki-Whispers and Lies" : Whispers_and_Lies_aop,
+	"Skrulls-Paibok the Power Skrull" : Paibok_fight_aop
 }
 
 # Iron Man
@@ -528,6 +532,9 @@ func effect(card, args=[]):
 	else:
 		return await links[s].call()
 
+func emitCustomSignalEnd():
+	emit_signal("finishCustom")
+
 func addCardEvent(event):
 	if event in $"../PlayerHand".eventCards:
 		$"../PlayerHand".eventCards[event] += 1
@@ -586,7 +593,10 @@ var villain_prereqs = {
 var villain_ambush = {
 	"Spider Foes-Green Goblin" : GreenGoblin_ambush,
 	"Radiation-The Leader" : TheLeader_ambush,
-	"Brotherhood-Juggernaut" : Juggernaut_ambush
+	"Brotherhood-Juggernaut" : Juggernaut_ambush,
+	"Enemies of Asgard-Ymir, Frost Giant King" : Ymir_ambush,
+	"Skrulls-Skrull Shapeshifters" : SkrullShapeshifters_ambush,
+	"Skrulls-Skrull Queen Veranke" : QueenVeranke_ambush,
 }
 
 var villain_fight = {
@@ -602,7 +612,15 @@ var villain_fight = {
 	"Radiation-Abomination" : Abomination_fight,
 	"Radiation-Maestro" : Maestro_fight,
 	"Radiation-Zzzax" : Zzzax_fight_esc,
-	"Brotherhood-Sabretooth" : Sabretooth_fight_esc
+	"Brotherhood-Sabretooth" : Sabretooth_fight_esc,
+	"Enemies of Asgard-Frost Giant" : FrostGiant_fight_esc,
+	"Enemies of Asgard-Destroyer" : Destroyer_fight,
+	"Enemies of Asgard-Enchantress" : Enchantress_fight,
+	"Enemies of Asgard-Ymir, Frost Giant King" : Ymir_fight,
+	"Skrulls-Super-Skrull" : SuperSkrull_fight,
+	"Skrulls-Skrull Shapeshifters" : SkrullShapeshifters_fight,
+	"Skrulls-Skrull Queen Veranke" : QueenVeranke_fight,
+	"Skrulls-Paibok the Power Skrull" : Paibok_fight
 }
 
 var villain_escape = {
@@ -611,7 +629,9 @@ var villain_escape = {
 	"Radiation-Zzzax" : Zzzax_fight_esc,
 	"Brotherhood-Juggernaut" : Juggernaut_esc,
 	"Brotherhood-Mystique" : Mystique_esc,
-	"Brotherhood-Sabretooth" : Sabretooth_fight_esc
+	"Brotherhood-Sabretooth" : Sabretooth_fight_esc,
+	"Enemies of Asgard-Frost Giant" : FrostGiant_fight_esc,
+	"Enemies of Asgard-Destroyer" : Destroyer_esc
 }
 
 var villain_aopfight = {
@@ -619,7 +639,9 @@ var villain_aopfight = {
 	"HYDRA-Viper" : Viper_fight_esc,
 	"Spider Foes-The Lizard" : Lizard_fight,
 	"Radiation-Zzzax" : Zzzax_fight_esc,
-	"Brotherhood-Sabretooth" : Sabretooth_fight_esc
+	"Brotherhood-Sabretooth" : Sabretooth_fight_esc,
+	"Enemies of Asgard-Frost Giant" : FrostGiant_fight_esc,
+	"Skrulls-Super-Skrull" : SuperSkrull_fight
 }
 
 func Sentinel_Fight():
@@ -717,6 +739,117 @@ func Sabretooth_fight_esc():
 	if $"../PlayerHand".teamCount(GameData.Teams.XMEN, false, true) == 0:
 		$"../PlayerHand".addWound(1)
 
+func FrostGiant_fight_esc():
+	if $"../PlayerHand".classCount(GameData.Classes.RANGED, false, true) == 0:
+		await $"../PlayerHand".addWound(1)
+
+func Destroyer_fight():
+	var p = 0
+	
+	while p < $"../PlayerHand".playerHand.size():
+		if $"../PlayerHand".playerHand[p].identifier == "Hero" and $"../PlayerHand".playerHand[p].team == GameData.Teams.SHIELD:
+			$"../KODeck".addCards($"../PlayerHand".playerHand[p])
+			$"../PlayerHand".playerHand[p].position = Vector2(-500, -500)
+			$"../PlayerHand".deleteCard($"../PlayerHand".playerHand[p])
+			await $"../PlayerHand".updateHandPositions()
+		else:
+			p += 1
+	
+	for i in $"../PlayerHand".played:
+		if i.identifier == "Hero" and i.team == GameData.Teams.SHIELD:
+			$"../KODeck".addCards(i)
+
+func Destroyer_esc():
+	await $"../BlackScreen".chooseCardKO(2, 2, ["hand", "played"], heroFilter)
+
+func Enchantress_fight():
+	$"../PlayerHand".drawCard()
+	$"../PlayerHand".drawCard()
+	$"../PlayerHand".drawCard()
+
+func Ymir_ambush():
+	if $"../PlayerHand".classCount(GameData.Classes.RANGED, false, true) == 0:
+		await $"../PlayerHand".addWound(1)
+
+func Ymir_fight():
+	var c = await $"../BlackScreen".choosePlayerName(false, false)
+	if c == $"../..".username:
+		Ymir_fight_aop(c)
+	else:
+		$"../..".socket.send_text(str("CardEffect:Enemies of Asgard-Ymir, Frost Giant King:", c))
+
+func Ymir_fight_aop(choice):
+	if choice == $"../..".username:
+		print(choice, " picked me")
+		await $"../BlackScreen".chooseCardKO(0, 0, ['hand', "discard"], woundFilter)
+	else:
+		print(choice, " not me")
+
+func SuperSkrull_fight():
+	await $"../BlackScreen".chooseCardKO(1, 1, ["hand", "played"], heroFilter)
+
+func SkrullShapeshifters_ambush():
+	var v = $"../City".addedVil
+	var hero = $"../HQ".hq[0]
+	v.attack = hero.cost
+	v.addExtraText(str("Held Card: ", hero.getFuncName()), "SkrullVil1")
+	v.addExtraText(str("Attack: ", v.attack), "SkrullVil2")
+	v.extraData = hero
+	hero.position = Vector2(-626, 114)
+	$"../HQ".hq[0] = null
+	$"../HQ".fillHQ()
+
+func SkrullShapeshifters_fight():
+	$"../PlayerHand".deck.discardCard($"../City".foughtVil.extraData)
+
+func QueenVeranke_ambush():
+	var ind = 0
+	var v = $"../City".addedVil
+	var hero = $"../HQ".hq[0]
+	for i in range(1, 5):
+		if $"../HQ".hq[i].cost > hero.cost:
+			hero = $"../HQ".hq[i]
+			ind = i
+	v.attack = hero.cost
+	v.addExtraText(str("Held Card: ", hero.getFuncName()), "SkrullVil1")
+	v.addExtraText(str("Attack: ", v.attack), "SkrullVil2")
+	v.extraData = hero
+	hero.position = Vector2(-626, 114)
+	$"../HQ".hq[ind] = null
+	$"../HQ".fillHQ()
+
+func QueenVeranke_fight():
+	$"../PlayerHand".deck.discardCard($"../City".foughtVil.extraData)
+
+func Paibok_fight():
+	var pl = $"../..".getOrderedPlayerList()
+	for i in pl:
+		var r = await $"../BlackScreen".customCardChoices(1, 1, i, $"../HQ".hq)
+		r = r[0]
+		var ind = $"../HQ".hq.find(r)
+		var payload = str(i, ",", ind)
+		if i == $"..".username:
+			await Paibok_fight_aop(payload)
+		else:
+			$"../..".recruitIgnores += 1
+			var msg = str("CardEffect:Skrulls-Paibok the Power Skrull:", payload)
+			$"../..".socket.send_text(msg)
+
+func Paibok_fight_aop(choice: String):
+	print("Payload Received: ", choice)
+	var uname = choice.substr(0, choice.find(","))
+	if uname == $"..".username:
+		var ind = int(choice[-1])
+		var c = $"../HQ".hq[ind]
+		$"../HQ".hq[ind] = null
+		$"../PlayerHand".deck.discardCard(c)
+		$"../HQ".fillHQ()
+		if $"..".PLAYER_COUNT > 1:
+			$"../..".socket.send_text(str("Recruited:", ind))
+
+
+
+
 
 
 
@@ -726,7 +859,8 @@ func Sabretooth_fight_esc():
 var mastermind_strikes = {
 	"Mastermind-Red Skull" : Red_Skull_Strike,
 	"Mastermind-Dr. Doom" : DrDoom_strike,
-	"Mastermind-Magneto" : Magneto_strike
+	"Mastermind-Magneto" : Magneto_strike,
+	"Mastermind-Loki" : Loki_strike
 }
 
 func Red_Skull_Strike():
@@ -755,6 +889,10 @@ func Magneto_strike():
 		var dCount = $"../PlayerHand".playerHand.size() - 4
 		await $"../BlackScreen".chooseCardDiscard(dCount, dCount, false)
 
+func Loki_strike():
+	if $"../PlayerHand".classCount(GameData.Classes.STRENGTH, false, true) == 0:
+		$"../PlayerHand".addWound(1)
+
 var mastermind_prereqs = {
 	
 }
@@ -772,6 +910,10 @@ var tactic_fight = {
 	"Magneto-Crushing Shockwave" : Crushing_Shockwave,
 	"Magneto-Electromagnetic Bubble" : Electromagnetic_Bubble,
 	"Magneto-Xavier's Nemesis" : Xaviers_Nemesis,
+	"Loki-Cruel Ruler" : Cruel_Ruler,
+	"Loki-Maniacal Tyrant" : Maniacal_Tyrant,
+	"Loki-Vanishing Illusions" : Vanishing_Illusions,
+	"Loki-Whispers and Lies" : Whispers_and_Lies
 }
 
 
@@ -894,6 +1036,58 @@ func Xaviers_Nemesis():
 
 
 
+# Loki
+
+func Cruel_Ruler():
+	var c = []
+	for i in $"../City".city:
+		if i and i.identifier == "Villain":
+			c.append(i)
+	if c.size() > 0:
+		var r = await $"../BlackScreen".customCardChoices(1, 1, "Defeat", c)
+		r = r[0]
+		await $"../City"._on_fight_button_down($"../City".city.find(r))
+
+func Maniacal_Tyrant():
+	await $"../BlackScreen".chooseCardKO(0, 4, ["discard"])
+
+func Vanishing_Illusions():
+	if $"../..".playerCount > 1:
+		$"../..".socket.send_text("CardEffect:Loki-Vanishing Illusions:1")
+
+func Vanishing_Illusions_aop(choice):
+	assert(choice)
+	var choices = []
+	for i in $"../PlayerHand".vicPile:
+		if i.identifier == "Villain":
+			choices.append(i)
+	var c = await $"../BlackScreen".customCardChoices(1, 1, "KO", choices)
+	if c:
+		c = c[0]
+		c.position = Vector2(114, -437)
+		$"../PlayerHand".vicPile.erase(c)
+		$"../KODeck".addCards(c)
+
+func Whispers_and_Lies():
+	if $"../..".playerCount > 1:
+		$"../..".socket.send_text("CardEffect:Loki-Whispers and Lies:1")
+
+func Whispers_and_Lies_aop(choice):
+	assert(choice)
+	var choices = []
+	for i in $"../PlayerHand".vicPile:
+		if i.identifier == "Bystander":
+			choices.append(i)
+	var c = await $"../BlackScreen".customCardChoices(2, 2, "KO", choices)
+	for i in c:
+		$"../PlayerHand".vicPile.erase(i)
+		$"../KODeck".addCards(i)
+		i.position = Vector2(114, -437)
+
+
+
+
+
 
 
 
@@ -908,7 +1102,9 @@ var SchemeTwistLinks = {
 	"Negative Zone Prison Breakout" : NegativeZoneBreakout_twist,
 	"Super Hero Civil War" : SuperHeroCivilWar_twist,
 	"Portals to the Dark Dimension" : PortalsDarkDimenstion_twist,
-	"Midtown Bank Robbery" : MidtownBankRobbery_twist
+	"Midtown Bank Robbery" : MidtownBankRobbery_twist,
+	"Replace Earth's Leaders with Killbots" : LeaderKillbot_twist,
+	"Secret Invasion of the Skrull Shapeshifters" : SecretInvasionSkrull_twist
 }
 
 var SchemeSetupLinks = {
@@ -969,3 +1165,41 @@ func MidtownBankRobbery_twist(t: int):
 			if b:
 				$"../City".city[1].captureBystander(b)
 	await $"../City".drawVilCard()
+
+func LeaderKillbot_twist(t: int):
+	for i in $"../Scheme".extraData:
+		i.attack = t
+		i.editExtraText(str("Killbot: ", t, " Attack"), "Killbot")
+
+func SecretInvasionSkrull_twist(t: int):
+	assert(t > 0)
+
+	var hero = $"../HQ".hq[0]
+	var ind = 0
+	for i in range(1, 5):
+		if $"../HQ".hq[i].cost > hero.cost:
+			hero = $"../HQ".hq[i]
+			ind = i
+	
+	hero.position = Vector2(-626, 114)
+	$"../HQ".hq[ind] = null
+	$"../HQ".fillHQ()
+	
+	var skrull = generateSkrull(hero)
+	await $"../City".addToCity(skrull)
+
+func generateSkrull(c):
+	var vilScene = preload("res://Scenes/Villain.tscn")
+	var v = vilScene.instantiate()
+	$"../PlayerHand".addCardToManager(v)
+	v.identifier = "Villain"
+	v.team = "SecretSkrulls"
+	v.attack = c.cost+2
+	v.cardName = c.cardName
+	v.vp = 0
+	v.spritePath = c.spritePath
+	v.initSprite(c.spritePath)
+	v.position = Vector2(-519, 114)
+	v.extraData = c
+	v.addExtraText(str("Secret Skrull: ", v.attack, " Attack"), "Secret Skrull")
+	return v

@@ -9,6 +9,8 @@ var twistCount
 var playedTwists = 0
 var overrides
 
+var extraData = []
+
 @onready
 var info = $"../..".scheme
 const OOS = Vector2(1047, -1224)
@@ -19,6 +21,8 @@ func _ready() -> void:
 	sName = info.sName
 	twistCount = info.twistCount
 	overrides = info.overrides
+	if "StartingTwists" in overrides.keys():
+		playedTwists = overrides["StartingTwists"]
 	if sName in $"../EffectManager".SchemeSetupLinks:
 		$"../EffectManager".SchemeSetupLinks[sName].call()
 	var cardScene = preload("res://Scenes/Card.tscn")
@@ -36,9 +40,3 @@ func twist():
 	await $"../EffectManager".SchemeTwistLinks[sName].call(playedTwists)
 	if $"../..".playerCount == 1:
 		await $"../BlackScreen".KOfromHQ($"../EffectManager".sixCostFilter)
-
-#func displayTwists(on):
-	#if on:
-		#$"../ExtraLabels".showLabel(str("Scheme Twists: ", playedTwists))
-	#else:
-		#$"../ExtraLabels".removeLabel()

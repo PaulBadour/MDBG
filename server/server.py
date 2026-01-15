@@ -1,7 +1,8 @@
 import asyncio
 import websockets
+import json
 
-ip = "localhost"
+ip = "0.0.0.0"
 port = 8080
 
 players = {}
@@ -22,6 +23,12 @@ class Lobby():
         for i in self.members:
             text += i[1] + "\n"
         return text
+
+    def getUsernames(self):
+        u = []
+        for i in self.members:
+            u.append(i[1])
+        return json.dumps(u)
     
     async def joinLobby(self, player):
         self.members.append((player, players[player]))
@@ -42,6 +49,7 @@ class Lobby():
     async def startGame(self):
         for i in self.members:
             await i[0].send(f"PlayerCount:{len(self.members)}")
+            await i[0].send(f"PlayerNames:{self.getUsernames()}")
         await self.sendTurn(False)
 
     async def sendDeckCode(self, code):

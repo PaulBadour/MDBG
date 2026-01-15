@@ -7,7 +7,7 @@ var heros
 
 var scheme_override = {}
 
-var websocket_url = "ws://0.0.0.0:8080"
+var websocket_url = "ws://3.21.168.204:8080"
 var socket = WebSocketPeer.new()
 var host
 
@@ -17,6 +17,9 @@ var playerCount = 1
 var username
 var heroShuffleCode
 var villainShuffleCode
+var playerList = []
+
+var recruitIgnores = 0
 
 var turn
 
@@ -58,6 +61,13 @@ func connectMultiplayer():
 		push_error("Unable to connect.")
 		set_process(false)
 
+func getOrderedPlayerList():
+	var list = playerList.duplicate(true)
+	while true:
+		if list[0] == username:
+			return list
+		list.append(list.pop_front())
+
 func _ready() -> void:
 	get_tree().set_auto_accept_quit(false)
 
@@ -84,6 +94,10 @@ func _process(delta: float) -> void:
 					elif packet_text.begins_with("PlayerCount:"):
 						playerCount = int(packet_text[-1])
 						startGame()
+					elif packet_text.begins_with("PlayerNames:"):
+						print(packet_text)
+						playerList = JSON.parse_string(packet_text.substr(12, packet_text.length()))
+						print(playerList)
 					elif packet_text.begins_with("HeroDeck:"):
 						#print("Got hero deck")
 						var codeStr = packet_text.substr(9, packet_text.length())
@@ -107,11 +121,14 @@ func _process(delta: float) -> void:
 						else:
 							emit_signal("firstTurnRecieved")
 					elif packet_text.begins_with("Recruited:"):
-						var f = int(packet_text.substr(10, packet_text.length()))
-						if f == -1:
-							gNode.get_node("HQ").addOfficer(true)
+						if recruitIgnores > 0:
+							recruitIgnores -= 1
 						else:
-							gNode.get_node("HQ").removeHero(f)
+							var f = int(packet_text.substr(10, packet_text.length()))
+							if f == -1:
+								gNode.get_node("HQ").addOfficer(true)
+							else:
+								gNode.get_node("HQ").removeHero(f)
 					elif packet_text.begins_with("Fought:"):
 						var f = int(packet_text.substr(7, packet_text.length()))
 						gNode.get_node("City").removeVil(f)
@@ -186,8 +203,10 @@ func _on_start_button_button_down() -> void:
 # Single player button
 func _on_single_button_button_down() -> void:
 	if $Username.text == "":
-		return
-	username = $Username.text
+		username="You"
+	else:
+		username = $Username.text
+	playerList = [username]
 	host = true
 	playerCount = 1
 	turn = username
@@ -263,8 +282,8 @@ func setup(c = null):
 		# GameData.BASE_HENCHMEN.find(GameData.HENCHMAN_DOOMBOTLEGION)
 		var hench = []
 		var vils = []
-		var code = []
 		var hlist = []
+		var code = []
 		var snum = generateChoices(1, GameData.BASE_SCHEMES.size())
 		if playerCount == 1:
 			while !GameData.BASE_SCHEMES[snum[0]].solo:
@@ -273,6 +292,9 @@ func setup(c = null):
 		var tempS = GameData.BASE_SCHEMES[code[0]]
 		if tempS.sName == "Negative Zone Prison Breakout":
 			henchCount += 1
+		if tempS.sName == "Secret Invasion of the Skrull Shapeshifters":
+			heroCount = 6
+			vils.append(GameData.BASE_VILLAINS.find(GameData.SKRULLS_VILLAINS))
 		code.append_array(generateChoices(1, GameData.BASE_MASTERMINDS.size()))
 		var mmind = GameData.BASE_MASTERMINDS[code[1]]
 		var leads = mmind.leads
@@ -297,6 +319,8 @@ func setup(c = null):
 		
 		if scheme.sName == "Negative Zone Prison Breakout":
 			henchCount += 1
+		if scheme.sName == "Secret Invasion of the Skrull Shapeshifters":
+			heroCount = 6
 			
 		mastermind = GameData.BASE_MASTERMINDS[c.pop_front()]
 		for i in range(vilCount):

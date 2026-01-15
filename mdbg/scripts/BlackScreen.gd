@@ -20,6 +20,10 @@ var isClickable = false
 var clicked = []
 var maxClick
 
+var globalChoice
+
+signal finishCustom
+
 func _input(event):
 	if event is InputEventMouseButton and event.button_index == MOUSE_BUTTON_LEFT and event.is_pressed() and isClickable:
 		var c = $"../CardManager".findCard()
@@ -169,15 +173,15 @@ func chooseCardKO(minKO, maxKO, locations, filter=null):
 			#print("Removing hand wound")
 			$"../PlayerHand".deleteCard(i)
 			await $"../PlayerHand".updateHandPositions()
-			i.position = Vector2(-500, -500)
+			#i.position = Vector2(-500, -500)
 		if i in $"../PlayerHand".deck.discard:
 			#print("Removing deck wound")
 			$"../PlayerHand".deck.discard.erase(i)
-			i.position = Vector2(-500, -500)
+			#i.position = Vector2(-500, -500)
 			$"../PlayerHand".updateDiscardCount($"../PlayerHand".deck.discard.size())
-		if i in $"../PlayerHand".played:
-			$"../PlayerHand".played.erase(i)
-			i.position = Vector2(-500, -500)
+		#if i in $"../PlayerHand".played:
+			#$"../PlayerHand".played.erase(i)
+		i.position = Vector2(-500, -500)
 		
 
 	
@@ -362,6 +366,23 @@ func attackRecruitSplit(cost):
 	var r = await $Sliders.sliderFinished
 	disappear()
 	return r
+
+func choosePlayerName(excludeSelf, optional):
+	assert(optional != null)
+	var buttons = []
+	var text = []
+	for i in $"../..".playerList:
+		if excludeSelf and i == $"../..".username:
+			continue
+		text.append(i)
+		var newf = func():
+			globalChoice = i
+			$"../EffectManager".emitCustomSignalEnd()
+		buttons.append(newf)
+	await customChoices(text, buttons)
+	var c = globalChoice
+	globalChoice = null
+	return c
 
 func endGameScreen(text):
 	appear()

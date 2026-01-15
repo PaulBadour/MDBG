@@ -65,9 +65,9 @@ static var SHIELD_OFFICER = {
 	spritePath = "res://cards/Base/Heros/Hero/shield-officer.png"
 }
 
-#func imrr():
-	#if $PlayerHand.classCount():
-		#pass
+
+
+
 
 static var REPULSOR_RAYS = {
 	attack = 2,
@@ -781,12 +781,93 @@ static var BROTHERHOOD_VILLAINS = {
 	SABRETOOTH : 2
 }
 
+static var FROST_GIANT = {
+	name = "Frost Giant",
+	attack = 4,
+	team = "Enemies of Asgard",
+	vp = 2,
+	spritePath = "res://cards/Base/Villains/EnemiesofAsgard-FrostGiant.png"
+}
+
+static var DESTROYER = {
+	name = "Destroyer",
+	attack = 7,
+	team = "Enemies of Asgard",
+	vp = 5,
+	spritePath = "res://cards/Base/Villains/EnemiesofAsgard-Destroyer.png"
+}
+
+static var ENCHANTRESS = {
+	name = "Enchantress",
+	attack = 6,
+	team = "Enemies of Asgard",
+	vp = 4,
+	spritePath = "res://cards/Base/Villains/EnemiesofAsgard-Enchantress.png"
+}
+
+static var YMIR = {
+	name = "Ymir, Frost Giant King",
+	attack = 6,
+	team = "Enemies of Asgard",
+	vp = 4,
+	spritePath = "res://cards/Base/Villains/EnemiesofAsgard-Ymir.png"
+}
+
+static var ENEMIESOFASGARD_VILLAINS = {
+	FROST_GIANT : 3,
+	DESTROYER : 1,
+	ENCHANTRESS : 2,
+	YMIR : 2
+}
+
+static var SUPER_SKRULL = {
+	name = "Super-Skrull",
+	attack = 4,
+	team = "Skrulls",
+	vp = 2,
+	spritePath = "res://cards/Base/Villains/Skrulls-SuperSkrull.png"
+}
+
+static var SKRULL_SHAPESHIFTERS = {
+	name = "Skrull Shapeshifters",
+	attack = 0,
+	team = "Skrulls",
+	vp = 2,
+	spritePath = "res://cards/Base/Villains/Skrulls-SkrullShapeshifters.png"
+}
+
+static var SKRULL_QUEEN_VERANKE = {
+	name = "Skrull Queen Veranke",
+	attack = 0,
+	team = "Skrulls",
+	vp = 4,
+	spritePath = "res://cards/Base/Villains/Skrulls-SkrullQueenVeranke.png"
+}
+
+static var PAIBOK = {
+	name = "Paibok the Power Skrull",
+	attack = 8,
+	team = "Skrulls",
+	vp = 3,
+	spritePath = "res://cards/Base/Villains/Skrulls-Paibok.png"
+}
+
+static var SKRULLS_VILLAINS = {
+	SUPER_SKRULL : 3,
+	SKRULL_SHAPESHIFTERS : 3,
+	SKRULL_QUEEN_VERANKE : 1,
+	PAIBOK : 1
+}
+
 static var BASE_VILLAINS = [
 	SPIDERFOES_VILLAINS,
 	HYDRA_VILLAINS,
 	RADIATION_VILLAINS,
-	BROTHERHOOD_VILLAINS
+	BROTHERHOOD_VILLAINS,
+	ENEMIESOFASGARD_VILLAINS,
+	SKRULLS_VILLAINS
 ]
+
 
 
 
@@ -837,6 +918,18 @@ static var BASE_HENCHMEN = [
 
 
 
+static var KILLBOT = {
+	name = "Killbot",
+	attack = 0,
+	team = "Scheme",
+	vp = 1,
+	spritePath = "res://cards/Base/Other/Bystander.png"
+}
+
+
+
+
+
 
 
 static var RED_SKULL = {
@@ -881,12 +974,26 @@ static var MAGNETO = {
 	}
 }
 
+static var LOKI = {
+	mName = "Loki",
+	leads = ENEMIESOFASGARD_VILLAINS,
+	attack = 10,
+	vp = 5,
+	spritePath = "res://cards/Base/Masterminds/Mastermind-Loki.png",
+	tactics = {
+		"Cruel Ruler" : "res://cards/Base/Masterminds/Loki-CruelRuler.png",
+		"Maniacal Tyrant" : "res://cards/Base/Masterminds/Loki-ManiacalTyrant.png",
+		"Vanishing Illusions" : "res://cards/Base/Masterminds/Loki-VanishingIllusions.png",
+		"Whispers and Lies" : "res://cards/Base/Masterminds/Loki-WhispersandLies.png"
+	}
+}
 
 
 static var BASE_MASTERMINDS = [
 	RED_SKULL,
 	DR_DOOM,
-	MAGNETO
+	MAGNETO,
+	LOKI
 ]
 
 
@@ -946,11 +1053,29 @@ static var MidtownBankRobbery = {
 	solo=true
 }
 
+static var LeaderKillbot = {
+	sName = "Replace Earth's Leaders with Killbots",
+	twistCount = 5,
+	overrides = {"Bystanders":18, "StartingTwists":3},
+	spritePath = "res://cards/Base/Schemes/LeaderKillbot.png",
+	solo=true
+}
+
+static var SecretInvasionSkrull = {
+	sName = "Secret Invasion of the Skrull Shapeshifters",
+	twistCount = 8,
+	overrides = {},
+	spritePath = "res://cards/Base/Schemes/SecretInvasionSkrull.png",
+	solo=true
+}
+
 static var BASE_SCHEMES = [
 	#PowerCosmicCube,
 	#LegacyVirus,
 	#NegativeZoneBreakout,
 	#SuperHeroCivilWar,
 	#PortalsDarkDimension,
-	MidtownBankRobbery
+	#MidtownBankRobbery,
+	#LeaderKillbot,
+	SecretInvasionSkrull
 ]

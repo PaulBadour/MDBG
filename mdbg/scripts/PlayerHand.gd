@@ -45,8 +45,8 @@ func _ready() -> void:
 func _input(event):
 	if event is InputEventKey and event.keycode == KEY_W and event.is_pressed() and !event.is_echo():
 		#return
-		$"../City".addBystander($"../Bystanders".draw())
-		#addWound(1)
+		#$"../City".addBystander($"../Bystanders".draw())
+		addWound(1)
 		#print(deck.cards)
 
 func isCardInHand(card):
@@ -171,7 +171,7 @@ func _on_button_button_down() -> void:
 	while played.size() > 0:
 		var c = played[0]
 		played.erase(c)
-		if c not in holdover:
+		if c not in holdover and c not in $"../KODeck".cards:
 			deck.discardCard(c)
 
 	drawHand()
@@ -235,6 +235,11 @@ func saveBystander():
 		var v = $"../Bystanders".draw()
 		vicPile.insert(0, v)
 	#print(str("VP: ", getVP()))
+
+func addToVicPile(c):
+	if c.identifer == "Villain" and c.cardName == "Killbot":
+		c.identifier = "Bystander"
+	vicPile.append(c)
 
 func getVP():
 	var c = 0

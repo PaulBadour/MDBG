@@ -62,9 +62,20 @@ func _ready() -> void:
 		addCards(ms)
 		ms.position = OOS
 	
-
-	for i in range(bystanderCount):
-		addCards($"../Bystanders".draw())
+	if $"../Scheme".sName == "Replace Earth's Leaders with Killbots":
+		for i in range(bystanderCount):
+			var kb = vilScene.instantiate()
+			$"../PlayerHand".addCardToManager(kb)
+			kb.initVil(GameData.KILLBOT)
+			kb.attack = 3
+			kb.position = OOS
+			kb.addExtraText("Killbot: 3 Attack", "Killbot")
+			$"../Scheme".extraData.append(kb)
+			$"../Bystanders".draw()
+			addCards(kb)
+	else:
+		for i in range(bystanderCount):
+			addCards($"../Bystanders".draw())
 	
 	
 	for i in range($"../Scheme".twistCount):
@@ -74,7 +85,13 @@ func _ready() -> void:
 		t.position = OOS
 		$"../PlayerHand".addCardToManager(t)
 		addCards(t)
-		
+	
+	if $"../Scheme".sName == "Secret Invasion of the Skrull Shapeshifters":
+		for i in range(12):
+			var c = $"../HeroDeck".draw()
+			var skrull = $"../EffectManager".generateSkrull(c)
+			addCards(skrull)
+	
 	if !$"../..".host:
 		print("Not host")
 		shuffle($"../..".villainShuffleCode)

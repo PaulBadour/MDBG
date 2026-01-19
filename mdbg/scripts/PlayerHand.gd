@@ -3,7 +3,7 @@ extends Node2D
 const CARD_WIDTH = 190
 const HAND_Y_POS = 800
 
-const HERO_SCRIPT = preload("res://scripts/Hero.gd")
+#const HERO_SCRIPT = preload("res://scripts/Hero.gd")
 
 var handSize = 6
 var playerHand = []
@@ -46,7 +46,9 @@ func _input(event):
 	if event is InputEventKey and event.keycode == KEY_W and event.is_pressed() and !event.is_echo():
 		#return
 		#$"../City".addBystander($"../Bystanders".draw())
-		addWound(1)
+		#addWound(1)
+		print(classCount(GameData.Classes.STRENGTH, false))
+		print(classCount(GameData.Classes.COVERT, false))
 		#print(deck.cards)
 
 func isCardInHand(card):
@@ -61,7 +63,7 @@ func isCardPlayed(card):
 			return true
 	return false
 
-func playCard(card):
+func playCard(card, copy=false):
 	#if isCardInHand(card):
 	cardBeingPlayed = card
 	var pr = await $"../EffectManager".prereq(card)
@@ -70,9 +72,10 @@ func playCard(card):
 		updateHandPositions()
 		return
 	
-	played.insert(0, card)
-	card.position = Vector2(2000, 2000)
-	$"../CardManager".hoverOff(card)
+	if !copy:
+		played.insert(0, card)
+		card.position = Vector2(2000, 2000)
+		$"../CardManager".hoverOff(card)
 	
 	if card.attack:
 		emit_signal("addAttack", card.attack)
@@ -119,8 +122,10 @@ func discardHand():
 		discardCard(playerHand[0], true)
 
 func discardCard(c, endOfTurn = false):
+	if !c:
+		return
 	if !endOfTurn:
-		if is_instance_of(c, HERO_SCRIPT) and c.getFuncName() == "Cyclops-Unending Energy":
+		if c.identifier == "Hero" and c.getFuncName() == "Cyclops-Unending Energy":
 			return
 	playerHand.erase(c)
 	deck.discardCard(c)
@@ -208,11 +213,11 @@ func classCount(c, skipPlayed = true, countHand = false):
 	if skipPlayed:
 		start = 1
 	for i in range(start, played.size()):
-		if played[i].hClass == c:
+		if played[i].isClass(c):
 			count += 1
 	if countHand:
 		for i in playerHand:
-			if i.identifier == "Hero" and i.hClass == c:
+			if i.identifier == "Hero" and i.isClass(c):
 				count += 1
 	return count
 

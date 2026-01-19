@@ -8,7 +8,7 @@ var hClass
 var effect
 var heroName
 var cardName
-
+var secondaryClasses = []
 
 
 # Called when the node enters the scene tree for the first time.
@@ -26,7 +26,15 @@ func initHero(info: Dictionary):
 	cardName = info.cardName
 	spritePath = info.spritePath
 	
+	if "secondaryClasses" in info.keys():
+		secondaryClasses = info.secondaryClasses
+	
 	initSprite(spritePath)
 
 func getFuncName():
 	return str(heroName, "-", cardName)
+
+func isClass(c):
+	if c == hClass or c in secondaryClasses:
+		return true
+	return false

@@ -33,7 +33,7 @@ func _ready() -> void:
 		masterStrikeCount = 1
 		henchCount = 3
 	else:
-		masterStrikeCount = 5
+		masterStrikeCount = 5 # 5
 		henchCount = 10
 	
 	for t in villains:

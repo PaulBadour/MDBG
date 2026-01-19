@@ -7,6 +7,7 @@ var handPos
 var vp
 var identifier
 var tName
+var isZoomable = true
 
 var spritePath
 

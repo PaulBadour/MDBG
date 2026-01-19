@@ -23,11 +23,11 @@ func draw(send=true):
 	$"../PlayerHand".addCardToManager(c)
 	c.initSprite(SPRITE_PATH)
 	countLeft -= 1
-	if countLeft == 0 and $"../Scheme".sName == "The Legacy Virus":
-		$"..".lose()
 	updateLabel()
 	if $"../..".playerCount > 1 and send:
 		$"../..".socket.send_text("Wound")
+	if countLeft == 0 and $"../Scheme".sName == "The Legacy Virus":
+		$"..".lose()
 	return c
 
 func updateLabel():

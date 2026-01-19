@@ -14,6 +14,7 @@ class Lobby():
     def __init__(self, host):
         self.host = host
         self.members = [(host, players[host])]
+        self.blackScreenLocks = [False]
         Lobby.lobbies.append(self)
         self.codeRequired = False
         self.turn = 0
@@ -29,9 +30,16 @@ class Lobby():
         for i in self.members:
             u.append(i[1])
         return json.dumps(u)
+
+    def isAnyLocked(self):
+        for i in self.blackScreenLocks:
+            if i:
+                return True
+        return False
     
     async def joinLobby(self, player):
         self.members.append((player, players[player]))
+        self.blackScreenLocks.append(False)
         await self.sendLobby()
     
     async def sendLobby(self):
@@ -45,6 +53,28 @@ class Lobby():
         user = self.members[self.turn][1]
         for i in range(len(self.members)):
             await self.members[i][0].send(f"Turn:{user}")
+    
+    async def lock(self, ws):
+        ind = 0
+        for num, i in enumerate(self.members):
+            if i[0] == ws:
+                ind = num
+                break
+        self.blackScreenLocks[num] = True
+        if self.blackScreenLocks[self.turn] == False:
+            await self.members[self.turn][0].send("Lock")
+    
+    async def unlock(self, ws):
+        ind = 0
+        for num, i in enumerate(self.members):
+            if i[0] == ws:
+                ind = num
+                break
+        self.blackScreenLocks[num] = False
+        if not self.isAnyLocked():
+            for i in self.members:
+                await i[0].send("Unlock")
+
     
     async def startGame(self):
         for i in self.members:
@@ -79,6 +109,10 @@ async def parseMsg(websocket, message):
     elif message.startswith("Uname:"):
         uname = message[message.index(":") + 1:]
         players[websocket] = uname
+    elif message == "BlackscreenLock":
+        await Lobby.lobbies[0].lock(websocket)
+    elif message == "BlackscreenUnlock":
+        await Lobby.lobbies[0].unlock(websocket)
     else:
         await Lobby.lobbies[0].msgAllOthers(message, websocket)
 

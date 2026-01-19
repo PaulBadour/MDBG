@@ -13,7 +13,10 @@ enum Heros {
 	CAPTAIN_AMERICA,
 	BLACK_WIDOW,
 	STORM,
-	THOR
+	THOR,
+	GAMBIT,
+	DEADPOOL,
+	ROGUE
 }
 
 enum Classes{
@@ -26,10 +29,11 @@ enum Classes{
 }
 
 enum Teams{
+	NONE,
 	XMEN,
 	AVENGERS,
 	SHIELD,
-	SPIDER_FRIENDS
+	SPIDER_FRIENDS,
 }
 
 static var SHIELD_AGENT = {
@@ -324,7 +328,7 @@ static var PSYCHIC_LINK = {
 
 static var DIAMOND_FORM = {
 	attack = 5,
-	recruit = null,
+	recruit = 0,
 	cost = 7,
 	team = Teams.XMEN,
 	hClass = Classes.STRENGTH,
@@ -597,6 +601,138 @@ static var TIDAL_WAVE = {
 	spritePath = "res://cards/Base/Heros/Storm/Storm-TidalWave.png"
 }
 
+static var STACK_THE_DECK = {
+	attack = null,
+	recruit = null,
+	cost = 2,
+	team = Teams.XMEN,
+	hClass = Classes.COVERT,
+	heroName = "Gambit",
+	cardName = "Stack the Deck",
+	spritePath = "res://cards/Base/Heros/Gambit/Gambit-StackTheDeck.png"
+}
+
+static var CARD_SHARK = {
+	attack = 2,
+	recruit = null,
+	cost = 4,
+	team = Teams.XMEN,
+	hClass = Classes.RANGED,
+	heroName = "Gambit",
+	cardName = "Card Shark",
+	spritePath = "res://cards/Base/Heros/Gambit/Gambit-CardShark.png"
+}
+
+static var HYPNOTIC_CHARM = {
+	attack = null,
+	recruit = 2,
+	cost = 3,
+	team = Teams.XMEN,
+	hClass = Classes.INSTINCT,
+	heroName = "Gambit",
+	cardName = "Hypnotic Charm",
+	spritePath = "res://cards/Base/Heros/Gambit/Gambit-HypnoticCharm.png"
+}
+
+static var HIGH_STAKES_JACKPOT = {
+	attack = 4,
+	recruit = null,
+	cost = 7,
+	team = Teams.XMEN,
+	hClass = Classes.INSTINCT,
+	heroName = "Gambit",
+	cardName = "High Stakes Jackpot",
+	spritePath = "res://cards/Base/Heros/Gambit/Gambit-HighStakesJackpot.png"
+}
+
+static var HERE_HOLD_THIS = {
+	attack = null,
+	recruit = 2,
+	cost = 3,
+	team = Teams.NONE,
+	hClass = Classes.TECH,
+	heroName = "Deadpool",
+	cardName = "Here, Hold This for a Second",
+	spritePath = "res://cards/Base/Heros/Deadpool/Deadpool-HereHoldThisForaSecond.png"
+}
+
+static var ODDBALL = {
+	attack = 2,
+	recruit = null,
+	cost = 5,
+	team = Teams.NONE,
+	hClass = Classes.COVERT,
+	heroName = "Deadpool",
+	cardName = "Oddball",
+	spritePath = "res://cards/Base/Heros/Deadpool/Deadpool-Oddball.png"
+}
+
+static var CAN_I_GET_A_DO_OVER = {
+	attack = 2,
+	recruit = null,
+	cost = 3,
+	team = Teams.NONE,
+	hClass = Classes.INSTINCT,
+	heroName = "Deadpool",
+	cardName = "Hey, Can I Get a Do Over?",
+	spritePath = "res://cards/Base/Heros/Deadpool/Deadpool-HeyCanIGetADoOver.png"
+}
+
+static var RANDOM_ACTS_OF_UNKINDNESS = {
+	attack = 6,
+	recruit = null,
+	cost = 7,
+	team = Teams.NONE,
+	hClass = Classes.INSTINCT,
+	heroName = "Deadpool",
+	cardName = "Random Acts of Unkindness",
+	spritePath = "res://cards/Base/Heros/Deadpool/Deadpool-RandomActsofUnkindness.png"
+}
+
+static var ENERGY_DRAIN = {
+	attack = null,
+	recruit = 2,
+	cost = 3,
+	team = Teams.XMEN,
+	hClass = Classes.COVERT,
+	heroName = "Rogue",
+	cardName = "Energy Drain",
+	spritePath = "res://cards/Base/Heros/Rogue/Rogue-EnergyDrain.png"
+}
+
+static var BORROWED_BRAWN = {
+	attack = 1,
+	recruit = null,
+	cost = 4,
+	team = Teams.XMEN,
+	hClass = Classes.STRENGTH,
+	heroName = "Rogue",
+	cardName = "Borrowed Brawn",
+	spritePath = "res://cards/Base/Heros/Rogue/Rogue-BorrowedBrawn.png"
+}
+
+static var COPY_POWERS = {
+	attack = null,
+	recruit = null,
+	cost = 5,
+	team = Teams.XMEN,
+	hClass = Classes.COVERT,
+	heroName = "Rogue",
+	cardName = "Copy Powers",
+	spritePath = "res://cards/Base/Heros/Rogue/Rogue-CopyPowers.png"
+}
+
+static var STEAL_ABILITIES = {
+	attack = 4,
+	recruit = null,
+	cost = 8,
+	team = Teams.XMEN,
+	hClass = Classes.STRENGTH,
+	heroName = "Rogue",
+	cardName = "Steal Abilities",
+	spritePath = "res://cards/Base/Heros/Rogue/Rogue-StealAbilities.png"
+}
+
 # Cards are in the order of common(5), common(5), uncommon(3), rare(1)
 static var BASE_HEROS = {
 	Heros.IRON_MAN : [REPULSOR_RAYS, ENDLESS_INVENTION, ARC_REACTOR, QUANTUM_BREAKTHROUGH],
@@ -610,19 +746,63 @@ static var BASE_HEROS = {
 	Heros.CAPTAIN_AMERICA : [AVENGERS_ASSEMBLE, PERFECT_TEAMWORK, DIVING_BLOCK, A_DAY_UNLIKE_ANY_OTHER],
 	Heros.BLACK_WIDOW : [DANGEROUS_RESCUE, MISSION_ACCOMPLISHED, COVERT_OPERATION, SILENT_SNIPER],
 	Heros.STORM : [LIGHTNING_BOLT, GATHERING_STORM_CLOUDS, SPINNING_CYLCONE, TIDAL_WAVE],
-	Heros.THOR : [SURGE_OF_POWER, ODINSON, CALL_LIGHTNING, GOD_OF_THUNDER]
+	Heros.THOR : [SURGE_OF_POWER, ODINSON, CALL_LIGHTNING, GOD_OF_THUNDER],
+	Heros.GAMBIT : [STACK_THE_DECK, CARD_SHARK, HYPNOTIC_CHARM, HIGH_STAKES_JACKPOT],
+	Heros.DEADPOOL : [HERE_HOLD_THIS, ODDBALL, CAN_I_GET_A_DO_OVER, RANDOM_ACTS_OF_UNKINDNESS],
+	Heros.ROGUE : [ENERGY_DRAIN, BORROWED_BRAWN, COPY_POWERS, STEAL_ABILITIES]
 }
 
 
+static func getCardCode(c):
+	if c.identifier == "Wound":
+		return "-1,3"
+	if c.heroName == "Hero":
+		if c.cardName == "SHIELD Agent":
+			return "-1,0"
+		elif c.cardName == "SHIELD Trooper":
+			return "-1,1"
+		elif c.cardName == "SHIELD Officer":
+			return "-1,2"
+	for i in range(Heros.size()):
+		for j in range(4):
+			if BASE_HEROS[i][j].heroName == c.heroName and BASE_HEROS[i][j].cardName == c.cardName:
+				return str(i, ",", j)
+	assert(false)
+
+static func getCardFromCode(c: String):
+	match c:
+		"-1,0":
+			return SHIELD_AGENT
+		"-1,1":
+			return SHIELD_TROOPER
+		"-1,2":
+			return SHIELD_OFFICER
+		"-1,3":
+			return null
+		_:
+			var i = int(c.substr(0, c.length()-2))
+			var j = int(c[-1])
+			return BASE_HEROS[i][j]
 
 
-
-
-
-
-
-
-
+## ADD TO CARD MANAGER WHEN GENERATED
+static func generateCardFromCode(code):
+	var cInfo = getCardFromCode(code)
+	# Wound
+	if !cInfo:
+		var cScene = preload("res://Scenes/Card.tscn")
+		var c = cScene.instantiate()
+		c.initSprite("res://cards/Base/Other/Wound.png")
+		c.identifier = "Wound"
+		c.position = Vector2(-324, -332)
+		return c
+	else:
+		var heroScene = preload("res://Scenes/Hero.tscn")
+		var h = heroScene.instantiate()
+		h.initHero(cInfo)
+		#$"../PlayerHand".addCardToManager(h)
+		h.position = Vector2(-300, 115)
+		return h
 
 
 static var ABOMINATION = {
@@ -859,13 +1039,53 @@ static var SKRULLS_VILLAINS = {
 	PAIBOK : 1
 }
 
+static var ULTRON = {
+	name = "Ultron",
+	attack = 6,
+	team = "Masters of Evil",
+	vp = 2,
+	spritePath = "res://cards/Base/Villains/MastersOfEvil-Ultron.png"
+}
+
+static var WHIRLWIND = {
+	name = "Whirlwind",
+	attack = 4,
+	team = "Masters of Evil",
+	vp = 2,
+	spritePath = "res://cards/Base/Villains/MastersOfEvil-Whirlwind.png"
+}
+
+static var BARONZEMO = {
+	name = "Baron Zemo",
+	attack = 6,
+	team = "Masters of Evil",
+	vp = 4,
+	spritePath = "res://cards/Base/Villains/MastersOfEvil-BaronZemo.png"
+}
+
+static var MELTER = {
+	name = "Melter",
+	attack = 5,
+	team = "Masters of Evil",
+	vp = 3,
+	spritePath = "res://cards/Base/Villains/MastersOfEvil-Melter.png"
+}
+
+static var MASTERSOFEVIL_VILLAINS = {
+	ULTRON : 2,
+	WHIRLWIND : 2,
+	BARONZEMO : 2,
+	MELTER : 2
+}
+
 static var BASE_VILLAINS = [
 	SPIDERFOES_VILLAINS,
 	HYDRA_VILLAINS,
 	RADIATION_VILLAINS,
 	BROTHERHOOD_VILLAINS,
 	ENEMIESOFASGARD_VILLAINS,
-	SKRULLS_VILLAINS
+	SKRULLS_VILLAINS,
+	MASTERSOFEVIL_VILLAINS
 ]
 
 
@@ -1070,12 +1290,12 @@ static var SecretInvasionSkrull = {
 }
 
 static var BASE_SCHEMES = [
-	#PowerCosmicCube,
-	#LegacyVirus,
-	#NegativeZoneBreakout,
-	#SuperHeroCivilWar,
-	#PortalsDarkDimension,
-	#MidtownBankRobbery,
-	#LeaderKillbot,
+	PowerCosmicCube,
+	LegacyVirus,
+	NegativeZoneBreakout,
+	SuperHeroCivilWar,
+	PortalsDarkDimension,
+	MidtownBankRobbery,
+	LeaderKillbot,
 	SecretInvasionSkrull
 ]

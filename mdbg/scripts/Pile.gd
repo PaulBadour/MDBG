@@ -10,6 +10,8 @@ func draw():
 	return null
 
 func addCards(c):
+	if c == null:
+		return
 	if typeof(c) != TYPE_ARRAY:
 		cards.insert(0, c)
 	else:

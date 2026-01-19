@@ -10,6 +10,7 @@ const Y_INCR = 300
 const BUTTON_LOCATION = Vector2(1700, 400)
 
 var customButtons = []
+var inCustom = false
 
 var isCovered = false
 var shownCards = []
@@ -22,7 +23,11 @@ var maxClick
 
 var globalChoice
 
-signal finishCustom
+var onlineCheck = false
+signal unlockOnline
+var skipChecks = 0
+
+#signal finishCustom
 
 func _input(event):
 	if event is InputEventMouseButton and event.button_index == MOUSE_BUTTON_LEFT and event.is_pressed() and isClickable:
@@ -39,6 +44,28 @@ func _ready():
 	get_node("DiscardButton").add_theme_font_size_override("font_size", 50)
 	disappear()
 
+func toggleLockCheck(r=null):
+	if $"../..".playerCount > 1:
+		if r != null:
+			onlineCheck = r
+		elif onlineCheck:
+			onlineCheck = false
+		else:
+			onlineCheck = true
+
+func addLockSkip(num=1):
+	skipChecks += num
+
+func lock():
+	if !onlineCheck:
+		onlineCheck = true
+		showCards([], false)
+		await stopShowCards()
+		onlineCheck = false
+
+func unlock():
+	emit_signal("unlockOnline")
+
 func appear():
 	position = Vector2(0, 0)
 	isCovered = true
@@ -54,7 +81,8 @@ func showCards(cards, clickable=false):
 	
 	if clickable:
 		isClickable = true
-	
+	if $"../..".playerCount > 1 and (clickable or inCustom) and onlineCheck:
+		$"../..".socket.send_text("BlackscreenLock")
 	#print(cards)
 	for i in cards:
 		
@@ -71,16 +99,23 @@ func showCards(cards, clickable=false):
 			currX += X_INCR
 	#print(lastLocations)
 
-func stopShowCards():
+func stopShowCards(ignoreClickedCards=true):
 	if $"../CardManager".cardZoomed:
 		$"../CardManager".unzoomCard()
 	for i in range(shownCards.size()):
 		if shownCards[i] in clicked:
 			shownCards[i].get_node("Highlight").visible = false
-		if !shownCards[i] in clicked or shownCards[i].identifier == "Mastermind":
+		if (!shownCards[i] in clicked or !ignoreClickedCards) or shownCards[i].identifier == "Mastermind":
 			shownCards[i].position = lastLocations[i]
 		shownCards[i].z_index = lastIndexes[i]
 		
+	if onlineCheck:
+		if skipChecks > 0:
+			skipChecks -= 1
+		else:
+			$"../..".socket.send_text("BlackscreenUnlock")
+			print("Unlocked")
+			await unlockOnline
 
 	isClickable = false
 	shownCards.clear()
@@ -211,7 +246,7 @@ func orderTopDeck(num):
 
 	for i in range(clicked.size()):
 		hand.deck.cards[i] = clicked[i]
-		clicked[i].position = Vector2(3000, 0)
+		clicked[i].position = Vector2(2500, 0)
 	stopShowCards()
 	return true
 
@@ -283,11 +318,12 @@ func discardFromDeck(minDisc, maxDisc, number):
 	
 	return true
 
-func customChoices(text : Array, funcs : Array):
+func customChoices(text : Array, funcs : Array, displayCard=null):
+	inCustom = true
 	if text.size() != funcs.size():
 		push_error("fucked up custom choices")
 		return
-	appear()
+	showCards([], false)
 	#customButtons = []
 	var c = 0
 	var offset = 150
@@ -299,14 +335,32 @@ func customChoices(text : Array, funcs : Array):
 		b.position = Vector2(BUTTON_LOCATION.x - 700, BUTTON_LOCATION.y + (c * offset))
 		b.button_down.connect(funcs[c])
 		c += 1
-	
+	var oldpos
+	var oldscale
+	var oldz
+	var oldisz
+	if displayCard:
+		oldpos = displayCard.position
+		oldscale = displayCard.scale
+		oldz = displayCard.z_index
+		oldisz = displayCard.isZoomable
+		displayCard.position = Vector2(1000 / 2.0, 1080 / 2.0)
+		displayCard.scale = Vector2(1.5, 1.5)
+		displayCard.z_index = 100
+		displayCard.isZoomable = false
 	#get_node("DiscardButton").position = BUTTON_LOCATION
 	await $"../EffectManager".finishCustom
 	
+	if displayCard:
+		displayCard.position = oldpos
+		displayCard.scale = oldscale
+		displayCard.z_index = oldz
+		displayCard.isZoomable = oldisz
 	deleteCustomButtons()
-	disappear()
+	stopShowCards()
+	inCustom = false
 
-func customCardChoices(minChoices, maxChoices, buttonText, cards):
+func customCardChoices(minChoices, maxChoices, buttonText, cards, ignoreClickMoving=true):
 	if cards.size() < maxChoices:
 		maxChoices = cards.size()
 	if minChoices > maxChoices:
@@ -327,8 +381,32 @@ func customCardChoices(minChoices, maxChoices, buttonText, cards):
 			valid = true
 	var c = clicked.duplicate(true)
 	button.queue_free()
-	stopShowCards()
+	stopShowCards(ignoreClickMoving)
 	return c
+
+func customChoicesWithCards(text : Array, funcs : Array, cards):
+	inCustom = true
+	if text.size() != funcs.size():
+		push_error("fucked up custom choices")
+		return
+	showCards(cards, false)
+	#customButtons = []
+	var c = 0
+	var offset = 150
+	for i in text:
+		var b = $DiscardButton.duplicate()
+		add_child(b)
+		b.text = i
+		customButtons.append(b)
+		b.position = Vector2(BUTTON_LOCATION.x - 700, BUTTON_LOCATION.y + (c * offset))
+		b.button_down.connect(funcs[c])
+		c += 1
+	#get_node("DiscardButton").position = BUTTON_LOCATION
+	await $"../EffectManager".finishCustom
+	
+	deleteCustomButtons()
+	stopShowCards()
+	inCustom = false
 
 func deleteCustomButtons():
 	for i in customButtons:

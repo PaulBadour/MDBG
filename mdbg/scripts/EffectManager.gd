@@ -65,7 +65,19 @@ var links = {
 	"Thor-Surge of Power" : Surge_of_Power,
 	"Thor-Odinson" : Odinson,
 	"Thor-Call Lightning" : Call_Lightning,
-	"Thor-God of Thunder" : God_of_Thunder
+	"Thor-God of Thunder" : God_of_Thunder,
+	"Gambit-Stack the Deck" : Stack_the_Deck,
+	"Gambit-Card Shark" : Card_Shark,
+	"Gambit-Hypnotic Charm" : Hypnotic_Charm,
+	"Gambit-High Stakes Jackpot" : High_Stakes_Jackpot,
+	"Deadpool-Here, Hold This for a Second" : HoldThis_ForaSecond,
+	"Deadpool-Oddball" : Oddball,
+	"Deadpool-Hey, Can I Get a Do Over?" : CanIGetADoover,
+	"Deadpool-Random Acts of Unkindness" : Random_Acts_of_Unkindness,
+	"Rogue-Energy Drain" : Energy_Drain,
+	"Rogue-Borrowed Brawn" : Borrowed_Brawn,
+	"Rogue-Copy Powers" : Copy_Powers,
+	"Rogue-Steal Abilities" : Steal_Abilities
 }
 
 var prereqs = {
@@ -73,7 +85,7 @@ var prereqs = {
 	"Cyclops-Optic Blast" : Optic_Blast_prereq
 }
 
-# Can count MM aops and Villain special aops
+# Counts all manual call aops
 var aop_effects = {
 	"Hawkeye-Covering Fire" : Covering_Fire_aop,
 	"Emma Frost-Shadowed Thoughts" : Shadowed_Thoughts_aop,
@@ -85,7 +97,11 @@ var aop_effects = {
 	"Enemies of Asgard-Ymir, Frost Giant King" : Ymir_fight_aop,
 	"Loki-Vanishing Illusions" : Vanishing_Illusions_aop,
 	"Loki-Whispers and Lies" : Whispers_and_Lies_aop,
-	"Skrulls-Paibok the Power Skrull" : Paibok_fight_aop
+	"Skrulls-Paibok the Power Skrull" : Paibok_fight_aop,
+	"Masters of Evil-Melter" : Melter_fight_aop,
+	"Gambit-Hypnotic Charm" : Hypnotic_Charm_aop,
+	"Deadpool-Random Acts of Unkindness" : Random_Acts_of_Unkindness_aop,
+	"Rogue-Steal Abilities" : Steal_Abilities_aop
 }
 
 # Iron Man
@@ -226,7 +242,9 @@ func Covering_Fire_aop(choice):
 	if choice == "1":
 		$"../PlayerHand".drawCard()
 	else:
+		$"../BlackScreen".toggleLockCheck()
 		await $"../BlackScreen".chooseCardDiscard(1, 1)
+		$"../BlackScreen".toggleLockCheck()
 
 func Impossible_Trickshot():
 	addCardEvent("Impossible Trickshot")
@@ -369,7 +387,9 @@ func Diving_Block():
 		$"../PlayerHand".deck.discard.append($"../Wounds".draw())
 		$"../PlayerHand".deck.updateDiscardCount()
 		emit_signal("finishCustom")
+	$"../BlackScreen".toggleLockCheck()
 	await $"../BlackScreen".customChoices(["Draw Card", "Add Wound"], [f1, f2])
+	$"../BlackScreen".toggleLockCheck()
 
 func A_Day_Unlike_Any_Other():
 	var count = $"../PlayerHand".teamCount(GameData.Teams.AVENGERS, true, false)
@@ -523,6 +543,264 @@ func Call_Lightning():
 func God_of_Thunder():
 	addCardEvent("God of Thunder")
 
+
+# Gambit
+
+func Stack_the_Deck():
+	$"../PlayerHand".drawCard()
+	$"../PlayerHand".drawCard()
+	var r = await $"../BlackScreen".customCardChoices(1, 1, "Put on top of Deck", $"../PlayerHand".playerHand)
+	if r:
+		r = r[0]
+		$"../PlayerHand".removeFromHand(r)
+		$"../PlayerHand".deck.cards.push_front(r)
+		$"../PlayerHand".updateDeckCount()
+		r.position = Vector2(-312, 1612)
+
+func Card_Shark():
+	var c = $"../PlayerHand".deck.getTop(1)
+	if c.identifier == "Hero" and c.team == GameData.Teams.XMEN:
+		$"../PlayerHand".drawCard()
+
+
+var gambitMutex = Mutex.new()
+var gambitData = {}
+var gambitDataCount = 1
+signal updatedGambitData
+func Hypnotic_Charm():
+	var cAbil = classAbility(GameData.Classes.INSTINCT)
+	var pList = $"../..".getOrderedPlayerList()
+	gambitData[pList[0]] = $"../PlayerHand".deck.getTop(1)
+	for i in range(1, pList.size()):
+		gambitData[pList[i]] = null
+	
+	if $"../..".playerCount > 1 and cAbil:
+		$"../..".socket.send_text("CardEffect:Gambit-Hypnotic Charm:,")
+	
+	var f1 = func():
+		#$"../KODeck".addCards($"../PlayerHand".deck.draw())
+		$"../PlayerHand".discardCard($"../PlayerHand".deck.draw())
+		emit_signal("finishCustom")
+	
+	var f2 = func():
+		emit_signal("finishCustom")
+	
+	await $"../BlackScreen".customChoices(["Discard", "Put back"], [f1, f2], $"../PlayerHand".deck.getTop(1))
+	
+	if cAbil:
+		while gambitDataCount < pList.size():
+			await updatedGambitData
+		
+		for i in pList:
+			#print(i)
+			if i == $"..".username:
+				continue
+			if !gambitData[i]:
+				continue
+			f1 = func():
+				$"../..".socket.send_text(str("CardEffect:Gambit-Hypnotic Charm:,,", i))
+				emit_signal("finishCustom")
+			var card = GameData.generateCardFromCode(gambitData[i])
+			$"../PlayerHand".addCardToManager(card)
+			await $"../BlackScreen".customChoices(["Discard", "Put back"], [f1, f2], card)
+			card.queue_free()
+		gambitData = {}
+		gambitDataCount = 1
+
+func Hypnotic_Charm_aop(choice: String):
+	# Requesting data to be sent
+	if choice == ",":
+		var c = $"../PlayerHand".deck.getTop(1)
+		if !c:
+			return
+		var code = str($"..".username, ",", GameData.getCardCode(c))
+		$"../..".socket.send_text(str("CardEffect:Gambit-Hypnotic Charm:,", code))
+	# Requesting card to get KO'd
+	elif choice.begins_with(",,") and choice.substr(2, -1) == $"..".username:
+		$"../PlayerHand".discardCard($"../PlayerHand".deck.draw())
+	# Receiveing card data
+	elif choice[1] != "," and $"..".yourTurn:
+		var uname = choice.substr(1, choice.find(",", 1) - 1)
+		var code = choice.substr(choice.find(",", 1) + 1, -1)
+		call_deferred("editGambitData", uname, code)
+
+func editGambitData(key, value):
+	gambitMutex.lock()
+	gambitData[key] = value
+	gambitDataCount += 1
+	gambitMutex.unlock()
+
+func High_Stakes_Jackpot():
+	var c = $"../PlayerHand".deck.getTop(1)
+	if c.cost > 0:
+		res.addAttack(c.cost)
+
+# Deadpool
+
+func HoldThis_ForaSecond():
+	var v = []
+	for i in $"../City".city:
+		if i:
+			v.append(i)
+	if v.size() > 0:
+		var r = await $"../BlackScreen".customCardChoices(1, 1, "Capture bystander", v, false)
+		r = r[0]
+		r.captureBystander($"../Bystanders".draw())
+
+func Oddball():
+	var nums = []
+	for i in $"../PlayerHand".played:
+		if i != $"../PlayerHand".played[-1] and i.identifier == "Hero" and i.cost % 2 == 1 and i.cost not in nums:
+			nums.append(i.cost)
+	res.addAttack(nums.size())
+
+func CanIGetADoover():
+	if $"../PlayerHand".played.size() == 1:
+		var f1 = func():
+			var id = 0
+			while id < $"../PlayerHand".playerHand.size():
+				var olds = $"../PlayerHand".playerHand.size()
+				$"../PlayerHand".discardCard($"../PlayerHand".playerHand[0])
+				if olds == $"../PlayerHand".playerHand.size():
+					id += 1
+			$"../PlayerHand".drawCard()
+			$"../PlayerHand".drawCard()
+			$"../PlayerHand".drawCard()
+			$"../PlayerHand".drawCard()
+			emitCustomSignalEnd()
+		var f2 = func():
+			emitCustomSignalEnd()
+		await $"../BlackScreen".customChoices(["Discard Hand", "Keep Hand"], [f1, f2], $"../PlayerHand".played[0])
+
+func Random_Acts_of_Unkindness():
+	var f1 = func():
+		#$"../PlayerHand".addWound(1)
+		$"../PlayerHand".addCardToHand($"../Wounds".draw())
+		emitCustomSignalEnd()
+	var f2 = func():
+		emitCustomSignalEnd()
+	await $"../BlackScreen".customChoices(["Gain Wound", "Do Nothing"], [f1, f2])
+	
+	if $"../..".playerCount > 1:
+		$"../..".socket.send_text("CardEffect:Deadpool-Random Acts of Unkindness:,")
+		await Random_Acts_of_Unkindness_aop(",")
+
+var RAOU_data = null
+signal raouReceived
+func Random_Acts_of_Unkindness_aop(choice: String):
+	var pList = $"../..".getOrderedPlayerList()
+	# Request to send
+	if choice == ",":
+		$"../BlackScreen".toggleLockCheck()
+		var r = await $"../BlackScreen".customCardChoices(1, 1, "Send", $"../PlayerHand".playerHand)
+		$"../BlackScreen".toggleLockCheck()
+		if r:
+			$"../PlayerHand".removeFromHand(r[0])
+			r[0].position = Vector2(-300, 300)
+			var c = GameData.getCardCode(r[0])
+			$"../..".socket.send_text(str("CardEffect:Deadpool-Random Acts of Unkindness:", pList[1], ",", c))
+		else:
+			#print("Not R")
+			$"../..".socket.send_text(str("CardEffect:Deadpool-Random Acts of Unkindness:", pList[1], ",0"))
+		if RAOU_data == null:
+			await raouReceived
+		#print(RAOU_data)
+		if !RAOU_data.is_class("String"):
+			#print($"../..".username, " received ", RAOU_data.identifier)
+			$"../PlayerHand".addCardToHand(RAOU_data)
+			
+	# Received data
+	elif choice.begins_with($"../..".username):
+		var data = choice.substr(choice.find(",") + 1, -1)
+		if data == "0":
+			data = "0"
+		else:
+			#print($"../..".username, "recieved ", data)
+			data = GameData.generateCardFromCode(data)
+			$"../CardManager".add_child(data)
+		RAOU_data = data
+		emit_signal("raouReceived")
+
+
+# Rogue
+
+func Energy_Drain():
+	if classAbility(GameData.Classes.COVERT):
+		var r = await $"../BlackScreen".chooseCardKO(0, 1, ["hand", "discard"], null)
+		if r:
+			res.addRecruit(1)
+
+func Borrowed_Brawn():
+	if classAbility(GameData.Classes.STRENGTH):
+		res.addAttack(3)
+
+func Copy_Powers():
+	var cardChoices = $"../PlayerHand".played.slice(1, $"../PlayerHand".played.size())
+	var r = await $"../BlackScreen".customCardChoices(1, 1, "Copy", cardChoices, false)
+	if r:
+		var card = r[0]
+		if card.hClass != GameData.Classes.COVERT:
+			$"../PlayerHand".cardBeingPlayed.secondaryClasses.append(card.hClass)
+		await $"../PlayerHand".playCard(card, true)
+
+func Steal_Abilities():
+	if $"../..".playerCount > 1:
+		$"../..".socket.send_text("CardEffect:Rogue-Steal Abilities:,")
+	
+	var pList = $"../..".getOrderedPlayerList()
+	SA_data[pList[0]] = $"../PlayerHand".deck.getTop(1)
+	for i in range(1, pList.size()):
+		SA_data[pList[i]] = null
+	$"../PlayerHand".discardCard($"../PlayerHand".deck.draw())
+	await get_tree().create_timer(.2).timeout
+	if saDataCount < $"../..".playerCount:
+		print("Awaiting")
+		await saReceived
+	
+	var c = []
+	print(SA_data)
+	for i in SA_data.keys():
+		if i == $"../..".username:
+			c.append(SA_data[i])
+		else:
+			c.append(GameData.generateCardFromCode(SA_data[i]))
+			$"../CardManager".add_child(c[-1])
+	
+	await $"../BlackScreen".customChoicesWithCards(["Confirm"], [emitCustomSignalEnd], c)
+	
+	for i in c:
+		await $"../BlackScreen".customChoices(["Play"], [emitCustomSignalEnd], i)
+		await $"../PlayerHand".playCard(i, true)
+
+var rogueMutex = Mutex.new()
+var SA_data = {}
+var saDataCount = 1
+signal saReceived
+func Steal_Abilities_aop(choice: String):
+	# Requesting data to be sent
+	if choice == ",":
+		var c = $"../PlayerHand".deck.getTop(1)
+		if !c:
+			return
+		
+		var code = str($"..".username, ",", GameData.getCardCode(c))
+		$"../..".socket.send_text(str("CardEffect:Rogue-Steal Abilities:,", code))
+		$"../PlayerHand".discardCard($"../PlayerHand".deck.draw())
+	# Requesting card to get KO'd
+	elif $"..".yourTurn:
+		var uname = choice.substr(1, choice.find(",", 1) - 1)
+		var code = choice.substr(choice.find(",", 1) + 1, -1)
+		print("Updating: ", uname, " ", code)
+		call_deferred("editRogueData", uname, code)
+		if saDataCount == $"../..".playerCount:
+			print("Emitting")
+			saReceived.emit()
+
+func editRogueData(key, value):
+	rogueMutex.lock()
+	SA_data[key] = value
+	saDataCount += 1
+	rogueMutex.unlock()
 # General funcs
 
 func effect(card, args=[]):
@@ -620,7 +898,10 @@ var villain_fight = {
 	"Skrulls-Super-Skrull" : SuperSkrull_fight,
 	"Skrulls-Skrull Shapeshifters" : SkrullShapeshifters_fight,
 	"Skrulls-Skrull Queen Veranke" : QueenVeranke_fight,
-	"Skrulls-Paibok the Power Skrull" : Paibok_fight
+	"Skrulls-Paibok the Power Skrull" : Paibok_fight,
+	"Masters of Evil-Whirlwind" : Whirlwind_fight,
+	"Masters of Evil-Baron Zemo" : BaronZemo_fight,
+	"Masters of Evil-Melter" : Melter_fight
 }
 
 var villain_escape = {
@@ -631,7 +912,8 @@ var villain_escape = {
 	"Brotherhood-Mystique" : Mystique_esc,
 	"Brotherhood-Sabretooth" : Sabretooth_fight_esc,
 	"Enemies of Asgard-Frost Giant" : FrostGiant_fight_esc,
-	"Enemies of Asgard-Destroyer" : Destroyer_esc
+	"Enemies of Asgard-Destroyer" : Destroyer_esc,
+	"Masters of Evil-Ultron" : Ultron_esc
 }
 
 var villain_aopfight = {
@@ -727,10 +1009,14 @@ func Blob_prereq():
 	return $"../PlayerHand".teamCount(GameData.Teams.XMEN, false, true) > 0
 
 func Juggernaut_ambush():
+	$"../BlackScreen".toggleLockCheck()
 	await $"../BlackScreen".chooseCardKO(2, 2, ["discard"], heroFilter)
+	$"../BlackScreen".toggleLockCheck()
 
 func Juggernaut_esc():
+	$"../BlackScreen".toggleLockCheck()
 	await $"../BlackScreen".chooseCardKO(2, 2, ["hand"], heroFilter)
+	$"../BlackScreen".toggleLockCheck()
 
 func Mystique_esc():
 	await $"../Scheme".twist()
@@ -760,7 +1046,9 @@ func Destroyer_fight():
 			$"../KODeck".addCards(i)
 
 func Destroyer_esc():
+	$"../BlackScreen".toggleLockCheck()
 	await $"../BlackScreen".chooseCardKO(2, 2, ["hand", "played"], heroFilter)
+	$"../BlackScreen".toggleLockCheck()
 
 func Enchantress_fight():
 	$"../PlayerHand".drawCard()
@@ -781,12 +1069,16 @@ func Ymir_fight():
 func Ymir_fight_aop(choice):
 	if choice == $"../..".username:
 		print(choice, " picked me")
+		$"../BlackScreen".toggleLockCheck()
 		await $"../BlackScreen".chooseCardKO(0, 0, ['hand', "discard"], woundFilter)
+		$"../BlackScreen".toggleLockCheck()
 	else:
 		print(choice, " not me")
 
 func SuperSkrull_fight():
+	$"../BlackScreen".toggleLockCheck()
 	await $"../BlackScreen".chooseCardKO(1, 1, ["hand", "played"], heroFilter)
+	$"../BlackScreen".toggleLockCheck()
 
 func SkrullShapeshifters_ambush():
 	var v = $"../City".addedVil
@@ -836,7 +1128,7 @@ func Paibok_fight():
 			$"../..".socket.send_text(msg)
 
 func Paibok_fight_aop(choice: String):
-	print("Payload Received: ", choice)
+	#print("Payload Received: ", choice)
 	var uname = choice.substr(0, choice.find(","))
 	if uname == $"..".username:
 		var ind = int(choice[-1])
@@ -846,6 +1138,96 @@ func Paibok_fight_aop(choice: String):
 		$"../HQ".fillHQ()
 		if $"..".PLAYER_COUNT > 1:
 			$"../..".socket.send_text(str("Recruited:", ind))
+
+func Ultron_esc():
+	if $"../PlayerHand".classCount(GameData.Classes.TECH, false, true) == 0:
+		await $"../PlayerHand".addWound(1)
+
+func Whirlwind_fight():
+	if $"../City".focused == 2 or $"../City".focused == 4:
+		await $"../BlackScreen".chooseCardKO(2, 2, ["hand", "played"], heroFilter)
+
+func BaronZemo_fight():
+	var c = $"../PlayerHand".teamCount(GameData.Teams.AVENGERS, false, true)
+	for i in c:
+		$"../PlayerHand".saveBystander()
+
+
+var melterMutex = Mutex.new()
+var melterData = {}
+var dataCount = 1
+signal updatedMelterData
+
+func Melter_fight():
+	var pList = $"../..".getOrderedPlayerList()
+	melterData[pList[0]] = $"../PlayerHand".deck.getTop(1)
+	for i in range(1, pList.size()):
+		melterData[pList[i]] = null
+	
+	if $"../..".playerCount > 1:
+		$"../..".socket.send_text("CardEffect:Masters of Evil-Melter:,")
+	
+	var f1 = func():
+		$"../KODeck".addCards($"../PlayerHand".deck.draw())
+		emit_signal("finishCustom")
+	
+	var f2 = func():
+		emit_signal("finishCustom")
+	
+	await $"../BlackScreen".customChoices(["KO", "Put back"], [f1, f2], $"../PlayerHand".deck.getTop(1))
+	
+	while dataCount < pList.size():
+		await updatedMelterData
+	
+	for i in pList:
+		#print(i)
+		if i == $"..".username:
+			continue
+		#melterMutex.lock()
+		if !melterData[i]:
+			#print("No data found")
+			#print("Main dict: ", melterData)
+			continue
+		f1 = func():
+			$"../..".socket.send_text(str("CardEffect:Masters of Evil-Melter:,,", i))
+			emit_signal("finishCustom")
+		var card = GameData.generateCardFromCode(melterData[i])
+		$"../PlayerHand".addCardToManager(card)
+		await $"../BlackScreen".customChoices(["KO", "Put back"], [f1, f2], card)
+		card.queue_free()
+		melterData = {}
+		dataCount = 1
+
+# Send request as ,
+# Send card data as ,username,12,0
+# Send ko data as ,,
+func Melter_fight_aop(choice: String):
+	# Requesting data to be sent
+	if choice == ",":
+		var c = $"../PlayerHand".deck.getTop(1)
+		if !c:
+			return
+		var code = str($"..".username, ",", GameData.getCardCode(c))
+		$"../..".socket.send_text(str("CardEffect:Masters of Evil-Melter:,", code))
+	# Requesting card to get KO'd
+	elif choice.begins_with(",,") and choice.substr(2, -1) == $"..".username:
+		$"../KODeck".addCards($"../PlayerHand".deck.draw())
+	# Receiveing card data
+	elif choice[1] != "," and $"..".yourTurn:
+		var uname = choice.substr(1, choice.find(",", 1) - 1)
+		var code = choice.substr(choice.find(",", 1) + 1, -1)
+		call_deferred("editMelterData", uname, code)
+
+func editMelterData(key, value):
+	melterMutex.lock()
+	melterData[key] = value
+	dataCount += 1
+	melterMutex.unlock()
+
+
+
+
+
 
 
 
@@ -864,30 +1246,37 @@ var mastermind_strikes = {
 }
 
 func Red_Skull_Strike():
+	$"../BlackScreen".toggleLockCheck()
 	await $"../BlackScreen".chooseCardKO(1, 1, ["hand"], heroFilter)
+	$"../BlackScreen".toggleLockCheck()
 
 func DrDoom_strike():
 	if $"../PlayerHand".playerHand.size() == 6:
 		if $"../PlayerHand".classCount(GameData.Classes.TECH, false, true) == 0:
+			$"../BlackScreen".toggleLockCheck()
+			$"../BlackScreen".addLockSkip(1)
 			var c = await $"../BlackScreen".customCardChoices(1, 1, "Put on top of deck", $"../PlayerHand".playerHand)
 			if c:
 				c = c[0]
 				$"../PlayerHand".removeFromHand(c)
-				c.postion = Vector2(111, -514)
+				c.position = Vector2(111, -514)
 				$"../PlayerHand".deck.cards.push_front(c)
 				$"../PlayerHand".updateDeckCount()
 				c = await $"../BlackScreen".customCardChoices(1, 1, "Put on top of deck", $"../PlayerHand".playerHand)
+				$"../BlackScreen".toggleLockCheck()
 				if c:
 					c = c[0]
 					$"../PlayerHand".removeFromHand(c)
-					c.postion = Vector2(111, -514)
+					c.position = Vector2(111, -514)
 					$"../PlayerHand".deck.cards.push_front(c)
 					$"../PlayerHand".updateDeckCount()
 
 func Magneto_strike():
 	if $"../PlayerHand".teamCount(GameData.Teams.XMEN, false, true) == 0:
 		var dCount = $"../PlayerHand".playerHand.size() - 4
+		$"../BlackScreen".toggleLockCheck()
 		await $"../BlackScreen".chooseCardDiscard(dCount, dCount, false)
+		$"../BlackScreen".toggleLockCheck()
 
 func Loki_strike():
 	if $"../PlayerHand".classCount(GameData.Classes.STRENGTH, false, true) == 0:
@@ -948,7 +1337,7 @@ func Dark_Technology():
 	var h = $"../HQ".hq
 	var choices = []
 	for i in h:
-		if i.hClass == GameData.Classes.TECH or i.hClass == GameData.Classes.RANGED:
+		if i.isClass(GameData.Classes.TECH) or i.isClass(GameData.Classes.RANGED):
 			choices.append(i) 
 	var c = await $"../BlackScreen".customCardChoices(0, 1, "Recruit", choices)
 	if c:
@@ -985,7 +1374,9 @@ func Monarchs_Decree_aop(choice):
 	if choice == "1":
 		$"../PlayerHand".drawCard()
 	else:
+		$"../BlackScreen".toggleLockCheck()
 		await $"../BlackScreen".chooseCardDiscard(1, 1)
+		$"../BlackScreen".toggleLockCheck()
 
 
 # Magneto
@@ -1061,7 +1452,9 @@ func Vanishing_Illusions_aop(choice):
 	for i in $"../PlayerHand".vicPile:
 		if i.identifier == "Villain":
 			choices.append(i)
+	$"../BlackScreen".toggleLockCheck()
 	var c = await $"../BlackScreen".customCardChoices(1, 1, "KO", choices)
+	$"../BlackScreen".toggleLockCheck()
 	if c:
 		c = c[0]
 		c.position = Vector2(114, -437)
@@ -1078,7 +1471,9 @@ func Whispers_and_Lies_aop(choice):
 	for i in $"../PlayerHand".vicPile:
 		if i.identifier == "Bystander":
 			choices.append(i)
+	$"../BlackScreen".toggleLockCheck()
 	var c = await $"../BlackScreen".customCardChoices(2, 2, "KO", choices)
+	$"../BlackScreen".toggleLockCheck()
 	for i in c:
 		$"../PlayerHand".vicPile.erase(i)
 		$"../KODeck".addCards(i)

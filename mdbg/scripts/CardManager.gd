@@ -34,7 +34,7 @@ func _input(event):
 	if event is InputEventKey and event.keycode == KEY_SPACE and !event.is_echo():
 		if event.is_pressed() and !cardDragged:
 			var c = findCard()
-			if c:
+			if c and c.isZoomable:
 				cardZoomed = c
 				oldZoomPos = c.position
 				oldZoomZ = c.z_index
@@ -58,7 +58,7 @@ func _input(event):
 			if c.identifier == "Villain":
 				print(c.bystanders)
 
-	if $"../BlackScreen".isClickable:
+	if $"../BlackScreen".isCovered and seeingDeck == null:
 		return
 	if isFocused:
 		return

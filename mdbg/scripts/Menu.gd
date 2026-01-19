@@ -7,7 +7,10 @@ var heros
 
 var scheme_override = {}
 
-var websocket_url = "ws://3.21.168.204:8080"
+#3.21.168.204:8080
+var ip = "3.21.168.204"
+var port = "8080"
+var websocket_url = str("ws://", ip, ":", port)
 var socket = WebSocketPeer.new()
 var host
 
@@ -138,6 +141,10 @@ func _process(delta: float) -> void:
 						gNode.get_node("Mastermind").removeTactic(f)
 					elif packet_text.begins_with("Wound"):
 						gNode.get_node("Wounds").draw(false)
+					elif packet_text.begins_with("Lock"):
+						gNode.get_node("BlackScreen").lock()
+					elif packet_text.begins_with("Unlock"):
+						gNode.get_node("BlackScreen").unlock()
 					elif packet_text.begins_with("CardEffect:"):
 						var eff = packet_text.substr(11, packet_text.length())
 						var cName = eff.substr(0, eff.find(":"))

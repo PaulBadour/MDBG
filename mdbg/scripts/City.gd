@@ -46,7 +46,7 @@ func focus(zone):
 		$Cancel.position = Vector2(xButton, y + BUTTON_Y_OFFSET)
 
 func _input(event: InputEvent) -> void:
-	if $"../BlackScreen".isClickable:
+	if $"../BlackScreen".isCovered:
 		return
 	if $"../HQ".focused:
 		return
@@ -108,7 +108,7 @@ func _on_fight_button_down(autoKill=null) -> void:
 				$"../PlayerHand".vicPile.append(i)
 			
 			$"../Mastermind".clearBystanders()
-			$"../PlayerHand".killOrRecruit = true
+			#$"../PlayerHand".killOrRecruit = true
 			killed = true
 
 			var fName = str($"../Mastermind".mName, "-", t.tName)
@@ -222,7 +222,9 @@ func addToCity(c):
 		if c.bystanders.size() > 0:
 			for i in c.bystanders:
 				$"../EscapePile".addCards(i)
+			$"../BlackScreen".toggleLockCheck()
 			await $"../BlackScreen".chooseCardDiscard(1, 1, false)
+			$"../BlackScreen".toggleLockCheck()
 	
 	if addedVil.getFuncName() in $"../EffectManager".villain_ambush.keys():
 		await $"../EffectManager".villain_ambush[addedVil.getFuncName()].call()

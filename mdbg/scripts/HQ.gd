@@ -103,7 +103,7 @@ func focus(zone):
 		$Cancel.position = Vector2(xButton, y + BUTTON_Y_OFFSET)
 
 func _input(event: InputEvent) -> void:
-	if $"../BlackScreen".isClickable:
+	if $"../BlackScreen".isCovered:
 		return
 	if $"../City".focused:
 		return

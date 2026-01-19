@@ -7,17 +7,25 @@ const OOS = Vector2(-500, 500)
 # Good test cards:
 # High Damage: IMPOSSIBLE_TRICKSHOT
 
+var debugCards = [GameData.STEAL_ABILITIES]
+
 func initStarterDeck():
 	var heroScene = preload("res://Scenes/Hero.tscn")
 	for i in range(8): # 8
 		var newCard = heroScene.instantiate()
-		newCard.initHero(GameData.IMPOSSIBLE_TRICKSHOT) # SHIELD_AGENT
+		newCard.initHero(GameData.SHIELD_OFFICER) # SHIELD_AGENT
 		get_parent().addCardToManager(newCard)
 		addCards(newCard)
 
 	for i in range(4): # 4
 		var newCard = heroScene.instantiate()
 		newCard.initHero(GameData.SHIELD_TROOPER) # SHIELD_TROOPER
+		get_parent().addCardToManager(newCard)
+		addCards(newCard)
+	
+	for i in debugCards:
+		var newCard = heroScene.instantiate()
+		newCard.initHero(i) # SHIELD_TROOPER
 		get_parent().addCardToManager(newCard)
 		addCards(newCard)
 
@@ -43,13 +51,14 @@ func draw(c=null):
 	return cards.pop_front()
 
 func resetDiscardDraw():
-	if discard.size() == 0:
+	if discard.size() == 0 or cards.size() > 0:
 		return
 	discard.shuffle()
 
 	addCards(discard)
 	discard.clear()
 	updateDiscardCount()
+	updateDrawCount()
 
 func discardCard(card):
 	discard.insert(0, card)
@@ -63,6 +72,8 @@ func getTop(num=1):
 			return null
 		resetDiscardDraw()
 	if num == 1:
+		if cards[0].identifier == "Hero":
+			print(cards[0].getFuncName())
 		return cards[0]
 	if num <= cards.size():
 		var c = cards.slice(0, num)

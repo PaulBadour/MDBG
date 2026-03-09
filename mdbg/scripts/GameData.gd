@@ -754,6 +754,12 @@ static var BASE_HEROS = {
 
 
 static func getCardCode(c):
+	if c.identifier == "Bystander":
+		return "-1,6"
+	if c.identifier == "Master Strike":
+		return "-1,5"
+	if c.identifier == "Twist":
+		return "-1,4"
 	if c.identifier == "Wound":
 		return "-1,3"
 	if c.heroName == "Hero":
@@ -763,10 +769,19 @@ static func getCardCode(c):
 			return "-1,1"
 		elif c.cardName == "SHIELD Officer":
 			return "-1,2"
-	for i in range(Heros.size()):
-		for j in range(4):
-			if BASE_HEROS[i][j].heroName == c.heroName and BASE_HEROS[i][j].cardName == c.cardName:
-				return str(i, ",", j)
+	if c.identifier == "Hero":
+		for i in range(Heros.size()):
+			for j in range(4):
+				if BASE_HEROS[i][j].heroName == c.heroName and BASE_HEROS[i][j].cardName == c.cardName:
+					return str(i, ",", j)
+	elif c.identifier == "Villain":
+		for i in range(BASE_VILLAINS.size()):
+			for j in range(4):
+				if BASE_VILLAINS[i][j].name == c.cardName:
+					return str(-3 - i, ",",j)
+		for i in range(BASE_HENCHMEN.size()):
+			if BASE_VILLAINS[i].name == c.cardName:
+				return str("-2,",i)
 	assert(false)
 
 static func getCardFromCode(c: String):
@@ -778,29 +793,56 @@ static func getCardFromCode(c: String):
 		"-1,2":
 			return SHIELD_OFFICER
 		"-1,3":
-			return null
+			return {identifier = "Wound"}
+		"-1,4":
+			return {identifier = "Twist"}
+		"-1,5":
+			return {identifier = "Master Strike"}
+		"-1,6":
+			return {identifier = "Bystander"}
 		_:
-			var i = int(c.substr(0, c.length()-2))
-			var j = int(c[-1])
-			return BASE_HEROS[i][j]
+			if c[0] == "-":
+				if c.begins_with("-2,"):
+					return BASE_HENCHMEN[int(c.substr(3, -1))]
+				else:
+					var i = int(c.substr(0, c.length()-2))
+					var j = int(c[-1])
+					return BASE_VILLAINS[i+3][j]
+			else:
+				var i = int(c.substr(0, c.length()-2))
+				var j = int(c[-1])
+				return BASE_HEROS[i][j]
 
 
 ## ADD TO CARD MANAGER WHEN GENERATED
 static func generateCardFromCode(code):
 	var cInfo = getCardFromCode(code)
 	# Wound
-	if !cInfo:
+	if "identifier" in cInfo.keys():
 		var cScene = preload("res://Scenes/Card.tscn")
 		var c = cScene.instantiate()
-		c.initSprite("res://cards/Base/Other/Wound.png")
-		c.identifier = "Wound"
+		match cInfo.identifier:
+			"Wound":
+				c.initSprite("res://cards/Base/Other/Wound.png")
+			"Twist":
+				c.initSprite("res://cards/Base/Other/SchemeTwist.png")
+			"Master Strike":
+				c.initSprite("res://cards/Base/Other/MasterStrike.png")
+			"Bystander":
+				c.initSprite("res://cards/Base/Other/Bystander.png")
+		c.identifier = cInfo.identifier
 		c.position = Vector2(-324, -332)
 		return c
-	else:
+	elif "cost" in cInfo.keys():
 		var heroScene = preload("res://Scenes/Hero.tscn")
 		var h = heroScene.instantiate()
 		h.initHero(cInfo)
-		#$"../PlayerHand".addCardToManager(h)
+		h.position = Vector2(-300, 115)
+		return h
+	else:
+		var vilScene = preload("res://Scenes/Villain.tscn")
+		var h = vilScene.instantiate()
+		h.initVil(cInfo)
 		h.position = Vector2(-300, 115)
 		return h
 

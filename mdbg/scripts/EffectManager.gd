@@ -189,7 +189,7 @@ func Frenzied_Slashing():
 	return true
 
 func Healing_Factor():
-	var r = await $"../BlackScreen".chooseCardKO(0, 1, ["hand", "discard"], woundFilter)
+	var r = await $"../BlackScreen".chooseCardKO(0, 1, ["hand", "discard"], woundFilter, "KO 0 or 1 Wounds from hand or discard. If KO'd, draw 1 card")
 	if r:
 		hand.drawCard()
 	return true
@@ -202,11 +202,11 @@ func Keen_Senses():
 # Cyclops
 
 func Determination_prereq():
-	var result = await $"../BlackScreen".chooseCardDiscard(1, 1)
+	var result = await $"../BlackScreen".chooseCardDiscard(1, 1, true, "Discard 1 card to play Determination")
 	return result
 
 func Optic_Blast_prereq():
-	var result = await $"../BlackScreen".chooseCardDiscard(1, 1)
+	var result = await $"../BlackScreen".chooseCardDiscard(1, 1, true, "Discard 1 card to play Optic Blast")
 	return result
 
 # This can actually just be null function, needs some functionality in the discard code
@@ -236,14 +236,14 @@ func Covering_Fire():
 			#await $"../BlackScreen".chooseCardDiscard(1, 1)
 			emit_signal("finishCustom")
 			
-		await $"../BlackScreen".customChoices(["Draw", "Discard"], [f1, f2])
+		await $"../BlackScreen".customChoices(["Draw", "Discard"], [f1, f2], null, "Choose: Each other player draws 1 or each other player discards 1")
 
 func Covering_Fire_aop(choice):
 	if choice == "1":
 		$"../PlayerHand".drawCard()
 	else:
 		$"../BlackScreen".toggleLockCheck()
-		await $"../BlackScreen".chooseCardDiscard(1, 1)
+		await $"../BlackScreen".chooseCardDiscard(1, 1, false, "Covering Fire: Discard 1 card")
 		$"../BlackScreen".toggleLockCheck()
 
 func Impossible_Trickshot():
@@ -274,7 +274,7 @@ func Shadowed_Thoughts():
 			res.addAttack(2)
 		var f2 = func():
 			emit_signal("finishCustom")
-		await $"../BlackScreen".customChoices(["Play Villain Card", "Dont play villain card"], [f1, f2])
+		await $"../BlackScreen".customChoices(["Play Villain Card", "Dont play villain card"], [f1, f2], null, "If villain card is played, gain 2 attack")
 
 func Shadowed_Thoughts_aop(choice):
 	assert(int(choice) == 1, "Fucked up staop")
@@ -296,8 +296,8 @@ func Diamond_Form():
 # Nick Fury
 
 func Battlefield_Promotion():
-	var r = await $"../BlackScreen".chooseCardKO(0, 1, ["hand", "discard"], shieldFilter)
-	if r:
+	var r = await $"../BlackScreen".chooseCardKO(0, 1, ["hand", "discard"], shieldFilter, "KO 0 or 1 SHIELD Heros. If KO'd, choose to gain SHIELD Officer")
+	if r and $"../HQ".officerCount > 0:
 		var f1 = func():
 			$"../HQ".addOfficer()
 			emit_signal("finishCustom")
@@ -305,7 +305,7 @@ func Battlefield_Promotion():
 		var f2 = func():
 			emit_signal("finishCustom")
 			
-		await $"../BlackScreen".customChoices(["Add Officer", "Nothing"], [f1, f2])
+		await $"../BlackScreen".customChoices(["Add Officer", "Nothing"], [f1, f2], $"../HQ".displayOfficer, "Add SHIELD Officer or do nothing")
 
 func HighTech_Weaponry():
 	if hand.classCount(GameData.Classes.TECH):
@@ -332,7 +332,7 @@ func Pure_Fury():
 			cards.append($"../City".city[i])
 	if cards.size() == 0:
 		return
-	var select = await $"../BlackScreen".customCardChoices(1, 1, "Defeat", cards.duplicate(true))
+	var select = await $"../BlackScreen".customCardChoices(1, 1, "Defeat", cards.duplicate(true), true, "Defeat villain/mastermind with attack less than number of KO'd SHIELD Heros")
 	var indind = cards.find(select)
 	await $"../City"._on_fight_button_down(inds[indind])
 
@@ -340,7 +340,7 @@ func Pure_Fury():
 # Hulk
 
 func Unstoppable_Hulk():
-	var r = await $"../BlackScreen".chooseCardKO(0, 1, ["hand", "discard"], woundFilter)
+	var r = await $"../BlackScreen".chooseCardKO(0, 1, ["hand", "discard"], woundFilter, "KO 0 or 1 Wounds from hand or discard. If KO'd, gain 2 attack")
 	if r:
 		res.addAttack(2)
 
@@ -351,7 +351,6 @@ func Growing_Anger():
 func Crazed_Rampage(choice=1):
 	assert(int(choice) == 1)
 	if $"../..".playerCount > 1 and $"..".yourTurn:
-		#print($"..".username, " sending message")
 		$"../..".socket.send_text("CardEffect:Hulk-Crazed Rampage:1")
 	$"../PlayerHand".addWound(1)
 
@@ -388,7 +387,7 @@ func Diving_Block():
 		$"../PlayerHand".deck.updateDiscardCount()
 		emit_signal("finishCustom")
 	$"../BlackScreen".toggleLockCheck()
-	await $"../BlackScreen".customChoices(["Draw Card", "Add Wound"], [f1, f2])
+	await $"../BlackScreen".customChoices(["Draw Card", "Add Wound"], [f1, f2], null, "Choose: Reveal Diving Block and draw a card or add wound to discard pile")
 	$"../BlackScreen".toggleLockCheck()
 
 func A_Day_Unlike_Any_Other():
@@ -400,7 +399,7 @@ func A_Day_Unlike_Any_Other():
 
 func Dangerous_Rescue():
 	if $"../PlayerHand".classCount(GameData.Classes.COVERT, true, false) > 0:
-		var r = await $"../BlackScreen".chooseCardKO(0, 1, ["hand", "discard"])
+		var r = await $"../BlackScreen".chooseCardKO(0, 1, ["hand", "discard"], null, "KO 0 or 1 card. If KO'd, rescue a bystander")
 		if r:
 			hand.saveBystander()
 
@@ -431,7 +430,7 @@ func Silent_Sniper():
 
 	if cards.size() == 0:
 		return
-	var select = await $"../BlackScreen".customCardChoices(1, 1, "Defeat", cards.duplicate(true))
+	var select = await $"../BlackScreen".customCardChoices(1, 1, "Defeat", cards.duplicate(true), true, "Defeat any villain/mastermind who has at least one bystander captured")
 	var indind = cards.find(select)
 	await $"../City"._on_fight_button_down(inds[indind])
 
@@ -452,7 +451,7 @@ func Spinning_Cyclone():
 			c.append(i)
 	if c == []:
 		return
-	var h = await $"../BlackScreen".customCardChoices(0, 1, "Move", c)
+	var h = await $"../BlackScreen".customCardChoices(0, 1, "Move", c, true, "Choose villain to move")
 	if h == []:
 		return
 	h = h[0]
@@ -496,7 +495,7 @@ func Spinning_Cyclone():
 	funcs.remove_at(ind)
 	text.remove_at(ind)
 	
-	await $"../BlackScreen".customChoices(text, funcs)
+	await $"../BlackScreen".customChoices(text, funcs, null, "Choose city spot to move/swap card")
 	if $"../..".playerCount > 1:
 		$"../..".socket.send_text(str("CardEffect:Storm-Spinning Cyclone:", ind, ",", $"../City".city.find(h)))
 
@@ -549,7 +548,7 @@ func God_of_Thunder():
 func Stack_the_Deck():
 	$"../PlayerHand".drawCard()
 	$"../PlayerHand".drawCard()
-	var r = await $"../BlackScreen".customCardChoices(1, 1, "Put on top of Deck", $"../PlayerHand".playerHand)
+	var r = await $"../BlackScreen".customCardChoices(1, 1, "Put on top of Deck", $"../PlayerHand".playerHand, true, "Choose card to put on top of your deck")
 	if r:
 		r = r[0]
 		$"../PlayerHand".removeFromHand(r)
@@ -585,7 +584,7 @@ func Hypnotic_Charm():
 	var f2 = func():
 		emit_signal("finishCustom")
 	
-	await $"../BlackScreen".customChoices(["Discard", "Put back"], [f1, f2], $"../PlayerHand".deck.getTop(1))
+	await $"../BlackScreen".customChoices(["Discard", "Put back"], [f1, f2], $"../PlayerHand".deck.getTop(1), "Discard top card of deck or put it back")
 	
 	if cAbil:
 		while gambitDataCount < pList.size():
@@ -602,7 +601,7 @@ func Hypnotic_Charm():
 				emit_signal("finishCustom")
 			var card = GameData.generateCardFromCode(gambitData[i])
 			$"../PlayerHand".addCardToManager(card)
-			await $"../BlackScreen".customChoices(["Discard", "Put back"], [f1, f2], card)
+			await $"../BlackScreen".customChoices(["Discard", "Put back"], [f1, f2], card, str("Discard top card of deck for ", i, " or put it back"))
 			card.queue_free()
 		gambitData = {}
 		gambitDataCount = 1
@@ -643,7 +642,7 @@ func HoldThis_ForaSecond():
 		if i:
 			v.append(i)
 	if v.size() > 0:
-		var r = await $"../BlackScreen".customCardChoices(1, 1, "Capture bystander", v, false)
+		var r = await $"../BlackScreen".customCardChoices(1, 1, "Capture bystander", v, false, "Choose Villain to capture bystander")
 		r = r[0]
 		r.captureBystander($"../Bystanders".draw())
 
@@ -670,7 +669,7 @@ func CanIGetADoover():
 			emitCustomSignalEnd()
 		var f2 = func():
 			emitCustomSignalEnd()
-		await $"../BlackScreen".customChoices(["Discard Hand", "Keep Hand"], [f1, f2], $"../PlayerHand".played[0])
+		await $"../BlackScreen".customChoices(["Discard Hand", "Keep Hand"], [f1, f2], $"../PlayerHand".played[0], "Choose: Discard hand and draw 4 cards or do nothing")
 
 func Random_Acts_of_Unkindness():
 	var f1 = func():
@@ -679,7 +678,7 @@ func Random_Acts_of_Unkindness():
 		emitCustomSignalEnd()
 	var f2 = func():
 		emitCustomSignalEnd()
-	await $"../BlackScreen".customChoices(["Gain Wound", "Do Nothing"], [f1, f2])
+	await $"../BlackScreen".customChoices(["Gain Wound", "Do Nothing"], [f1, f2], null, "Choose: Add wound to hand or do nothing")
 	
 	if $"../..".playerCount > 1:
 		$"../..".socket.send_text("CardEffect:Deadpool-Random Acts of Unkindness:,")
@@ -692,7 +691,7 @@ func Random_Acts_of_Unkindness_aop(choice: String):
 	# Request to send
 	if choice == ",":
 		$"../BlackScreen".toggleLockCheck()
-		var r = await $"../BlackScreen".customCardChoices(1, 1, "Send", $"../PlayerHand".playerHand)
+		var r = await $"../BlackScreen".customCardChoices(1, 1, "Send", $"../PlayerHand".playerHand, true, "Choose card to give to next player in line")
 		$"../BlackScreen".toggleLockCheck()
 		if r:
 			$"../PlayerHand".removeFromHand(r[0])
@@ -726,7 +725,7 @@ func Random_Acts_of_Unkindness_aop(choice: String):
 
 func Energy_Drain():
 	if classAbility(GameData.Classes.COVERT):
-		var r = await $"../BlackScreen".chooseCardKO(0, 1, ["hand", "discard"], null)
+		var r = await $"../BlackScreen".chooseCardKO(0, 1, ["hand", "discard"], null, "KO 0 or 1 card from hand and discard. If KO'd, gain 1 recruit")
 		if r:
 			res.addRecruit(1)
 
@@ -736,7 +735,7 @@ func Borrowed_Brawn():
 
 func Copy_Powers():
 	var cardChoices = $"../PlayerHand".played.slice(1, $"../PlayerHand".played.size())
-	var r = await $"../BlackScreen".customCardChoices(1, 1, "Copy", cardChoices, false)
+	var r = await $"../BlackScreen".customCardChoices(1, 1, "Copy", cardChoices, false, "Choose card to play a copy of")
 	if r:
 		var card = r[0]
 		if card.hClass != GameData.Classes.COVERT:
@@ -766,10 +765,10 @@ func Steal_Abilities():
 			c.append(GameData.generateCardFromCode(SA_data[i]))
 			$"../CardManager".add_child(c[-1])
 	
-	await $"../BlackScreen".customChoicesWithCards(["Confirm"], [emitCustomSignalEnd], c)
+	await $"../BlackScreen".customChoicesWithCards(["Confirm"], [emitCustomSignalEnd], c, "Cards being played in order")
 	
 	for i in c:
-		await $"../BlackScreen".customChoices(["Play"], [emitCustomSignalEnd], i)
+		await $"../BlackScreen".customChoices(["Play"], [emitCustomSignalEnd], i, "Next card to play")
 		await $"../PlayerHand".playCard(i, true)
 
 var rogueMutex = Mutex.new()
@@ -927,13 +926,13 @@ var villain_aopfight = {
 }
 
 func Sentinel_Fight():
-	await $"../BlackScreen".chooseCardKO(1, 1, ["hand", "played"], heroFilter)
+	await $"../BlackScreen".chooseCardKO(1, 1, ["hand", "played"], heroFilter, "KO 1 Hero from hand or played cards")
 
 func HandNinja_Fight():
 	res.addRecruit(1)
 
 func DoombotLegion_fight():
-	await $"../BlackScreen".KOFromDeck(1, 1, 2)
+	await $"../BlackScreen".KOFromDeck(1, 1, 2, "KO 1 of the top 2 cards of your deck")
 
 func SavageLandMutates_fight():
 	$"../PlayerHand".handSize += 1
@@ -952,14 +951,15 @@ func Viper_fight_esc():
 	return true
 
 func Kidnapper_fight():
-	var f1 = func():
-		$"../HQ".addOfficer()
-		emit_signal("finishCustom")
-		
-	var f2 = func():
-		emit_signal("finishCustom")
-		
-	await $"../BlackScreen".customChoices(["Add Officer", "Nothing"], [f1, f2])
+	if $"../HQ".officerCount > 0:
+		var f1 = func():
+			$"../HQ".addOfficer()
+			emit_signal("finishCustom")
+			
+		var f2 = func():
+			emit_signal("finishCustom")
+			
+		await $"../BlackScreen".customChoices(["Add Officer", "Nothing"], [f1, f2], $"../HQ".displayOfficer)
 
 func DocOc_fight():
 	$"../PlayerHand".handSize += 2
@@ -969,14 +969,12 @@ func GreenGoblin_ambush():
 	var b = $"../Bystanders".draw()
 	if b:
 		v.captureBystander(b)
-	else:
-		print("Could not draw bystander")
 
 func Lizard_fight():
 	#print("Liz fight, ", $"..".yourTurn)
 	var ind = $"../City".focused
 	if ind == 0:
-		if $"..".PLAYER_COUNT == 1 or !$"..".yourTurn:
+		if !$"..".yourTurn:
 			$"../PlayerHand".addWound(1)
 
 func Venom_prereq():
@@ -998,7 +996,7 @@ func TheLeader_ambush():
 func Maestro_fight():
 	var count = $"../PlayerHand".classCount(GameData.Classes.STRENGTH, false, true)
 	if count > 0:
-		await $"../BlackScreen".chooseCardKO(count, count, ["hand", "played"], heroFilter)
+		await $"../BlackScreen".chooseCardKO(count, count, ["hand", "played"], heroFilter, str("KO ", count, " heroes from hand and played"))
 
 func Zzzax_fight_esc():
 	var count = $"../PlayerHand".classCount(GameData.Classes.STRENGTH, false, true)
@@ -1010,12 +1008,12 @@ func Blob_prereq():
 
 func Juggernaut_ambush():
 	$"../BlackScreen".toggleLockCheck()
-	await $"../BlackScreen".chooseCardKO(2, 2, ["discard"], heroFilter)
+	await $"../BlackScreen".chooseCardKO(2, 2, ["discard"], heroFilter, "KO 2 heroes from discard pile")
 	$"../BlackScreen".toggleLockCheck()
 
 func Juggernaut_esc():
 	$"../BlackScreen".toggleLockCheck()
-	await $"../BlackScreen".chooseCardKO(2, 2, ["hand"], heroFilter)
+	await $"../BlackScreen".chooseCardKO(2, 2, ["hand"], heroFilter, "KO 2 heroes from hand")
 	$"../BlackScreen".toggleLockCheck()
 
 func Mystique_esc():
@@ -1047,7 +1045,7 @@ func Destroyer_fight():
 
 func Destroyer_esc():
 	$"../BlackScreen".toggleLockCheck()
-	await $"../BlackScreen".chooseCardKO(2, 2, ["hand", "played"], heroFilter)
+	await $"../BlackScreen".chooseCardKO(2, 2, ["hand", "played"], heroFilter, "KO 2 cards from hand and played cards")
 	$"../BlackScreen".toggleLockCheck()
 
 func Enchantress_fight():
@@ -1060,7 +1058,7 @@ func Ymir_ambush():
 		await $"../PlayerHand".addWound(1)
 
 func Ymir_fight():
-	var c = await $"../BlackScreen".choosePlayerName(false, false)
+	var c = await $"../BlackScreen".choosePlayerName(false, false, "Choose player to KO wounds from hand/discard pile")
 	if c == $"../..".username:
 		Ymir_fight_aop(c)
 	else:
@@ -1070,14 +1068,14 @@ func Ymir_fight_aop(choice):
 	if choice == $"../..".username:
 		print(choice, " picked me")
 		$"../BlackScreen".toggleLockCheck()
-		await $"../BlackScreen".chooseCardKO(0, 0, ['hand', "discard"], woundFilter)
+		await $"../BlackScreen".chooseCardKO(0, 0, ['hand', "discard"], woundFilter, "KO any number of wounds from hand and discard pile")
 		$"../BlackScreen".toggleLockCheck()
 	else:
 		print(choice, " not me")
 
 func SuperSkrull_fight():
 	$"../BlackScreen".toggleLockCheck()
-	await $"../BlackScreen".chooseCardKO(1, 1, ["hand", "played"], heroFilter)
+	await $"../BlackScreen".chooseCardKO(1, 1, ["hand", "played"], heroFilter, "KO a hero from your hand or played cards")
 	$"../BlackScreen".toggleLockCheck()
 
 func SkrullShapeshifters_ambush():
@@ -1116,7 +1114,7 @@ func QueenVeranke_fight():
 func Paibok_fight():
 	var pl = $"../..".getOrderedPlayerList()
 	for i in pl:
-		var r = await $"../BlackScreen".customCardChoices(1, 1, i, $"../HQ".hq)
+		var r = await $"../BlackScreen".customCardChoices(1, 1, i, $"../HQ".hq, true, str("Choose card to recruit for ", i))
 		r = r[0]
 		var ind = $"../HQ".hq.find(r)
 		var payload = str(i, ",", ind)
@@ -1145,7 +1143,7 @@ func Ultron_esc():
 
 func Whirlwind_fight():
 	if $"../City".focused == 2 or $"../City".focused == 4:
-		await $"../BlackScreen".chooseCardKO(2, 2, ["hand", "played"], heroFilter)
+		await $"../BlackScreen".chooseCardKO(2, 2, ["hand", "played"], heroFilter, "KO 2 heros from your hand or played cards")
 
 func BaronZemo_fight():
 	var c = $"../PlayerHand".teamCount(GameData.Teams.AVENGERS, false, true)
@@ -1174,7 +1172,7 @@ func Melter_fight():
 	var f2 = func():
 		emit_signal("finishCustom")
 	
-	await $"../BlackScreen".customChoices(["KO", "Put back"], [f1, f2], $"../PlayerHand".deck.getTop(1))
+	await $"../BlackScreen".customChoices(["KO", "Put back"], [f1, f2], $"../PlayerHand".deck.getTop(1), "KO top card of deck or put it back")
 	
 	while dataCount < pList.size():
 		await updatedMelterData
@@ -1193,7 +1191,7 @@ func Melter_fight():
 			emit_signal("finishCustom")
 		var card = GameData.generateCardFromCode(melterData[i])
 		$"../PlayerHand".addCardToManager(card)
-		await $"../BlackScreen".customChoices(["KO", "Put back"], [f1, f2], card)
+		await $"../BlackScreen".customChoices(["KO", "Put back"], [f1, f2], card, str("KO top card of deck or put it back for ", i))
 		card.queue_free()
 		melterData = {}
 		dataCount = 1
@@ -1247,7 +1245,7 @@ var mastermind_strikes = {
 
 func Red_Skull_Strike():
 	$"../BlackScreen".toggleLockCheck()
-	await $"../BlackScreen".chooseCardKO(1, 1, ["hand"], heroFilter)
+	await $"../BlackScreen".chooseCardKO(1, 1, ["hand"], heroFilter, "KO a hero from your hand")
 	$"../BlackScreen".toggleLockCheck()
 
 func DrDoom_strike():
@@ -1255,14 +1253,14 @@ func DrDoom_strike():
 		if $"../PlayerHand".classCount(GameData.Classes.TECH, false, true) == 0:
 			$"../BlackScreen".toggleLockCheck()
 			$"../BlackScreen".addLockSkip(1)
-			var c = await $"../BlackScreen".customCardChoices(1, 1, "Put on top of deck", $"../PlayerHand".playerHand)
+			var c = await $"../BlackScreen".customCardChoices(1, 1, "Put on top of deck", $"../PlayerHand".playerHand, true, "Put 1 card on top of deck (Chosen twice)")
 			if c:
 				c = c[0]
 				$"../PlayerHand".removeFromHand(c)
 				c.position = Vector2(111, -514)
 				$"../PlayerHand".deck.cards.push_front(c)
 				$"../PlayerHand".updateDeckCount()
-				c = await $"../BlackScreen".customCardChoices(1, 1, "Put on top of deck", $"../PlayerHand".playerHand)
+				c = await $"../BlackScreen".customCardChoices(1, 1, "Put on top of deck", $"../PlayerHand".playerHand, "Put 1 card on top of deck (Chosen twice)")
 				$"../BlackScreen".toggleLockCheck()
 				if c:
 					c = c[0]
@@ -1275,7 +1273,7 @@ func Magneto_strike():
 	if $"../PlayerHand".teamCount(GameData.Teams.XMEN, false, true) == 0:
 		var dCount = $"../PlayerHand".playerHand.size() - 4
 		$"../BlackScreen".toggleLockCheck()
-		await $"../BlackScreen".chooseCardDiscard(dCount, dCount, false)
+		await $"../BlackScreen".chooseCardDiscard(dCount, dCount, false, str("Discard ", dCount, " cards from hand"))
 		$"../BlackScreen".toggleLockCheck()
 
 func Loki_strike():
@@ -1323,7 +1321,7 @@ func Negablast_Grenades():
 	res.addAttack(3)
 
 func Ruthless_Dictator():
-	await $"../BlackScreen".KOFromDeck(1, 1, 3)
+	await $"../BlackScreen".KOFromDeck(1, 1, 3, "KO 1 card from top 3 cards of deck, then discard 1 card from top 2 cards of deck")
 	await $"../BlackScreen".discardFromDeck(1, 1, 2)
 
 
@@ -1339,7 +1337,7 @@ func Dark_Technology():
 	for i in h:
 		if i.isClass(GameData.Classes.TECH) or i.isClass(GameData.Classes.RANGED):
 			choices.append(i) 
-	var c = await $"../BlackScreen".customCardChoices(0, 1, "Recruit", choices)
+	var c = await $"../BlackScreen".customCardChoices(0, 1, "Recruit", choices, true, "Recruit Tech or Ranged hero for free")
 	if c:
 		c = c[0]
 		var ind = $"../HQ".hq.find(c)
@@ -1353,7 +1351,7 @@ func Secrets_of_Time_Travel():
 	$"../PlayerHand".extraTurn += 1
 
 func Monarchs_Decree():
-	if hand.classCount(GameData.Classes.TECH) >= 1 and $"../..".playerCount > 1:
+	if $"../..".playerCount > 1:
 		var f1 = func():
 			#$"../PlayerHand".drawCard()
 			if $"../..".playerCount > 1:
@@ -1368,7 +1366,7 @@ func Monarchs_Decree():
 			#await $"../BlackScreen".chooseCardDiscard(1, 1)
 			emit_signal("finishCustom")
 			
-		await $"../BlackScreen".customChoices(["Draw", "Discard"], [f1, f2])
+		await $"../BlackScreen".customChoices(["Draw", "Discard"], [f1, f2], null, "Choose: All other players draw a card or discard a card")
 
 func Monarchs_Decree_aop(choice):
 	if choice == "1":
@@ -1388,7 +1386,7 @@ func Bitter_Captor():
 	for i in h:
 		if i.team == GameData.Teams.XMEN:
 			choices.append(i) 
-	var c = await $"../BlackScreen".customCardChoices(0, 1, "Recruit", choices)
+	var c = await $"../BlackScreen".customCardChoices(0, 1, "Recruit", choices, true, "Recruit an X-MEN hero for free")
 	if c:
 		c = c[0]
 		var ind = $"../HQ".hq.find(c)
@@ -1415,7 +1413,7 @@ func Electromagnetic_Bubble():
 	for i in $"../PlayerHand".played:
 		if i.team == GameData.Teams.XMEN:
 			c.append(i)
-	var choice = await $"../BlackScreen".customCardChoices(1, 1, "Holdover", c)
+	var choice = await $"../BlackScreen".customCardChoices(1, 1, "Holdover", c, true, "Choose X-MEN card to put in hand next turn")
 	if choice:
 		choice = choice[0]
 		$"../PlayerHand".holdoverCard(choice)
@@ -1435,12 +1433,12 @@ func Cruel_Ruler():
 		if i and i.identifier == "Villain":
 			c.append(i)
 	if c.size() > 0:
-		var r = await $"../BlackScreen".customCardChoices(1, 1, "Defeat", c)
+		var r = await $"../BlackScreen".customCardChoices(1, 1, "Defeat", c, true, "Defeat a villain in the city for free")
 		r = r[0]
 		await $"../City"._on_fight_button_down($"../City".city.find(r))
 
 func Maniacal_Tyrant():
-	await $"../BlackScreen".chooseCardKO(0, 4, ["discard"])
+	await $"../BlackScreen".chooseCardKO(0, 4, ["discard"], null, "KO up to 4 cards from your discard pile")
 
 func Vanishing_Illusions():
 	if $"../..".playerCount > 1:
@@ -1453,7 +1451,7 @@ func Vanishing_Illusions_aop(choice):
 		if i.identifier == "Villain":
 			choices.append(i)
 	$"../BlackScreen".toggleLockCheck()
-	var c = await $"../BlackScreen".customCardChoices(1, 1, "KO", choices)
+	var c = await $"../BlackScreen".customCardChoices(1, 1, "KO", choices, true, "KO villain from your VP pile")
 	$"../BlackScreen".toggleLockCheck()
 	if c:
 		c = c[0]
@@ -1472,7 +1470,7 @@ func Whispers_and_Lies_aop(choice):
 		if i.identifier == "Bystander":
 			choices.append(i)
 	$"../BlackScreen".toggleLockCheck()
-	var c = await $"../BlackScreen".customCardChoices(2, 2, "KO", choices)
+	var c = await $"../BlackScreen".customCardChoices(2, 2, "KO", choices, true, "KO 2 bystanders from your VP pile")
 	$"../BlackScreen".toggleLockCheck()
 	for i in c:
 		$"../PlayerHand".vicPile.erase(i)

@@ -110,5 +110,5 @@ func draw():
 	var c = super()
 	$VilLabel.text = str("Villain Deck: ", cards.size())
 	if !c:
-		$"..".tie()
+		await $"..".tie()
 	return c

@@ -39,4 +39,4 @@ func twist():
 	sCard.extraText[0] = str("Scheme Twists: ", playedTwists)
 	await $"../EffectManager".SchemeTwistLinks[sName].call(playedTwists)
 	if $"../..".playerCount == 1:
-		await $"../BlackScreen".KOfromHQ($"../EffectManager".sixCostFilter)
+		await $"../BlackScreen".KOfromHQ($"../EffectManager".sixCostFilter, "KO card from HQ")

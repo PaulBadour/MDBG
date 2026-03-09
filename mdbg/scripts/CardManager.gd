@@ -17,8 +17,14 @@ var isFocused = false
 var seeingDeck = null
 
 var cardDragged
+var draggedZ
+
+var autoplaying = false
+
 var screenSize
 var isHovering
+var cardHovering
+
 var cardZoomed
 var oldZoomPos
 var oldZoomZ
@@ -31,10 +37,10 @@ const ZOOM_SCALE = 2
 func _input(event):
 	if event.is_action_pressed("ui_cancel"):
 		get_tree().quit()
-	if event is InputEventKey and event.keycode == KEY_SPACE and !event.is_echo():
-		if event.is_pressed() and !cardDragged:
+	if (event is InputEventKey and event.keycode == KEY_SPACE and !event.is_echo()) or (event is InputEventMouseButton and event.button_index == MOUSE_BUTTON_MIDDLE):
+		if event.is_pressed() and !cardDragged and !cardZoomed:
 			var c = findCard()
-			if c and c.isZoomable:
+			if c and c.isZoomable and !c.isMoving and (!autoplaying or c not in $"../PlayerHand".playerHand):
 				cardZoomed = c
 				oldZoomPos = c.position
 				oldZoomZ = c.z_index
@@ -43,12 +49,13 @@ func _input(event):
 				c.z_index = 100
 				$"../ExtraLabels".showLabel(c.getExtraText())
 		elif event.is_released() and cardZoomed:
-			cardZoomed.position = oldZoomPos
-			cardZoomed.scale = Vector2(BASE_SIZE, BASE_SIZE)
-			cardZoomed.z_index = oldZoomZ
-			hoverOff(cardZoomed)
-			$"../ExtraLabels".removeLabel()
-			cardZoomed = null
+			unzoomCard()
+			#cardZoomed.position = oldZoomPos
+			#cardZoomed.scale = Vector2(BASE_SIZE, BASE_SIZE)
+			#cardZoomed.z_index = oldZoomZ
+			#hoverOff(cardZoomed)
+			#$"../ExtraLabels".removeLabel()
+			#cardZoomed = null
 	# DEBUG
 	if event is InputEventKey and event.keycode == KEY_N and !event.is_echo() and event.is_pressed():
 		var c = findCard(false)
@@ -62,6 +69,29 @@ func _input(event):
 		return
 	if isFocused:
 		return
+	if event is InputEventMouseButton and event.button_index == MOUSE_BUTTON_LEFT and !cardZoomed:
+		if event.is_pressed():
+			var c = findCard()
+			if c and $"../PlayerHand".isCardInHand(c) and $"..".yourTurn:
+				draggedZ = c.z_index
+				c.z_index = 50
+				cardDragged = c
+		elif cardDragged:
+			if cardDragged.position.y < PLAY_ZONE and cardDragged.identifier == "Hero":
+				$"../PlayerHand".playCard(cardDragged)
+			elif $"../PlayerHand".isCardInHand(cardDragged):
+				$"../PlayerHand".animateCard(cardDragged, cardDragged.handPos)
+			cardDragged.z_index = draggedZ
+			cardDragged = null
+	if cardDragged:
+		return
+	if event is InputEventKey and event.keycode == KEY_SLASH and !event.is_echo():
+		if event.is_pressed() and !seeingDeck:
+			$"../BlackScreen".showControls()
+			seeingDeck = "/"
+		elif seeingDeck == "/":
+			$"../BlackScreen".stopShowControls()
+			seeingDeck = null
 	if event is InputEventKey and event.keycode == KEY_D and !event.is_echo():
 		if event.is_pressed() and !seeingDeck:
 			$"../BlackScreen".showCards($"../PlayerHand".deck.discard, false)
@@ -113,29 +143,26 @@ func _input(event):
 			seeingDeck = null
 	if event is InputEventKey and event.keycode == KEY_A and !event.is_echo() and $"..".yourTurn:
 		if event.is_pressed():
-			$"../PlayerHand".autoplay()
+			isHovering = false
+			cardHovering = null
+			autoplaying = true
+			unzoomCard()
+			await $"../PlayerHand".autoplay()
+			autoplaying = false
 	if event is InputEventKey and event.keycode == KEY_E and !event.is_echo() and $"..".yourTurn:
 		if event.is_pressed() and !seeingDeck:
 			$"../PlayerHand"._on_button_button_down()
 
-	if event is InputEventMouseButton and event.button_index == MOUSE_BUTTON_LEFT and !cardZoomed:
-		if event.is_pressed():
-			var c = findCard()
-			if c and $"../PlayerHand".isCardInHand(c) and $"..".yourTurn:
-				cardDragged = c
-		elif cardDragged:
-			if cardDragged.position.y < PLAY_ZONE and cardDragged.identifier == "Hero":
-				$"../PlayerHand".playCard(cardDragged)
-			elif $"../PlayerHand".isCardInHand(cardDragged):
-				$"../PlayerHand".animateCard(cardDragged, cardDragged.handPos)
-			cardDragged = null
+	
 
 func unzoomCard():
 	if cardZoomed:
+		#$"../PlayerHand".animateCard(cardZoomed, oldZoomPos)
+		#$"../PlayerHand".animateZ(cardZoomed, oldZoomZ)
 		cardZoomed.position = oldZoomPos
 		cardZoomed.scale = Vector2(BASE_SIZE, BASE_SIZE)
 		cardZoomed.z_index = oldZoomZ
-		hoverOff(cardZoomed)
+		#hoverOff(cardZoomed)
 		$"../ExtraLabels".removeLabel()
 		cardZoomed = null
 
@@ -168,38 +195,44 @@ func findCard(first=true):
 		return topCard
 	return null
 
-func hoverOn(card):
-	return
-	if !isHovering and !cardZoomed and !isFocused:
-		highlightCard(card, true)
-		isHovering = true
+#func hoverOn(card):
+	#return
+	#if !isHovering and !cardZoomed and !isFocused and card in $"../PlayerHand".playerHand and !card.isMoving:
+		#highlightCard(card, true)
+		#cardHovering = card
+		#isHovering = true
 
-func hoverOff(card):
-	#print("HoverOff")
-	if cardZoomed:
-		return
-	highlightCard(card, false)
-	#isHovering = false
-	var newCard = findCard()
-	if newCard and $"../PlayerHand".isCardInHand(card) and !isFocused:
-		highlightCard(newCard, true)
-	else:
-		isHovering = false
+#func hoverOff(card):
+	#return
+	##print("HoverOff")
+	#if cardZoomed:
+		#return
+	#highlightCard(card, false)
+	##isHovering = false
+	#var newCard = findCard()
+	#if newCard and !isHovering and !cardZoomed and !isFocused and newCard in $"../PlayerHand".playerHand and !newCard.isMoving:
+		#highlightCard(newCard, true)
+	#else:
+		#isHovering = false
 
 @warning_ignore("unused_parameter")
 func highlightCard(card, hovered):
-	pass
-	#if hovered and $"../PlayerHand".isCardInHand(card):
+	var highlightOffset = 15
+	if hovered and $"../PlayerHand".isCardInHand(card):
 		#card.scale = Vector2(HIGHLIGHT_SIZE, HIGHLIGHT_SIZE)
-		#card.z_index = 2
-	#else:
-		##print(str("Resetting card", card))
-		#card.scale = Vector2(BASE_SIZE, BASE_SIZE)
-		#card.z_index = 1
+		$"../PlayerHand".animateCard(card, Vector2(card.position.x, card.position.y - highlightOffset))
+		card.z_index = 15
+	elif isHovering:
+		if card == cardZoomed:
+			oldZoomPos = Vector2($"../PlayerHand".calcCardPosition($"../PlayerHand".playerHand.find(card)), $"../PlayerHand".HAND_Y_POS)
+			oldZoomZ = $"../PlayerHand".playerHand.find(card) + 1
+		else:
+			$"../PlayerHand".animateCard(card, Vector2($"../PlayerHand".calcCardPosition($"../PlayerHand".playerHand.find(card)), $"../PlayerHand".HAND_Y_POS))
+			card.z_index = $"../PlayerHand".playerHand.find(card) + 1
 
-func connectCardSignals(card):
-	card.connect("hovOn", hoverOn)
-	card.connect("hovOff", hoverOff)
+#func connectCardSignals(card):
+	#card.connect("hovOn", hoverOn)
+	#card.connect("hovOff", hoverOff)
 
 # Called when the node enters the scene tree for the first time.
 func _ready() -> void:
@@ -212,6 +245,16 @@ func _process(delta: float) -> void:
 	if cardDragged:
 		var mpos = get_global_mouse_position()
 		cardDragged.position = Vector2(clamp(mpos.x, 0, screenSize.x), clamp(mpos.y, 0, screenSize.y))
+	else:
+		var card = findCard()
+		if isHovering and (cardZoomed or card != cardHovering):
+			highlightCard(cardHovering, false)
+			isHovering = false
+			cardHovering = null
+		if card and !isHovering and !cardZoomed and !isFocused and card in $"../PlayerHand".playerHand and !card.isMoving and !$"../BlackScreen".isCovered:
+			isHovering = true
+			highlightCard(card, true)
+			cardHovering = card
 
 
 func _on_hq_focused_hq() -> void:

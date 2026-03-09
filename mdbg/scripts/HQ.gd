@@ -132,6 +132,7 @@ func fillHQ():
 		if !hq[i]:
 			var card = $"../HeroDeck".draw()
 			card.position = Vector2(START_X - (i * DECR), y)
+			#$"../PlayerHand".animateCard(card, Vector2(START_X - (i * DECR), y))
 			card.z_index = 3
 			hq[i] = card
 

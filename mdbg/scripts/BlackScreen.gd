@@ -59,23 +59,31 @@ func addLockSkip(num=1):
 func lock():
 	if !onlineCheck:
 		onlineCheck = true
-		showCards([], false)
+		await showCards([], false)
 		await stopShowCards()
 		onlineCheck = false
 
 func unlock():
 	emit_signal("unlockOnline")
 
-func appear():
+func appear(displayText=null):
+	if $"../CardManager".isHovering:
+		$"../CardManager".isHovering = false
+		$"../CardManager".cardHovering = false
+		$"../PlayerHand".updateHandPositions(true)
+		#await get_tree().create_timer(1).timeout
+	if displayText:
+		$DisplayLabel.text = displayText
 	position = Vector2(0, 0)
 	isCovered = true
 
 func disappear():
+	$DisplayLabel.text = ""
 	position = Vector2(2000, 2000)
 	isCovered = false
 	
-func showCards(cards, clickable=false):
-	appear()
+func showCards(cards, clickable=false, displayText=null):
+	await appear(displayText)
 	var currX = START_LOC.x
 	var currY = START_LOC.y
 	
@@ -83,11 +91,13 @@ func showCards(cards, clickable=false):
 		isClickable = true
 	if $"../..".playerCount > 1 and (clickable or inCustom) and onlineCheck:
 		$"../..".socket.send_text("BlackscreenLock")
-	#print(cards)
+	
 	for i in cards:
 		
 		lastLocations.append(i.position)
 		lastIndexes.append(i.z_index)
+		if i.isMoving:
+			await i.moveTween.finished
 		i.position = Vector2(currX, currY)
 		i.z_index = 21
 		
@@ -131,7 +141,7 @@ func stopShowCards(ignoreClickedCards=true):
 
 # Bug if played card is played where a choice may be
 
-func chooseCardDiscard(minDisc, maxDisc, exclude=true):
+func chooseCardDiscard(minDisc, maxDisc, exclude=true, displayText=null):
 	var hand = $"../PlayerHand".playerHand.duplicate(true)
 	if exclude:
 		hand.erase($"../PlayerHand".cardBeingPlayed)
@@ -139,7 +149,7 @@ func chooseCardDiscard(minDisc, maxDisc, exclude=true):
 	if hand.size() == 0:
 		return false
 
-	showCards(hand, true)
+	await showCards(hand, true, displayText)
 	get_node("DiscardButton").position = BUTTON_LOCATION
 	var valid = false
 	while !valid:
@@ -157,11 +167,11 @@ func chooseCardDiscard(minDisc, maxDisc, exclude=true):
 	
 	
 	stopShowCards()
-	$"../PlayerHand".updateHandPositions()
+	$"../PlayerHand".updateHandPositions(true)
 	return true
 
 # possible locations: "hand", "discard", "Played"
-func chooseCardKO(minKO, maxKO, locations, filter=null):
+func chooseCardKO(minKO, maxKO, locations, filter=null, displayText=null):
 	var hand = $"../PlayerHand".playerHand
 	
 	var stack = []
@@ -189,7 +199,7 @@ func chooseCardKO(minKO, maxKO, locations, filter=null):
 	if stack.size() < minKO:
 		minKO = stack.size()
 	
-	showCards(stack, true)
+	await showCards(stack, true, displayText)
 	get_node("KOButton").position = BUTTON_LOCATION
 	var valid = false
 	while !valid:
@@ -231,7 +241,7 @@ func chooseCardKO(minKO, maxKO, locations, filter=null):
 func orderTopDeck(num):
 	var hand = $"../PlayerHand"
 	#print("num is ", num)
-	showCards(hand.deck.getTop(num), true)
+	await showCards(hand.deck.getTop(num), true)
 	maxClick = num
 	
 	get_node("OrderButton").position = BUTTON_LOCATION
@@ -251,7 +261,7 @@ func orderTopDeck(num):
 	return true
 
 
-func KOFromDeck(minKO, maxKO, number):
+func KOFromDeck(minKO, maxKO, number, displayText=null):
 	maxClick = maxKO
 	var deck = $"../PlayerHand".deck
 	
@@ -260,7 +270,7 @@ func KOFromDeck(minKO, maxKO, number):
 	if stack == null:
 		return false
 
-	showCards(stack, true)
+	await showCards(stack, true, displayText)
 	get_node("KOButton").position = BUTTON_LOCATION
 	var valid = false
 	while !valid:
@@ -293,7 +303,7 @@ func discardFromDeck(minDisc, maxDisc, number):
 	if stack == null:
 		return false
 
-	showCards(stack, true)
+	await showCards(stack, true)
 	get_node("DiscardButton").position = BUTTON_LOCATION
 	var valid = false
 	while !valid:
@@ -318,12 +328,12 @@ func discardFromDeck(minDisc, maxDisc, number):
 	
 	return true
 
-func customChoices(text : Array, funcs : Array, displayCard=null):
+func customChoices(text : Array, funcs : Array, displayCard=null, displayText=null):
 	inCustom = true
 	if text.size() != funcs.size():
 		push_error("fucked up custom choices")
 		return
-	showCards([], false)
+	showCards([], false, displayText)
 	#customButtons = []
 	var c = 0
 	var offset = 150
@@ -360,7 +370,7 @@ func customChoices(text : Array, funcs : Array, displayCard=null):
 	stopShowCards()
 	inCustom = false
 
-func customCardChoices(minChoices, maxChoices, buttonText, cards, ignoreClickMoving=true):
+func customCardChoices(minChoices, maxChoices, buttonText, cards, ignoreClickMoving=true, displayText=null):
 	if cards.size() < maxChoices:
 		maxChoices = cards.size()
 	if minChoices > maxChoices:
@@ -368,7 +378,7 @@ func customCardChoices(minChoices, maxChoices, buttonText, cards, ignoreClickMov
 	if maxChoices == 0:
 		return null
 	maxClick = maxChoices
-	showCards(cards, true)
+	await showCards(cards, true, displayText)
 	
 	var button = $DiscardButton.duplicate()
 	add_child(button)
@@ -389,7 +399,7 @@ func customChoicesWithCards(text : Array, funcs : Array, cards):
 	if text.size() != funcs.size():
 		push_error("fucked up custom choices")
 		return
-	showCards(cards, false)
+	await showCards(cards, false)
 	#customButtons = []
 	var c = 0
 	var offset = 150
@@ -413,7 +423,7 @@ func deleteCustomButtons():
 		i.queue_free()
 	customButtons.clear()
 
-func KOfromHQ(filter):
+func KOfromHQ(filter, displayText=null):
 	maxClick = 1
 	var stack = $"../HQ".hq
 	if filter:
@@ -422,7 +432,7 @@ func KOfromHQ(filter):
 			if filter.call(i):
 				newStack.append(i)
 		stack = newStack
-	showCards(stack, true)
+	await showCards(stack, true, displayText)
 	get_node("KOButton").position = BUTTON_LOCATION
 	var valid = false
 	while !valid:
@@ -445,7 +455,7 @@ func attackRecruitSplit(cost):
 	disappear()
 	return r
 
-func choosePlayerName(excludeSelf, optional):
+func choosePlayerName(excludeSelf, optional, displayText=null):
 	assert(optional != null)
 	var buttons = []
 	var text = []
@@ -457,7 +467,7 @@ func choosePlayerName(excludeSelf, optional):
 			globalChoice = i
 			$"../EffectManager".emitCustomSignalEnd()
 		buttons.append(newf)
-	await customChoices(text, buttons)
+	await customChoices(text, buttons, null, displayText)
 	var c = globalChoice
 	globalChoice = null
 	return c
@@ -499,4 +509,15 @@ func showInfoPanel():
 func stopShowInfoPanel():
 	var l = get_node("Info")
 	l.position = Vector2(1225, 2025)
+	await disappear()
+
+func showControls():
+	var l = get_node("Info")
+	l.text = "A = Autoplay\nD = view Draw pile\nE = End turn\nI = game Info\nK = view Ko pile\nP = view Played cards\nS = view eScape pile\nT = view Tactics left\nV = view Victory pile\nSpace or Middle Mouse = Zoom in on card"
+	await appear()
+	l.position = Vector2(1000, 500)
+
+func stopShowControls():
+	var l = get_node("Info")
+	l.position = Vector2(1225, 2026)
 	await disappear()

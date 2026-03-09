@@ -8,6 +8,8 @@ var vp
 var identifier
 var tName
 var isZoomable = true
+var isMoving = false
+var moveTween
 
 var spritePath
 
@@ -22,7 +24,7 @@ const BASE_SIZE = .5
 func _ready() -> void:
 	var size = BASE_SIZE
 	self.scale = Vector2(size, size)
-	get_parent().connectCardSignals(self)
+	#get_parent().connectCardSignals(self)
 
 func initSprite(path):
 	var loadedPath = load(path)

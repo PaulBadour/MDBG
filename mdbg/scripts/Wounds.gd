@@ -27,7 +27,7 @@ func draw(send=true):
 	if $"../..".playerCount > 1 and send:
 		$"../..".socket.send_text("Wound")
 	if countLeft == 0 and $"../Scheme".sName == "The Legacy Virus":
-		$"..".lose()
+		await $"..".lose()
 	return c
 
 func updateLabel():

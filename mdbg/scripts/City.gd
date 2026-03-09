@@ -197,7 +197,7 @@ func addToCity(c):
 			#await $"../EffectManager".villain_ambush[c.getFuncName()].call()
 		if city[i] == null:
 			city[i] = c
-			c.position = calcCardPosition(i)
+			$"../PlayerHand".animateCard(c, calcCardPosition(i))
 			c.z_index = 3
 			$"../ModifierManager".applyCityPosition(i)
 			esc = false
@@ -206,24 +206,24 @@ func addToCity(c):
 		var newC = city[i]
 		city[i] = c
 		$"../ModifierManager".applyCityPosition(i)
-		c.position = calcCardPosition(i)
+		$"../PlayerHand".animateCard(c, calcCardPosition(i))
 		if i == 0:
 			c.z_index = 3
 		c = newC
 	
 	if esc:
 		$"../EscapePile".addCards(c)
-		c.position = OOS
+		$"../PlayerHand".animateCard(c, OOS)
 		if c.getFuncName() in $"../EffectManager".villain_escape.keys():
 			await $"../EffectManager".villain_escape[c.getFuncName()].call()
 		if $"..".yourTurn:
-			await $"../BlackScreen".KOfromHQ($"../EffectManager".sixCostFilter)
+			await $"../BlackScreen".KOfromHQ($"../EffectManager".sixCostFilter, "KO hero from HQ")
 
 		if c.bystanders.size() > 0:
 			for i in c.bystanders:
 				$"../EscapePile".addCards(i)
 			$"../BlackScreen".toggleLockCheck()
-			await $"../BlackScreen".chooseCardDiscard(1, 1, false)
+			await $"../BlackScreen".chooseCardDiscard(1, 1, false, "Discard 1 card from hand")
 			$"../BlackScreen".toggleLockCheck()
 	
 	if addedVil.getFuncName() in $"../EffectManager".villain_ambush.keys():
@@ -250,7 +250,6 @@ func removeVil(ind):
 		focused = null
 	foughtVil = null
 	
-
 func reveal(c):
 	var oldz = c.z_index
 	var oldScale = c.scale
@@ -277,13 +276,17 @@ func drawVilCard():
 		#print("Vil")
 		await addToCity(vc)
 	elif vc.identifier == "Twist":
-		#print("Twist!")
 		await $"../Scheme".twist()
+		if $"../Scheme".sName == "Replace Earth's Leaders with Killbots" or $"../Scheme".sName == "Portals to the Dark Dimension":
+			pass
+		else:
+			$"../KODeck".ignoreSend = true
+			$"../KODeck".addCards(vc)
 	elif vc.identifier == "Master Strike":
-		#print("Strike")
 		await $"../Mastermind".strike()
+		$"../KODeck".ignoreSend = true
+		$"../KODeck".addCards(vc)
 	elif vc.identifier == "Bystander":
-		
 		#print("Bystander")
 		addBystander(vc)
 	else:

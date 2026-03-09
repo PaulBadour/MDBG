@@ -48,7 +48,7 @@ func drawTactic():
 func removeTactic(ind):
 	tactics.pop_at(ind)
 	if tactics.size() == 0:
-		$"..".win()
+		await $"..".win()
 
 func strike():
 	$"../EffectManager".mastermind_strikes[getFuncName()].call()

@@ -7,13 +7,13 @@ const OOS = Vector2(-500, 500)
 # Good test cards:
 # High Damage: IMPOSSIBLE_TRICKSHOT
 
-var debugCards = [GameData.STEAL_ABILITIES]
+var debugCards = []
 
 func initStarterDeck():
 	var heroScene = preload("res://Scenes/Hero.tscn")
 	for i in range(8): # 8
 		var newCard = heroScene.instantiate()
-		newCard.initHero(GameData.SHIELD_OFFICER) # SHIELD_AGENT
+		newCard.initHero(GameData.SHIELD_AGENT) # SHIELD_AGENT
 		get_parent().addCardToManager(newCard)
 		addCards(newCard)
 
@@ -62,7 +62,8 @@ func resetDiscardDraw():
 
 func discardCard(card):
 	discard.insert(0, card)
-	card.position = OOS
+	#card.position = OOS
+	get_parent().animateCard(card, OOS)
 	updateDiscardCount()
 
 # This is gonna need to allow for discard shuffle mid get
@@ -79,9 +80,16 @@ func getTop(num=1):
 		var c = cards.slice(0, num)
 		return c
 	else:
-		return null
+		var c = cards.duplicate()
+		resetDiscardDraw()
+		c.append_array(cards)
+		cards = c.duplicate()
+		updateDrawCount()
+		c = cards.slice(0, num)
+		return c
 
-
+func reveal(n=1):
+	return getTop(n)
 
 func updateDiscardCount():
 	get_parent().updateDiscardCount(discard.size())

@@ -1,7 +1,7 @@
 extends Node2D
 
 const CARD_WIDTH = 190
-const HAND_Y_POS = 800
+const HAND_Y_POS = 900
 
 #const HERO_SCRIPT = preload("res://scripts/Hero.gd")
 
@@ -45,10 +45,12 @@ func _ready() -> void:
 func _input(event):
 	if event is InputEventKey and event.keycode == KEY_W and event.is_pressed() and !event.is_echo():
 		#return
+		#drawCard()
+		#print($"../KODeck".cards)
 		#$"../City".addBystander($"../Bystanders".draw())
-		#addWound(1)
-		print(classCount(GameData.Classes.STRENGTH, false))
-		print(classCount(GameData.Classes.COVERT, false))
+		addWound(1)
+		#print(classCount(GameData.Classes.STRENGTH, false))
+		#print(classCount(GameData.Classes.COVERT, false))
 		#print(deck.cards)
 
 func isCardInHand(card):
@@ -73,9 +75,12 @@ func playCard(card, copy=false):
 		return
 	
 	if !copy:
+		#$"../CardManager".highlightCard(card, false, true)
+		$"../CardManager".isHovering = false
+		$"../CardManager".cardHovering = null
 		played.insert(0, card)
 		card.position = Vector2(2000, 2000)
-		$"../CardManager".hoverOff(card)
+		
 	
 	if card.attack:
 		emit_signal("addAttack", card.attack)
@@ -83,7 +88,7 @@ func playCard(card, copy=false):
 	if card.recruit:
 		emit_signal("addRecruit", card.recruit)
 		
-	removeFromHand(card)
+	await removeFromHand(card)
 	await $"../EffectManager".effect(card)
 	cardBeingPlayed = null
 
@@ -94,28 +99,52 @@ func addCardToHand(card):
 	playerHand.insert(0, card)
 	updateHandPositions()
 
-func updateHandPositions():
+func updateHandPositions(instant = false):
 	#print("Updating hand pos")
 	for i in range(playerHand.size()):
 		var newPostition = Vector2(calcCardPosition(i), HAND_Y_POS)
 		var card = playerHand[i]
 		card.handPos = newPostition
-		animateCard(card, newPostition)
+		if instant:
+			card.position = newPostition
+		else:
+			animateCard(card, newPostition)
+		card.z_index = i+1
 
 func calcCardPosition(num):
-	var totalWidth = (handSize) * CARD_WIDTH
-	var xoffset = centerScreenx + (num * CARD_WIDTH) - totalWidth / 2.0
+	var cardsInHand = playerHand.size()
+	var avInd = (cardsInHand - 1) / 2.0
+	var indOffset = num - avInd
+	var xoffset
+	if cardsInHand <= 7:
+		xoffset = (1920 / 2.0) + (indOffset * CARD_WIDTH)
+	else:
+		var magicNumber = 3 * CARD_WIDTH
+		var newCardSize = magicNumber / avInd
+		xoffset = (1920 / 2.0) + (indOffset * newCardSize)
+	#var totalWidth = (handSize) * CARD_WIDTH
+	#var xoffset = centerScreenx + (num * CARD_WIDTH) - totalWidth / 2.0
 	return xoffset
 
 func animateCard(card, pos):
-	card.position = pos
-	return
+	#card.position = pos
+	#return
+	card.isMoving = true
+	var tween = get_tree().create_tween()
+	card.moveTween = tween
+	tween.tween_property(card, "position", pos, .1)
+	await tween.finished
+	card.isMoving = false
+	card.moveTween = null
+
+#func animateZ(card, z):
 	#var tween = get_tree().create_tween()
-	#tween.tween_property(card, "position", pos, .2)
+	#tween.tween_property(card, "z_index", z, .1)
 
 func removeFromHand(card):
 	playerHand.erase(card)
 	updateHandPositions()
+	await get_tree().create_timer(.11).timeout
 
 func discardHand():
 	while playerHand.size() > 0:
@@ -165,6 +194,9 @@ func updateDiscardCount(num=null):
 # End of turn
 func _on_button_button_down() -> void:
 	$"../CardManager".unzoomCard()
+	$"../CardManager".isHovering = false
+	$"../CardManager".cardHovering = false
+	updateHandPositions(true)
 	if !killOrRecruit:
 		#print("no kill/recruit")
 		if countWoundsInHand() > 0:
@@ -286,3 +318,4 @@ func autoplay():
 			limit += 1
 		else:
 			await playCard(playerHand[limit])
+			await get_tree().create_timer(.13).timeout

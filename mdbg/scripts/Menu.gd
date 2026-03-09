@@ -141,6 +141,13 @@ func _process(delta: float) -> void:
 						gNode.get_node("Mastermind").removeTactic(f)
 					elif packet_text.begins_with("Wound"):
 						gNode.get_node("Wounds").draw(false)
+					elif packet_text.begins_with("KO"):
+						var f = packet_text.substr(3, packet_text.length())
+						print("Code: ", f)
+						var card = GameData.generateCardFromCode(f)
+						gNode.get_node("CardManager").add_child(card)
+						gNode.get_node("KODeck").ignoreSend = true
+						gNode.get_node("KODeck").addCards(card)
 					elif packet_text.begins_with("Lock"):
 						gNode.get_node("BlackScreen").lock()
 					elif packet_text.begins_with("Unlock"):
